@@ -26,11 +26,9 @@ public class JobSeeker {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	/** First name of the job seeker */
-	private String firstName;
+	/** Full name of the job seeker */
+	private String fullName;
 	
-	/** Last name of the job seeker */
-	private String lastName;
 	
 	/** Email address, used as a login identifier */
 	private String email;
@@ -114,20 +112,14 @@ public class JobSeeker {
 		this.id = id;
 	}
 
-	public String getFirstName() {
-		return firstName;
-	}
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+	
 
-	public String getLastName() {
-		return lastName;
+	public String getFullName() {
+		return fullName;
 	}
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -295,11 +287,7 @@ public class JobSeeker {
 	public JobSeeker() {
 		super();
 	}
-
-	/**
-	 * Parameterized constructor to initialize all fields of the JobSeeker entity.
-	 */
-	public JobSeeker(int id, String firstName, String lastName, String email, String password, String confirmPassword,
+	public JobSeeker(int id, String fullName, String email, String password, String confirmPassword,
 			String mobileNumber, String address, String gender, LocalDate dateOfBirth, String profileSummary,
 			String highestEducationQualification, String yearOfPassing, String collegeName, String skills,
 			int yearsOfExperience, String resumeUrl, String githubProfileUrl, String profileImageUrl,
@@ -307,8 +295,7 @@ public class JobSeeker {
 			boolean profileComplete, LocalDateTime createdAt, LocalDateTime updatedAt) {
 		super();
 		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.email = email;
 		this.password = password;
 		this.confirmPassword = confirmPassword;
@@ -333,4 +320,9 @@ public class JobSeeker {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 	}
+
+	/**
+	 * Parameterized constructor to initialize all fields of the JobSeeker entity.
+	 */
+	
 }

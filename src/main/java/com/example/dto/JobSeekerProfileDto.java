@@ -4,82 +4,79 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object (DTO) for Job Seeker Profile.
- * Used to transfer job seeker profile data between layers.
+ * Data Transfer Object (DTO) for Job Seeker Profile. Used to transfer job
+ * seeker profile data between layers.
  */
 public class JobSeekerProfileDto {
-	
+
 	// Unique identifier for the job seeker profile
 	private int id;
-	
+
 	// Job seeker's first name
-	private String firstName;
-	
-	// Job seeker's last name
-	private String lastName;
-	
+	private String fullName;
+
 	// Job seeker's email address
 	private String email;
-	
+
 	// Job seeker's mobile phone number as String (to accommodate formatting)
 	private String mobileNumber;
-	
+
 	// Residential address of the job seeker
 	private String address;
-	
+
 	// Gender of the job seeker (e.g., Male, Female, Other)
 	private String gender;
-	
+
 	// Date of birth of the job seeker
 	private LocalDate dateOfBirth;
-	
+
 	// Brief summary or introduction of the job seeker's profile
 	private String profileSummary;
-	
+
 	// Highest education qualification (e.g., B.Tech, MBA, etc.)
 	private String highestEducationQualification;
-	
+
 	// Year of passing from the highest education institution
 	private String yearOfPassing;
-	
+
 	// Name of the college/university attended
 	private String collegeName;
-	
+
 	// Skills possessed by the job seeker (comma-separated or formatted string)
 	private String skills;
-	
+
 	// Total years of professional experience
 	private int yearsOfExperience;
-	
+
 	// URL or path to the job seeker's uploaded resume
 	private String resumeUrl;
-	
+
 	// URL to the job seeker's GitHub profile (if any)
 	private String githubProfileUrl;
-	
+
 	// URL or path to the job seeker's profile image
 	private String profileImageUrl;
-	
+
 	// Preferred location(s) where the job seeker wants to work
 	private String preferredJobLocation;
-	
+
 	// Notice period the job seeker has to serve before joining a new job
 	private String noticePeriod;
-	
+
 	// Current salary (Cost to Company) of the job seeker
 	private Double currentCtc;
-	
+
 	// Expected salary (Cost to Company) from the new job
 	private Double expectedCtc;
-	
+
 	// Flag to indicate if the profile is marked as complete
 	private boolean profileComplete;
-	
+	private LocalDateTime updatedAt;
+
 	// Timestamp when the profile was created
 	private LocalDateTime createdAt;
-	
+
 	// Timestamp when the profile was last updated
-	private LocalDateTime updatedAt;
 
 	/**
 	 * Default no-argument constructor.
@@ -92,16 +89,22 @@ public class JobSeekerProfileDto {
 	/**
 	 * Parameterized constructor to initialize all fields.
 	 */
-	public JobSeekerProfileDto(int id, String firstName, String lastName, String email, String mobileNumber,
-			String address, String gender, LocalDate dateOfBirth, String profileSummary,
-			String highestEducationQualification, String yearOfPassing, String collegeName, String skills,
-			int yearsOfExperience, String resumeUrl, String githubProfileUrl, String profileImageUrl,
-			String preferredJobLocation, String noticePeriod, Double currentCtc, Double expectedCtc,
-			boolean profileComplete, LocalDateTime createdAt, LocalDateTime updatedAt) {
+
+	// Getters and setters for all the above fields
+
+	public int getId() {
+		return id;
+	}
+
+	public JobSeekerProfileDto(int id, String fullName, String email, String mobileNumber, String address,
+			String gender, LocalDate dateOfBirth, String profileSummary, String highestEducationQualification,
+			String yearOfPassing, String collegeName, String skills, int yearsOfExperience, String resumeUrl,
+			String githubProfileUrl, String profileImageUrl, String preferredJobLocation, String noticePeriod,
+			Double currentCtc, Double expectedCtc, boolean profileComplete, LocalDateTime createdAt,
+			LocalDateTime updatedAt) {
 		super();
 		this.id = id;
-		this.firstName = firstName;
-		this.lastName = lastName;
+		this.fullName = fullName;
 		this.email = email;
 		this.mobileNumber = mobileNumber;
 		this.address = address;
@@ -125,30 +128,16 @@ public class JobSeekerProfileDto {
 		this.updatedAt = updatedAt;
 	}
 
-	// Getters and setters for all the above fields
-
-	public int getId() {
-		return id;
-	}
-
 	public void setId(int id) {
 		this.id = id;
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getLastName() {
-		return lastName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getEmail() {

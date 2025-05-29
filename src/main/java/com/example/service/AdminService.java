@@ -60,8 +60,7 @@ public class AdminService {
         List<JobSeekerProfileDto> jobSeekerProfiles = jobSeekerRepository.findAll().stream()
             .map(js -> new JobSeekerProfileDto(
                 js.getId(),
-                js.getFirstName(),
-                js.getLastName(),
+                js.getFullName(),
                 js.getEmail(),
                 js.getMobileNumber(),
                 js.getAddress(),
