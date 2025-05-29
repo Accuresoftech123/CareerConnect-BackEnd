@@ -36,8 +36,7 @@ public class JobSeekerService {
 
         // Create a new JobSeeker entity from DTO
         JobSeeker jobSeeker = new JobSeeker();
-        jobSeeker.setFirstName(newJobSeeker.getFirstName());
-        jobSeeker.setLastName(newJobSeeker.getLastName());
+        jobSeeker.setFullName(newJobSeeker.getFullName());      
         jobSeeker.setEmail(newJobSeeker.getEmail());
         jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
         jobSeeker.setPassword(newJobSeeker.getPassword());
@@ -83,8 +82,7 @@ public class JobSeekerService {
         // Proceed only if DTO contains data
         if (!isDtoEmpty(dto)) {
             // Update non-null and valid fields
-            if (dto.getFirstName() != null) jobSeeker.setFirstName(dto.getFirstName());
-            if (dto.getLastName() != null) jobSeeker.setLastName(dto.getLastName());
+            if (dto.getFullName() != null) jobSeeker.setFullName(dto.getFullName());         
             if (dto.getMobileNumber() != null) jobSeeker.setMobileNumber(dto.getMobileNumber());
             if (dto.getAddress() != null) jobSeeker.setAddress(dto.getAddress());
             if (dto.getGender() != null) jobSeeker.setGender(dto.getGender());
@@ -122,8 +120,7 @@ public class JobSeekerService {
      * @return true if empty, false otherwise
      */
     private boolean isDtoEmpty(JobSeekerProfileDto dto) {
-        return dto.getFirstName() == null &&
-               dto.getLastName() == null &&
+        return dto.getFullName() == null &&          
                dto.getMobileNumber() == null &&
                dto.getAddress() == null &&
                dto.getGender() == null &&
