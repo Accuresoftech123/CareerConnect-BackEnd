@@ -59,29 +59,8 @@ public class AdminService {
         // Convert each JobSeeker entity to a JobSeekerProfileDto
         List<JobSeekerProfileDto> jobSeekerProfiles = jobSeekerRepository.findAll().stream()
             .map(js -> new JobSeekerProfileDto(
-                js.getId(),
-                js.getFullName(),
-                js.getEmail(),
-                js.getMobileNumber(),
-                js.getAddress(),
-                js.getGender(),
-                js.getDateOfBirth(),
-                js.getProfileSummary(),
-                js.getHighestEducationQualification(),
-                js.getYearOfPassing(),
-                js.getCollegeName(),
-                js.getSkills(),
-                js.getYearsOfExperience(),
-                js.getResumeUrl(),
-                js.getGithubProfileUrl(),
-                js.getProfileImageUrl(),
-                js.getPreferredJobLocation(),
-                js.getNoticePeriod(),
-                js.getCurrentCtc(),
-                js.getExpectedCtc(),
-                js.isProfileComplete(),
-                js.getCreatedAt(),
-                js.getUpdatedAt()
+              
+              
             ))
             .collect(Collectors.toList());
 

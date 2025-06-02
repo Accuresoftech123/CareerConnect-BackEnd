@@ -1,12 +1,21 @@
 package com.example.entity;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.List;
 
+import com.example.entity.profile.Education;
+import com.example.entity.profile.Experience;
+import com.example.entity.profile.JobPreferences;
+import com.example.entity.profile.JobSeekerPersonalInfo;
+import com.example.entity.profile.SocialProfile;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -33,6 +42,9 @@ public class JobSeeker {
 	/** Email address, used as a login identifier */
 	private String email;
 	
+	/** Mobile phone number */
+	private String mobileNumber;
+	
 	/** Password for authentication */
 	private String password;
 
@@ -42,287 +54,207 @@ public class JobSeeker {
 	 */
 	@Transient
 	private String confirmPassword;
+	
+	
+	
+	// personalInfo
+	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
+	private JobSeekerPersonalInfo personalInfo;
+	
+	//education
+	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
+	private List<Education> educationList;
+	
+	// experience
+	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
+	private List<Experience> experienceList;
+	
+	//skills
+	@ElementCollection
+	private List<String> skills;
+	
+	//social profile
+	@OneToOne(mappedBy = "jobSeeker" , cascade = CascadeType.ALL)
+	private SocialProfile socialProfile;
+	
+	//jobpreference
+	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
+	private JobPreferences jobPrefeences;
+	
+	
 
-	/** Mobile phone number */
-	private String mobileNumber;
-	
-	/** Residential or mailing address */
-	private String address;
-	
-	/** Gender of the job seeker */
-	private String gender;
-	
-	/** Date of birth */
-	private LocalDate dateOfBirth;
+	public JobSeeker() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
-	/** Short summary or bio of the job seeker */
-	private String profileSummary;
-	
-	/** Highest educational qualification attained */
-	private String highestEducationQualification;
-	
-	/** Year of passing or graduation */
-	private String yearOfPassing;
-	
-	/** Name of the college/university attended */
-	private String collegeName;
-	
-	/** Skills possessed by the job seeker (comma separated) */
-	private String skills;
-	
-	/** Number of years of professional experience */
-	private int yearsOfExperience;
-	
-	/** URL link to the uploaded resume document */
-	private String resumeUrl;
-	
-	/** URL of GitHub profile */
-	private String githubProfileUrl;
 
-	/** URL to the profile image */
-	private String profileImageUrl;
-	
-	/** Preferred job location (city or region) */
-	private String preferredJobLocation;
-	
-	/** Notice period required before joining a new job */
-	private String noticePeriod;
-	
-	/** Current annual salary (CTC) in numeric form */
-	private Double currentCtc;
-	
-	/** Expected annual salary (CTC) in numeric form */
-	private Double expectedCtc;
 
-	/** Indicates if the profile is complete or still in progress */
-	private boolean profileComplete;
+	public JobSeeker(int id, String fullName, String email, String mobileNumber, String password,
+			String confirmPassword, JobSeekerPersonalInfo personalInfo, List<Education> educationList,
+			List<Experience> experienceList, List<String> skills, SocialProfile socialProfile,
+			JobPreferences jobPrefeences) {
+		super();
+		this.id = id;
+		this.fullName = fullName;
+		this.email = email;
+		this.mobileNumber = mobileNumber;
+		this.password = password;
+		this.confirmPassword = confirmPassword;
+		this.personalInfo = personalInfo;
+		this.educationList = educationList;
+		this.experienceList = experienceList;
+		this.skills = skills;
+		this.socialProfile = socialProfile;
+		this.jobPrefeences = jobPrefeences;
+	}
 
-	/** Timestamp when the profile was created */
-	private LocalDateTime createdAt;
-	
-	/** Timestamp when the profile was last updated */
-	private LocalDateTime updatedAt;
 
-	// Getter and Setter methods for each field
 
 	public int getId() {
 		return id;
 	}
+
+
+
 	public void setId(int id) {
 		this.id = id;
 	}
 
-	
+
 
 	public String getFullName() {
 		return fullName;
 	}
+
+
+
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
+
+
+
 	public String getEmail() {
 		return email;
 	}
+
+
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
 
-	public String getPassword() {
-		return password;
-	}
-	public void setPassword(String password) {
-		this.password = password;
-	}
 
-	public String getConfirmPassword() {
-		return confirmPassword;
-	}
-	public void setConfirmPassword(String confirmPassword) {
-		this.confirmPassword = confirmPassword;
-	}
 
 	public String getMobileNumber() {
 		return mobileNumber;
 	}
+
+
+
 	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
 
-	public String getAddress() {
-		return address;
-	}
-	public void setAddress(String address) {
-		this.address = address;
+
+
+	public String getPassword() {
+		return password;
 	}
 
-	public String getGender() {
-		return gender;
-	}
-	public void setGender(String gender) {
-		this.gender = gender;
+
+
+	public void setPassword(String password) {
+		this.password = password;
 	}
 
-	public LocalDate getDateOfBirth() {
-		return dateOfBirth;
-	}
-	public void setDateOfBirth(LocalDate dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
+
+
+	public String getConfirmPassword() {
+		return confirmPassword;
 	}
 
-	public String getProfileSummary() {
-		return profileSummary;
-	}
-	public void setProfileSummary(String profileSummary) {
-		this.profileSummary = profileSummary;
+
+
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
-	public String getHighestEducationQualification() {
-		return highestEducationQualification;
-	}
-	public void setHighestEducationQualification(String highestEducationQualification) {
-		this.highestEducationQualification = highestEducationQualification;
+
+
+	public JobSeekerPersonalInfo getPersonalInfo() {
+		return personalInfo;
 	}
 
-	public String getYearOfPassing() {
-		return yearOfPassing;
-	}
-	public void setYearOfPassing(String yearOfPassing) {
-		this.yearOfPassing = yearOfPassing;
+
+
+	public void setPersonalInfo(JobSeekerPersonalInfo personalInfo) {
+		this.personalInfo = personalInfo;
 	}
 
-	public String getCollegeName() {
-		return collegeName;
-	}
-	public void setCollegeName(String collegeName) {
-		this.collegeName = collegeName;
+
+
+	public List<Education> getEducationList() {
+		return educationList;
 	}
 
-	public String getSkills() {
+
+
+	public void setEducationList(List<Education> educationList) {
+		this.educationList = educationList;
+	}
+
+
+
+	public List<Experience> getExperienceList() {
+		return experienceList;
+	}
+
+
+
+	public void setExperienceList(List<Experience> experienceList) {
+		this.experienceList = experienceList;
+	}
+
+
+
+	public List<String> getSkills() {
 		return skills;
 	}
-	public void setSkills(String skills) {
+
+
+
+	public void setSkills(List<String> skills) {
 		this.skills = skills;
 	}
 
-	public int getYearsOfExperience() {
-		return yearsOfExperience;
-	}
-	public void setYearsOfExperience(int yearsOfExperience) {
-		this.yearsOfExperience = yearsOfExperience;
+
+
+	public SocialProfile getSocialProfile() {
+		return socialProfile;
 	}
 
-	public String getResumeUrl() {
-		return resumeUrl;
-	}
-	public void setResumeUrl(String resumeUrl) {
-		this.resumeUrl = resumeUrl;
+
+
+	public void setSocialProfile(SocialProfile socialProfile) {
+		this.socialProfile = socialProfile;
 	}
 
-	public String getGithubProfileUrl() {
-		return githubProfileUrl;
-	}
-	public void setGithubProfileUrl(String githubProfileUrl) {
-		this.githubProfileUrl = githubProfileUrl;
+
+
+	public JobPreferences getJobPrefeences() {
+		return jobPrefeences;
 	}
 
-	public String getProfileImageUrl() {
-		return profileImageUrl;
-	}
-	public void setProfileImageUrl(String profileImageUrl) {
-		this.profileImageUrl = profileImageUrl;
+
+
+	public void setJobPrefeences(JobPreferences jobPrefeences) {
+		this.jobPrefeences = jobPrefeences;
 	}
 
-	public String getPreferredJobLocation() {
-		return preferredJobLocation;
-	}
-	public void setPreferredJobLocation(String preferredJobLocation) {
-		this.preferredJobLocation = preferredJobLocation;
-	}
-
-	public String getNoticePeriod() {
-		return noticePeriod;
-	}
-	public void setNoticePeriod(String noticePeriod) {
-		this.noticePeriod = noticePeriod;
-	}
-
-	public Double getCurrentCtc() {
-		return currentCtc;
-	}
-	public void setCurrentCtc(Double currentCtc) {
-		this.currentCtc = currentCtc;
-	}
-
-	public Double getExpectedCtc() {
-		return expectedCtc;
-	}
-	public void setExpectedCtc(Double expectedCtc) {
-		this.expectedCtc = expectedCtc;
-	}
-
-	public boolean isProfileComplete() {
-		return profileComplete;
-	}
-	public void setProfileComplete(boolean profileComplete) {
-		this.profileComplete = profileComplete;
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
-	}
-
-	public LocalDateTime getUpdatedAt() {
-		return updatedAt;
-	}
-	public void setUpdatedAt(LocalDateTime updatedAt) {
-		this.updatedAt = updatedAt;
-	}
-
-	/**
-	 * Default no-argument constructor.
-	 */
-	public JobSeeker() {
-		super();
-	}
-	public JobSeeker(int id, String fullName, String email, String password, String confirmPassword,
-			String mobileNumber, String address, String gender, LocalDate dateOfBirth, String profileSummary,
-			String highestEducationQualification, String yearOfPassing, String collegeName, String skills,
-			int yearsOfExperience, String resumeUrl, String githubProfileUrl, String profileImageUrl,
-			String preferredJobLocation, String noticePeriod, Double currentCtc, Double expectedCtc,
-			boolean profileComplete, LocalDateTime createdAt, LocalDateTime updatedAt) {
-		super();
-		this.id = id;
-		this.fullName = fullName;
-		this.email = email;
-		this.password = password;
-		this.confirmPassword = confirmPassword;
-		this.mobileNumber = mobileNumber;
-		this.address = address;
-		this.gender = gender;
-		this.dateOfBirth = dateOfBirth;
-		this.profileSummary = profileSummary;
-		this.highestEducationQualification = highestEducationQualification;
-		this.yearOfPassing = yearOfPassing;
-		this.collegeName = collegeName;
-		this.skills = skills;
-		this.yearsOfExperience = yearsOfExperience;
-		this.resumeUrl = resumeUrl;
-		this.githubProfileUrl = githubProfileUrl;
-		this.profileImageUrl = profileImageUrl;
-		this.preferredJobLocation = preferredJobLocation;
-		this.noticePeriod = noticePeriod;
-		this.currentCtc = currentCtc;
-		this.expectedCtc = expectedCtc;
-		this.profileComplete = profileComplete;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
-	}
-
-	/**
-	 * Parameterized constructor to initialize all fields of the JobSeeker entity.
-	 */
+	
+	
+	
 	
 }
