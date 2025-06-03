@@ -58,15 +58,15 @@ public class JobSeeker {
 	
 	
 	// personalInfo
-	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
 	private JobSeekerPersonalInfo personalInfo;
 	
 	//education
-	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
 	private List<Education> educationList;
 	
 	// experience
-	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
 	private List<Experience> experienceList;
 	
 	//skills
@@ -74,11 +74,11 @@ public class JobSeeker {
 	private List<String> skills;
 	
 	//social profile
-	@OneToOne(mappedBy = "jobSeeker" , cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(mappedBy = "jobSeeker" , cascade = CascadeType.ALL)
 	private SocialProfile socialProfile;
 	
 	//jobpreference
-	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToOne(mappedBy = "jobSeeker" ,cascade = CascadeType.ALL)
 	private JobPreferences jobPrefeences;
 	
 	
