@@ -9,7 +9,10 @@ import java.util.List;
  * seeker profile data between layers.
  */
 public class JobSeekerProfileDto {
-	
+	private int id;
+	private String fullName; // Job seeker's Full name
+	private String email; // Job seeker's email address
+	private String mobileNumber;
 	private JobSeekerPersonalInfoDto personalInfo;
 	private List<JobSeekerEducationDto> educationList;
 	private List<JobSeekerExperienceDto> experienceList;
@@ -20,10 +23,18 @@ public class JobSeekerProfileDto {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public JobSeekerProfileDto(JobSeekerPersonalInfoDto personalInfo, List<JobSeekerEducationDto> educationList,
+
+	
+
+	public JobSeekerProfileDto(int id, String fullName, String email, String mobileNumber,
+			JobSeekerPersonalInfoDto personalInfo, List<JobSeekerEducationDto> educationList,
 			List<JobSeekerExperienceDto> experienceList, List<String> skills, JobSeekerJonPreferencesDto jobPreferences,
 			JobSeekerSocialProfileDto scoicalProfile) {
 		super();
+		this.id = id;
+		this.fullName = fullName;
+		this.email = email;
+		this.mobileNumber = mobileNumber;
 		this.personalInfo = personalInfo;
 		this.educationList = educationList;
 		this.experienceList = experienceList;
@@ -31,6 +42,9 @@ public class JobSeekerProfileDto {
 		this.jobPreferences = jobPreferences;
 		this.scoicalProfile = scoicalProfile;
 	}
+
+
+
 	public JobSeekerPersonalInfoDto getPersonalInfo() {
 		return personalInfo;
 	}
@@ -67,6 +81,56 @@ public class JobSeekerProfileDto {
 	public void setScoicalProfile(JobSeekerSocialProfileDto scoicalProfile) {
 		this.scoicalProfile = scoicalProfile;
 	}
+
+
+
+	public int getId() {
+		return id;
+	}
+
+
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+
+
+	public String getFullName() {
+		return fullName;
+	}
+
+
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+
+
+	public String getEmail() {
+		return email;
+	}
+
+
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+
+
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+
+	
 
 	
 
