@@ -11,6 +11,7 @@ import jakarta.persistence.Transient;
 public class JobSeekerRegistrationDto {
 
 	// Basic personal information fields
+	private int id;
 	private String fullName; // Job seeker's Full name
 	private String email; // Job seeker's email address
 	private String mobileNumber; // Job seeker's contact mobile number
@@ -32,9 +33,10 @@ public class JobSeekerRegistrationDto {
 	/**
 	 * Parameterized constructor to initialize all fields of the DTO.
 	 */
-	public JobSeekerRegistrationDto(String fullName, String email, String mobileNumber, String password,
+	public JobSeekerRegistrationDto(int id, String fullName, String email, String mobileNumber, String password,
 			String confirmPassword) {
 		super();
+		this.id = id;
 		this.fullName = fullName;
 		this.email = email;
 		this.mobileNumber = mobileNumber;
@@ -43,10 +45,21 @@ public class JobSeekerRegistrationDto {
 	}
 
 	// Getter and Setter methods for all fields below
+	
+	
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getFullName() {
 		return fullName;
 	}
 
+	
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}

@@ -1,6 +1,5 @@
 package com.example.service;
 
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,230 +28,200 @@ import com.example.repository.JobSeekerRepository;
 @Service
 public class JobSeekerService {
 
-    @Autowired
-    private JobSeekerRepository repo;
+	@Autowired
+	private JobSeekerRepository repo;
 
-    /**
-     * Registers a new job seeker if the email is not already taken.
-     *
-     * @param newJobSeeker the registration details of the new job seeker
-     * @return message indicating registration success or failure
-     */
-    public String register(JobSeekerRegistrationDto newJobSeeker) {
-        // Check if a JobSeeker with the given email already exists
-        Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
+	/**
+	 * Registers a new job seeker if the email is not already taken.
+	 *
+	 * @param newJobSeeker the registration details of the new job seeker
+	 * @return message indicating registration success or failure
+	 */
+	public String register(JobSeekerRegistrationDto newJobSeeker) {
+		// Check if a JobSeeker with the given email already exists
+		Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
 
-        if (existing.isPresent()) {
-            return "Email already registered!";
-        }
+		if (existing.isPresent()) {
+			return "Email already registered!";
+		}
 
-        // Create a new JobSeeker entity from DTO
-        JobSeeker jobSeeker = new JobSeeker();
-        jobSeeker.setFullName(newJobSeeker.getFullName());      
-        jobSeeker.setEmail(newJobSeeker.getEmail());
-        jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-        jobSeeker.setPassword(newJobSeeker.getPassword());
-        jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
-       
+		// Create a new JobSeeker entity from DTO
+		JobSeeker jobSeeker = new JobSeeker();
+		jobSeeker.setFullName(newJobSeeker.getFullName());
+		jobSeeker.setEmail(newJobSeeker.getEmail());
+		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
+		jobSeeker.setPassword(newJobSeeker.getPassword());
+		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
 
-        repo.save(jobSeeker);
-        return "Registration successful!";
-    }
+		repo.save(jobSeeker);
+		return "Registration successful!";
+	}
 
-    /**
-     * Validates login credentials.
-     *
-     * @param email    the email address
-     * @param password the password
-     * @return JobSeeker object if login is successful, otherwise null
-     */
-    public JobSeeker login(String email, String password) {
-        // Find JobSeeker by email
-        JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
-        
-        // Verify password match
-        if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
-            return existingJobSeeker;
-        }
-        return null;
-    }
-    
-    
-    // update jobseeker profile
-    
-    public String updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
-    
-    	JobSeeker jobSeeker = repo.findById(id).orElse(null);
+	/**
+	 * Validates login credentials.
+	 *
+	 * @param email    the email address
+	 * @param password the password
+	 * @return JobSeeker object if login is successful, otherwise null
+	 */
+	public JobSeeker login(String email, String password) {
+		// Find JobSeeker by email
+		JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
 
-         	if(jobSeeker == null) {
-         		
-         		return "Job Seeker not found with ID: " + id;
-         	}
-         	
-         // update personal info
-         	JobSeekerPersonalInfoDto personalInfoDto = dto.getPersonalInfo();
-         	
-         	if(personalInfoDto != null) {
-         		
-         		JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
-         		
-         		// check if the personalInfo is null , then create new object
-         		if(personalInfo == null) {
-         			personalInfo = new JobSeekerPersonalInfo();
-         		}
-         		
-         		personalInfo.setCity(personalInfoDto.getCity());
-         		personalInfo.setState(personalInfoDto.getState());
-         		personalInfo.setCountry(personalInfoDto.getCountry());
-         		personalInfo.setResumeUrl(personalInfoDto.getResumeUrl());
-         		personalInfo.setIntroVideoUrl(personalInfoDto.getIntroVideoUrl());
-         		personalInfo.setProfileImageUrl(personalInfoDto.getProfileImageUrl());
-         		personalInfo.setJobSeeker(jobSeeker);
-         		
-         		jobSeeker.setPersonalInfo(personalInfo);
-         		
-         	}
-         	
-         	
-         	// update education
-         	
-         	// seperate the educationdto from profile dto
-         	List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
-         
-    		if(educationDtoList != null) {
-    			
-    			// store the new education object
-    			List<Education> updateEducations = new ArrayList<>();
-    			
-    			for(JobSeekerEducationDto num : educationDtoList) {
-    				
-    				Education education = new Education();
-    				
-    				
-    				// create object or save each object of education
-    				education.setDegree(num.getDegree());
-    				education.setFieldOfStudy(num.getFieldOfStudy());
-    				education.setInstitution(num.getInstitution());
-    				education.setPassingYear(num.getPassingYear());
-    				education.setJobSeeker(jobSeeker);
-    				
-    				//add education object in array list
-    				
-    				updateEducations.add(education);
-    			}
-    			
-    			   jobSeeker.setEducationList(updateEducations);   
-    			
-    		}
-    		
-    		
-    		//update experience
-    		
-    		
-    		List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
-    		
-    		if(experienceDtoList != null) {
-    			
-    			// store the new experience object
-    			List<Experience> updateExperienceList = new ArrayList<>();
-    			
-    			for(JobSeekerExperienceDto num : experienceDtoList) {
-    				
-    				//create object of experience to access the data
-        			Experience experience = new Experience();
-        			
-        			experience.setCompanyName(num.getCompanyName());
-        			experience.setStartDate(num.getStartDate());
-        			experience.setEndDate(num.getEndDate());
-        			experience.setKeyResponsibilities(num.getKeyResponsibilities());
-        			experience.setJobSeeker(jobSeeker);
-        			
-        			
-        			updateExperienceList.add(experience);
-    				
-    			}
-    			
-    			jobSeeker.setExperienceList(updateExperienceList);
-    		}
-    		
-    		
-    		// update skills
-    		
-    		List<String> skills = dto.getSkills();
-    		
-    		if(skills != null) {
-    			jobSeeker.setSkills(skills);
-    		}
-    		
-    		
-    		//update social media
-    		
-    		JobSeekerSocialProfileDto socialProfileDto = dto.getScoicalProfile();
-    		
-    		if(socialProfileDto != null) {
-    			
-    			SocialProfile socialProfile = jobSeeker.getSocialProfile();
-    			// null check and initialization for socialprofile
-    			
-    			if(socialProfile == null) {
-    				socialProfile = new SocialProfile();
-    			}
-    			
-    			socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
-    			socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
-    			socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
-    			socialProfile.setJobSeeker(jobSeeker);
-    			
-    			jobSeeker.setSocialProfile(socialProfile);
-    		}
-    		
-    		
-    		// update job preferences
-    		
-    		JobSeekerJonPreferencesDto preferencesDto = dto.getJobPreferences();
-    		
-    		
-    		if(preferencesDto != null) {
-    			
-    			// null check and intilization for job preference
-    			JobPreferences preferences = jobSeeker.getJobPrefeences();
-    			if(preferences == null) {
-    				preferences = new JobPreferences();
-    			}
-    			
-    			preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
-    			preferences.setJobType(preferencesDto.getJobType());
-    			preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
-    			preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
-    			preferences.setJobSeeker(jobSeeker);
-    			
-    			jobSeeker.setJobPrefeences(preferences);
-    		}
-    		
-    		
-    		repo.save(jobSeeker);
-    		
-    		return "Profile updated successfully";
-    	}
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+		// Verify password match
+		if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
+			return existingJobSeeker;
+		}
+		return null;
+	}
+
+	// update jobseeker profile
+
+	public String updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
+
+		JobSeeker jobSeeker = repo.findById(id).orElse(null);
+
+		if (jobSeeker == null) {
+
+			return "Job Seeker not found with ID: " + id;
+		}
+
+		// update personal info
+		JobSeekerPersonalInfoDto personalInfoDto = dto.getPersonalInfo();
+
+		if (personalInfoDto != null) {
+
+			JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
+
+			// check if the personalInfo is null , then create new object
+			if (personalInfo == null) {
+				personalInfo = new JobSeekerPersonalInfo();
+			}
+
+			personalInfo.setCity(personalInfoDto.getCity());
+			personalInfo.setState(personalInfoDto.getState());
+			personalInfo.setCountry(personalInfoDto.getCountry());
+			personalInfo.setResumeUrl(personalInfoDto.getResumeUrl());
+			personalInfo.setIntroVideoUrl(personalInfoDto.getIntroVideoUrl());
+			personalInfo.setProfileImageUrl(personalInfoDto.getProfileImageUrl());
+			personalInfo.setJobSeeker(jobSeeker);
+
+			jobSeeker.setPersonalInfo(personalInfo);
+
+		}
+
+		// update education
+
+		// seperate the educationdto from profile dto
+		List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
+
+		if (educationDtoList != null) {
+
+			// store the new education object
+			List<Education> updateEducations = new ArrayList<>();
+
+			for (JobSeekerEducationDto num : educationDtoList) {
+
+				Education education = new Education();
+
+				// create object or save each object of education
+				education.setDegree(num.getDegree());
+				education.setFieldOfStudy(num.getFieldOfStudy());
+				education.setInstitution(num.getInstitution());
+				education.setPassingYear(num.getPassingYear());
+				education.setJobSeeker(jobSeeker);
+
+				// add education object in array list
+
+				updateEducations.add(education);
+			}
+
+			jobSeeker.setEducationList(updateEducations);
+
+		}
+
+		// update experience
+
+		List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
+
+		if (experienceDtoList != null) {
+
+			// store the new experience object
+			List<Experience> updateExperienceList = new ArrayList<>();
+
+			for (JobSeekerExperienceDto num : experienceDtoList) {
+
+				// create object of experience to access the data
+				Experience experience = new Experience();
+
+				experience.setCompanyName(num.getCompanyName());
+				experience.setStartDate(num.getStartDate());
+				experience.setEndDate(num.getEndDate());
+				experience.setKeyResponsibilities(num.getKeyResponsibilities());
+				experience.setJobSeeker(jobSeeker);
+				experience.setJobTitle(num.getJobTitle());
+
+				updateExperienceList.add(experience);
+
+			}
+
+			jobSeeker.setExperienceList(updateExperienceList);
+		}
+
+		// update skills
+
+		List<String> skills = dto.getSkills();
+
+		if (skills != null) {
+			jobSeeker.setSkills(skills);
+		}
+
+		// update social media
+
+		JobSeekerSocialProfileDto socialProfileDto = dto.getScoicalProfile();
+
+		if (socialProfileDto != null) {
+
+			SocialProfile socialProfile = jobSeeker.getSocialProfile();
+			// null check and initialization for socialprofile
+
+			if (socialProfile == null) {
+				socialProfile = new SocialProfile();
+			}
+
+			socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
+			socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
+			socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
+			socialProfile.setJobSeeker(jobSeeker);
+
+			jobSeeker.setSocialProfile(socialProfile);
+		}
+
+		// update job preferences
+
+		JobSeekerJonPreferencesDto preferencesDto = dto.getJobPreferences();
+
+		if (preferencesDto != null) {
+
+			// null check and intilization for job preference
+			JobPreferences preferences = jobSeeker.getJobPrefeences();
+			if (preferences == null) {
+				preferences = new JobPreferences();
+			}
+
+			preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
+			preferences.setJobType(preferencesDto.getJobType());
+			preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
+			preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
+			preferences.setJobSeeker(jobSeeker);
+
+			jobSeeker.setJobPrefeences(preferences);
+		}
+
+		repo.save(jobSeeker);
+
+		return "Profile updated successfully";
+	}
 
 //    /**
 //     * Updates an existing job seeker's profile with the provided data.
