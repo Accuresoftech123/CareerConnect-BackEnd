@@ -1,6 +1,7 @@
 package com.example.service;
 
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -101,12 +102,12 @@ public class JobSeekerService {
          			personalInfo = new JobSeekerPersonalInfo();
          		}
          		
-         		personalInfo.setCity(personalInfoDto.getCity());
-         		personalInfo.setState(personalInfoDto.getState());
-         		personalInfo.setCountry(personalInfoDto.getCountry());
-         		personalInfo.setResumeUrl(personalInfoDto.getResumeUrl());
-         		personalInfo.setIntroVideoUrl(personalInfoDto.getIntroVideoUrl());
-         		personalInfo.setProfileImageUrl(personalInfoDto.getProfileImageUrl());
+         		if(personalInfoDto.getCity() != null) personalInfo.setCity(personalInfoDto.getCity());
+         		if(personalInfoDto.getState() != null) personalInfo.setState(personalInfoDto.getState());
+         		if(personalInfoDto.getCountry() != null) personalInfo.setCountry(personalInfoDto.getCountry());
+         		if(personalInfoDto.getResumeUrl() != null) personalInfo.setResumeUrl(personalInfoDto.getResumeUrl());
+         		if(personalInfoDto.getIntroVideoUrl() != null) personalInfo.setIntroVideoUrl(personalInfoDto.getIntroVideoUrl());
+         		if(personalInfoDto.getProfileImageUrl() != null) personalInfo.setProfileImageUrl(personalInfoDto.getProfileImageUrl());
          		personalInfo.setJobSeeker(jobSeeker);
          		
          		jobSeeker.setPersonalInfo(personalInfo);
@@ -130,10 +131,12 @@ public class JobSeekerService {
     				
     				
     				// create object or save each object of education
-    				education.setDegree(num.getDegree());
-    				education.setFieldOfStudy(num.getFieldOfStudy());
-    				education.setInstitution(num.getInstitution());
-    				education.setPassingYear(num.getPassingYear());
+    				if(num.getDegree() != null) education.setDegree(num.getDegree());
+    				if(num.getFieldOfStudy() != null) education.setFieldOfStudy(num.getFieldOfStudy());
+    				if(num.getInstitution() != null) education.setInstitution(num.getInstitution());
+    				if (num.getPassingYear() != null && num.getPassingYear() >= 1950) {
+    	                education.setPassingYear(num.getPassingYear());
+    	            }
     				education.setJobSeeker(jobSeeker);
     				
     				//add education object in array list
@@ -161,10 +164,15 @@ public class JobSeekerService {
     				//create object of experience to access the data
         			Experience experience = new Experience();
         			
-        			experience.setCompanyName(num.getCompanyName());
-        			experience.setStartDate(num.getStartDate());
-        			experience.setEndDate(num.getEndDate());
-        			experience.setKeyResponsibilities(num.getKeyResponsibilities());
+        			if(num.getJobTitle() != null) experience.setJobTitle(num.getJobTitle());
+        			if(num.getCompanyName() != null) experience.setCompanyName(num.getCompanyName());
+        			if(num.getStartDate() != null) experience.setStartDate(num.getStartDate());
+        			if(num.getEndDate() != null) { 
+        				experience.setEndDate(num.getEndDate());
+        			}else {
+        				experience.setEndDate(LocalDate.now());
+        			}	
+        			if(num.getKeyResponsibilities() != null) experience.setKeyResponsibilities(num.getKeyResponsibilities());
         			experience.setJobSeeker(jobSeeker);
         			
         			
@@ -180,8 +188,23 @@ public class JobSeekerService {
     		
     		List<String> skills = dto.getSkills();
     		
-    		if(skills != null) {
-    			jobSeeker.setSkills(skills);
+    		if(skills != null && !skills.isEmpty()) {
+    			
+    			List<String> existingSkills = jobSeeker.getSkills();
+    			
+    			if(existingSkills == null) {
+    				
+    				existingSkills = new ArrayList<>();
+    			}
+    			
+    			for(String skill : skills) {
+    				
+    				if(skill != null && !existingSkills.contains(skill) ) {
+    					existingSkills.add(skill);
+    				}
+    			}
+    			
+    			jobSeeker.setSkills(existingSkills);
     		}
     		
     		
@@ -198,9 +221,9 @@ public class JobSeekerService {
     				socialProfile = new SocialProfile();
     			}
     			
-    			socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
-    			socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
-    			socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
+    			if(socialProfileDto.getLinkedinUrl() != null) socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
+    			if(socialProfileDto.getGithubUrl() != null) socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
+    			if(socialProfileDto.getPortfolioWebsite() != null) socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
     			socialProfile.setJobSeeker(jobSeeker);
     			
     			jobSeeker.setSocialProfile(socialProfile);
@@ -220,10 +243,10 @@ public class JobSeekerService {
     				preferences = new JobPreferences();
     			}
     			
-    			preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
-    			preferences.setJobType(preferencesDto.getJobType());
-    			preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
-    			preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
+    			if(preferencesDto.getDesiredJobTitle() != null) preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
+    			if(preferencesDto.getJobType() != null)preferences.setJobType(preferencesDto.getJobType());
+    			if(preferencesDto.getExpectedSalary() != 0)preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
+    			if(preferencesDto.getPreferredLocation() != null) preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
     			preferences.setJobSeeker(jobSeeker);
     			
     			jobSeeker.setJobPrefeences(preferences);
