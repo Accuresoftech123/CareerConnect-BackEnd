@@ -2,6 +2,8 @@ package com.example.service;
 
 
 import java.time.LocalDate;
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +31,7 @@ import com.example.repository.JobSeekerRepository;
  */
 @Service
 public class JobSeekerService {
+
 
     @Autowired
     private JobSeekerRepository repo;
@@ -276,6 +279,8 @@ public class JobSeekerService {
     
     
     
+
+
 
 //    /**
 //     * Updates an existing job seeker's profile with the provided data.

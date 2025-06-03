@@ -4,7 +4,12 @@ package com.example.controller;
 import com.example.service.AdminService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -40,8 +45,9 @@ public class AdminController {
      * Returns a detailed report of all job seekers along with the total count.
      */
     @GetMapping("/jobseekers/report")
-    public Map<String, Object> getJobSeekerReport() {
-        return adminService.getJobSeekersReportWithCount();
+    public ResponseEntity<Map<String, Object>> getJobSeekersReport() {
+        Map<String, Object> report = adminService.getJobSeekersReportWithCount();
+        return ResponseEntity.ok(report);
     }
 
     /**
@@ -51,4 +57,17 @@ public class AdminController {
     public Map<String, Object> getRecruiterReport() {
         return adminService.getRecruitersReportWithCount();
     }
+    
+    @DeleteMapping("delete/{id}")
+    public ResponseEntity<String> deleteJobSeeker(@PathVariable int id) {
+        try {
+        	adminService.deleteJobSeekerById(id);
+            return ResponseEntity.ok("JobSeeker and related data deleted successfully.");
+        } catch (EmptyResultDataAccessException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("JobSeeker with ID " + id + " not found.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while deleting.");
+        }
+    }
+
 }
