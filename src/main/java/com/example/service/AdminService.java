@@ -3,6 +3,7 @@ package com.example.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,10 +18,12 @@ import com.example.dto.JobSeekerProfileDto;
 import com.example.dto.JobSeekerSocialProfileDto;
 import com.example.dto.RecruiterProfileDto;
 import com.example.entity.JobSeeker;
+import com.example.entity.Recruiter;
 import com.example.entity.profile.Education;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.example.enums.Status;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
 
@@ -78,22 +81,15 @@ public class AdminService {
 			// Personal Info
 			if (jobSeeker.getPersonalInfo() != null) {
 				JobSeekerPersonalInfo pi = jobSeeker.getPersonalInfo();
-				dto.setPersonalInfo(new JobSeekerPersonalInfoDto(pi.getProfileImageUrl(), 
-						pi.getCity(),
-						pi.getState(),
-						pi.getCountry(), 
-						pi.getResumeUrl(), 
-						pi.getIntroVideoUrl()));
+				dto.setPersonalInfo(new JobSeekerPersonalInfoDto(pi.getProfileImageUrl(), pi.getCity(), pi.getState(),
+						pi.getCountry(), pi.getResumeUrl(), pi.getIntroVideoUrl()));
 			}
 
 			// Education List
 			if (jobSeeker.getEducationList() != null) {
 				List<JobSeekerEducationDto> educationDtos = jobSeeker
-						.getEducationList().stream().map(edu -> new JobSeekerEducationDto(
-								edu.getDegree(),
-								edu.getFieldOfStudy(),
-								edu.getInstitution(), 
-								edu.getPassingYear()))
+						.getEducationList().stream().map(edu -> new JobSeekerEducationDto(edu.getDegree(),
+								edu.getFieldOfStudy(), edu.getInstitution(), edu.getPassingYear()))
 						.collect(Collectors.toList());
 				dto.setEducationList(educationDtos);
 			}
@@ -101,12 +97,8 @@ public class AdminService {
 			// Experience List
 			if (jobSeeker.getExperienceList() != null) {
 				List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
-						.map(exp -> new JobSeekerExperienceDto(
-								exp.getJobTitle(),
-								exp.getCompanyName(),
-								exp.getStartDate(),
-								exp.getEndDate(),
-								exp.getKeyResponsibilities()))
+						.map(exp -> new JobSeekerExperienceDto(exp.getJobTitle(), exp.getCompanyName(),
+								exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities()))
 						.collect(Collectors.toList());
 				dto.setExperienceList(experienceDtos);
 			}
@@ -117,20 +109,15 @@ public class AdminService {
 			// Social Profile
 			if (jobSeeker.getSocialProfile() != null) {
 				SocialProfile social = jobSeeker.getSocialProfile();
-				dto.setScoicalProfile(new JobSeekerSocialProfileDto(
-						social.getLinkedinUrl(), 
-						social.getGithubUrl(),
+				dto.setScoicalProfile(new JobSeekerSocialProfileDto(social.getLinkedinUrl(), social.getGithubUrl(),
 						social.getPortfolioWebsite()));
 			}
 
 			// Job Preferences
 			if (jobSeeker.getJobPrefeences() != null) {
 				JobPreferences pref = jobSeeker.getJobPrefeences();
-				dto.setJobPreferences(new JobSeekerJonPreferencesDto(
-						pref.getDesiredJobTitle(), 
-						pref.getJobType(),
-						pref.getExpectedSalary(),
-						pref.getPreferredLocation()));
+				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobType(),
+						pref.getExpectedSalary(), pref.getPreferredLocation()));
 			}
 
 			return dto; // 👉 you missed this line before!
@@ -156,20 +143,45 @@ public class AdminService {
 		List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream()
 				.map(r -> new RecruiterProfileDto(r.getCompanyName(), r.getCompanyAddress(), r.getCompanyDescription(),
 						r.getCompanyWebsiteUrl(), r.getNumberOfEmployees(), r.getIndustryType(), r.getFirstName(),
-						r.getLastName(), r.getEmail(), r.getPhoneNumber(), r.getCity()))
+						r.getLastName(), r.getEmail(), r.getPhoneNumber(), r.getCity(), r.getStatus()))
 				.collect(Collectors.toList());
+
+		// Fetch status counts
+		long pendingCount = recruiterRepository.countByStatus(Status.PENDING);
+		long approvedCount = recruiterRepository.countByStatus(Status.APPROVED);
+		long rejectedCount = recruiterRepository.countByStatus(Status.REJECTED);
 
 		// Prepare the response map
 		Map<String, Object> response = new HashMap<>();
+		response.put("Total PANDING", pendingCount);
+		response.put("Total APPROVED", approvedCount);
+		response.put("Total REJECTED", rejectedCount);
 		response.put("totalRecruiters", recruiterProfiles.size());
 		response.put("recruiters", recruiterProfiles);
 
 		return response;
 	}
-	
-	// This deletes JobSeeker and cascades delete to related entities
-	public void deleteJobSeekerById(int id) {
-	    jobSeekerRepository.deleteById(id);  
+
+	// Update recruter status ex.panding, approve, regected
+	public String updateRecruterStatus(int id, Status status) {
+		Optional<Recruiter> optionalRecruiter = recruiterRepository.findById(id);
+
+		if (optionalRecruiter.isPresent()) {
+			Recruiter recruiter = optionalRecruiter.get();
+			recruiter.setStatus(status);
+			recruiterRepository.save(recruiter);
+			return "Recruter status updated Successfully " + status;
+		} else {
+			return "Recruter not found with id: " + id;
+		}
 	}
 
+	// This deletes JobSeeker and cascades delete to related entities
+	public void deleteJobSeekerById(int id) {
+		jobSeekerRepository.deleteById(id);
+	}
+
+	public void deleteRecruiterById(int id) {
+		recruiterRepository.deleteById(id);
+	}
 }

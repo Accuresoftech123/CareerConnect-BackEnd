@@ -1,6 +1,10 @@
 package com.example.entity;
 
+import com.example.enums.Status;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -65,6 +69,11 @@ public class Recruiter {
 	// Confirm password field, not persisted to the database (used for validation)
 	@Transient
 	private String confirmPassword;
+	
+	
+	// Use EnumType.STRING so the enum value is stored as a readable string in the database
+	 @Enumerated(EnumType.STRING)
+	    private Status status;
 
 	// Getters and Setters for all fields follow
 	
@@ -179,13 +188,22 @@ public class Recruiter {
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
 	}
+	
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
 
 	/**
 	 * Constructor with all fields (except transient confirmPassword)
 	 */
 	public Recruiter(int id, String companyName, String companyAddress, String companyDescription,
 			String companyWebsiteUrl, int numberOfEmployees, String firstName, String lastName,
-			String email, long phoneNumber, String city, String password, String confirmPassword, String industryType) {
+			String email, long phoneNumber, String city, String password, String confirmPassword, String industryType,Status status) {
 		super();
 		this.id = id;
 		this.companyName = companyName;
@@ -201,6 +219,7 @@ public class Recruiter {
 		this.password = password;
 		this.confirmPassword = confirmPassword;
 		this.industryType = industryType;
+		this.status=status;
 	}
 
 	/**
