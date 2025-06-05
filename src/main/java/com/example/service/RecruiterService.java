@@ -1,10 +1,12 @@
 package com.example.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.RecruiterProfileDto;
 import com.example.entity.Recruiter;
+import com.example.enums.Status;
 import com.example.repository.RecruiterRepository;
 
 /**
@@ -30,6 +32,8 @@ public class RecruiterService {
             return "Email already registered";
         }
 
+        // Set default status as PENDING before saving
+        newRecruiter.setStatus(Status.PENDING);
         recruiterRepository.save(newRecruiter);
         return "Registration successful";
     }
@@ -41,11 +45,18 @@ public class RecruiterService {
      * @param password password of the recruiter
      * @return recruiter object if valid, otherwise null
      */
-    public Recruiter login(String email, String password) {
+    public ResponseEntity<?> login(String email, String password) {
         Recruiter existing = recruiterRepository.findByEmail(email).orElse(null);
         if (existing != null && existing.getPassword().equals(password)) {
-            return existing;
+        	
+        	 if (existing.getStatus() == Status.APPROVED) {
+                 return ResponseEntity.ok(existing);
+             }else {
+            	 return ResponseEntity.ok("Access Denied.Your application status is "+existing.getStatus());
+             }
+          
         }
+       
         return null;
     }
 
