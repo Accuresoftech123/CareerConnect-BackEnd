@@ -1,5 +1,7 @@
 package com.example.dto;
 
+import com.example.enums.Status;
+
 /**
  * DTO (Data Transfer Object) for Recruiter Profile Information.
  * This class contains both company details and recruiter's personal details
@@ -21,7 +23,7 @@ public class RecruiterProfileDto {
     private String email;                    // Email address of the recruiter
     private long phoneNumber;                // Contact number of the recruiter
     private String city;                     // City where the recruiter is located
-
+    private Status status;
     /**
      * Default constructor.
      */
@@ -46,7 +48,7 @@ public class RecruiterProfileDto {
      */
     public RecruiterProfileDto(String companyName, String companyAddress, String companyDescription,
                                String companyWebsiteUrl, int numberOfEmployees, String industryType,
-                               String firstName, String lastName, String email, long phoneNumber, String city) {
+                               String firstName, String lastName, String email, long phoneNumber, String city, Status status) {
         super();
         this.companyName = companyName;
         this.companyAddress = companyAddress;
@@ -59,6 +61,7 @@ public class RecruiterProfileDto {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.city = city;
+        this.status=status;
     }
 
     // Getters and Setters
@@ -150,4 +153,13 @@ public class RecruiterProfileDto {
     public void setCity(String city) {
         this.city = city;
     }
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+    
 }

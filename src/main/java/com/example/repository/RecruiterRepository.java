@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.example.entity.Recruiter;
+import com.example.enums.Status;
 
 /**
  * Repository interface for Recruiter entity.
@@ -23,4 +24,6 @@ public interface RecruiterRepository extends JpaRepository<Recruiter, Integer> {
      * @return Optional containing Recruiter if found, or empty if not
      */
     Optional<Recruiter> findByEmail(String email);
+    //it is used to countbyStatus
+    long countByStatus(Status status);
 }
