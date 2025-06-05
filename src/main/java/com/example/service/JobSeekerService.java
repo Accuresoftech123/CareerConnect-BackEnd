@@ -93,6 +93,16 @@ public class JobSeekerService {
          		return "Job Seeker not found with ID: " + id;
          	}
          	
+         // update registration data
+         	
+         	if(dto.getFullName() != null) {
+         		jobSeeker.setFullName(dto.getFullName());
+         	}
+         	
+         	if(dto.getMobileNumber() != null) {
+         		jobSeeker.setMobileNumber(dto.getMobileNumber());
+         	}
+         	
          // update personal info
          	JobSeekerPersonalInfoDto personalInfoDto = dto.getPersonalInfo();
          	

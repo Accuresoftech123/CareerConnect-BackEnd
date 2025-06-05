@@ -78,22 +78,15 @@ public class AdminService {
 			// Personal Info
 			if (jobSeeker.getPersonalInfo() != null) {
 				JobSeekerPersonalInfo pi = jobSeeker.getPersonalInfo();
-				dto.setPersonalInfo(new JobSeekerPersonalInfoDto(pi.getProfileImageUrl(), 
-						pi.getCity(),
-						pi.getState(),
-						pi.getCountry(), 
-						pi.getResumeUrl(), 
-						pi.getIntroVideoUrl()));
+				dto.setPersonalInfo(new JobSeekerPersonalInfoDto(pi.getProfileImageUrl(), pi.getCity(), pi.getState(),
+						pi.getCountry(), pi.getResumeUrl(), pi.getIntroVideoUrl()));
 			}
 
 			// Education List
 			if (jobSeeker.getEducationList() != null) {
 				List<JobSeekerEducationDto> educationDtos = jobSeeker
-						.getEducationList().stream().map(edu -> new JobSeekerEducationDto(
-								edu.getDegree(),
-								edu.getFieldOfStudy(),
-								edu.getInstitution(), 
-								edu.getPassingYear()))
+						.getEducationList().stream().map(edu -> new JobSeekerEducationDto(edu.getDegree(),
+								edu.getFieldOfStudy(), edu.getInstitution(), edu.getPassingYear()))
 						.collect(Collectors.toList());
 				dto.setEducationList(educationDtos);
 			}
@@ -101,12 +94,8 @@ public class AdminService {
 			// Experience List
 			if (jobSeeker.getExperienceList() != null) {
 				List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
-						.map(exp -> new JobSeekerExperienceDto(
-								exp.getJobTitle(),
-								exp.getCompanyName(),
-								exp.getStartDate(),
-								exp.getEndDate(),
-								exp.getKeyResponsibilities()))
+						.map(exp -> new JobSeekerExperienceDto(exp.getJobTitle(), exp.getCompanyName(),
+								exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities()))
 						.collect(Collectors.toList());
 				dto.setExperienceList(experienceDtos);
 			}
@@ -117,20 +106,15 @@ public class AdminService {
 			// Social Profile
 			if (jobSeeker.getSocialProfile() != null) {
 				SocialProfile social = jobSeeker.getSocialProfile();
-				dto.setScoicalProfile(new JobSeekerSocialProfileDto(
-						social.getLinkedinUrl(), 
-						social.getGithubUrl(),
+				dto.setScoicalProfile(new JobSeekerSocialProfileDto(social.getLinkedinUrl(), social.getGithubUrl(),
 						social.getPortfolioWebsite()));
 			}
 
 			// Job Preferences
 			if (jobSeeker.getJobPrefeences() != null) {
 				JobPreferences pref = jobSeeker.getJobPrefeences();
-				dto.setJobPreferences(new JobSeekerJonPreferencesDto(
-						pref.getDesiredJobTitle(), 
-						pref.getJobType(),
-						pref.getExpectedSalary(),
-						pref.getPreferredLocation()));
+				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobType(),
+						pref.getExpectedSalary(), pref.getPreferredLocation()));
 			}
 
 			return dto; // 👉 you missed this line before!
@@ -166,10 +150,10 @@ public class AdminService {
 
 		return response;
 	}
-	
+
 	// This deletes JobSeeker and cascades delete to related entities
 	public void deleteJobSeekerById(int id) {
-	    jobSeekerRepository.deleteById(id);  
+		jobSeekerRepository.deleteById(id);
 	}
 
 }
