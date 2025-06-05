@@ -162,6 +162,7 @@ public class AdminService {
 		return response;
 	}
 
+
 	// Update recruter status ex.panding, approve, regected
 	public String updateRecruterStatus(int id, Status status) {
 		Optional<Recruiter> optionalRecruiter = recruiterRepository.findById(id);
@@ -175,6 +176,7 @@ public class AdminService {
 			return "Recruter not found with id: " + id;
 		}
 	}
+
 
 	// This deletes JobSeeker and cascades delete to related entities
 	public void deleteJobSeekerById(int id) {
