@@ -25,4 +25,6 @@ public interface JobSeekerRepository extends JpaRepository<JobSeeker, Integer> {
      * @return Optional<Job_Seeker> if email exists, else empty
      */
     Optional<JobSeeker> findByEmail(String email);
+    Optional<JobSeeker> findByMobileNumber(String mobileNumber);
+
 }
