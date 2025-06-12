@@ -50,16 +50,18 @@ public class JobSeekerService {
 
         // Create a new JobSeeker entity from DTO
         JobSeeker jobSeeker = new JobSeeker();
-        jobSeeker.setFullName(newJobSeeker.getFullName());      
+        jobSeeker.setFullName(newJobSeeker.getFullName());
         jobSeeker.setEmail(newJobSeeker.getEmail());
         jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
         jobSeeker.setPassword(newJobSeeker.getPassword());
         jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
-       
+
+      
 
         repo.save(jobSeeker);
         return "Registration successful!";
     }
+
 
     /**
      * Validates login credentials.
