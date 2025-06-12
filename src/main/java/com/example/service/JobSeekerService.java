@@ -283,6 +283,7 @@ public class JobSeekerService {
 		return "Profile updated successfully";
 	}
 
+
 //    /**
 //     * Updates an existing job seeker's profile with the provided data.
 //     *
