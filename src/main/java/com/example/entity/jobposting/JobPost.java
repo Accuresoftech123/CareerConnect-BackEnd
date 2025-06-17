@@ -1,7 +1,7 @@
 package com.example.entity.jobposting;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.*;
+
 import java.time.LocalDate;
 import com.example.entity.Recruiter;
 
@@ -16,26 +16,25 @@ public class JobPost {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @NotBlank(message = "Job title is mandatory")
-    @Size(min = 2, max = 100, message = "Title must be between 2 and 100 characters")
+    
     private String title;
 
-    @NotBlank(message = "Job description is mandatory")
+   
     private String description;
 
-    @NotBlank(message = "Location is required")
+    
     private String location;
 
-    @PositiveOrZero(message = "Salary must be zero or positive")
+    
     private double salary;
 
-    @NotBlank(message = "Employment type is required")
+    
     private String employmentType;
 
-    @Min(value = 0, message = "Experience must be zero or more years")
+   
     private String experience;
 
-    @NotNull(message = "Last date to apply is required")
+    
     private LocalDate lastDateToApply;
 
     private LocalDate postedDate;

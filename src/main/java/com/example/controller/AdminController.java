@@ -55,7 +55,7 @@ public class AdminController {
 
 	// update status of the recruiter
 	@PutMapping("/update/{id}/status")
-	public ResponseEntity<String> updateRecruterStatus(@PathVariable int id, @RequestParam Status status) {
+	public ResponseEntity<String> updateRecruterStatus(@PathVariable int id, @PathVariable Status status) {
 		String result = adminService.updateRecruterStatus(id, status);
 		return ResponseEntity.ok(result);
 	}

@@ -2,6 +2,7 @@ package com.example.controller;
 
 import com.example.dto.RecruiterLoginDto;
 import com.example.dto.RecruiterProfileDto;
+import com.example.dto.RecruiterRegistrationDto;
 import com.example.entity.Recruiter;
 import com.example.service.RecruiterService;
 
@@ -28,7 +29,7 @@ public class RecruiterController {
 	 * @return Success or failure message
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<String> registerRecruiter(@RequestBody Recruiter recruiter) {
+	public ResponseEntity<String> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiter) {
 		String result = recruiterService.register(recruiter);
 		return ResponseEntity.ok(result);
 	}
@@ -58,10 +59,10 @@ public class RecruiterController {
 	 * @return Success message
 	 */
 	@PutMapping("/profile/{id}")
-	public ResponseEntity<String> updateRecruiterProfile(@PathVariable int id,
+	public ResponseEntity<Recruiter> updateRecruiterProfile(@PathVariable int id,
 			@RequestBody RecruiterProfileDto profileDto) {
 
-		String result = recruiterService.updateProfile(id, profileDto);
+		Recruiter result = recruiterService.updateProfile(id, profileDto);
 		return ResponseEntity.ok(result);
 	}
 }

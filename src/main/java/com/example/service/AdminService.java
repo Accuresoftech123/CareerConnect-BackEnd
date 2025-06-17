@@ -19,6 +19,7 @@ import com.example.dto.JobSeekerSocialProfileDto;
 import com.example.dto.RecruiterProfileDto;
 import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
+import com.example.entity.profile.CompanyProfile;
 import com.example.entity.profile.Education;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
@@ -139,29 +140,73 @@ public class AdminService {
 	 */
 	@Transactional(readOnly = true)
 	public Map<String, Object> getRecruitersReportWithCount() {
-		// Convert each Recruiter entity to a RecruiterProfileDto
-		List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream()
-				.map(r -> new RecruiterProfileDto(r.getCompanyName(), r.getCompanyAddress(), r.getCompanyDescription(),
-						r.getCompanyWebsiteUrl(), r.getNumberOfEmployees(), r.getIndustryType(), r.getFirstName(),
-						r.getLastName(), r.getEmail(), r.getPhoneNumber(), r.getCity(), r.getStatus()))
-				.collect(Collectors.toList());
+	    // Convert each Recruiter entity to a RecruiterProfileDto
+	    List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream()
+	            .map(r -> {
+	                RecruiterProfileDto dto = new RecruiterProfileDto();
+	                dto.setFullName(r.getFullName());
+	                dto.setMobileNumber(r.getMobileNumber());
+	                
+	                // Map company profile information if available
+	                if (r.getCompanyProfile() != null) {
+	                    CompanyProfile cp = r.getCompanyProfile();
+	                    dto.setCompanyName(cp.getCompanyName());
+	                    dto.setCompanyWebsiteUrl(cp.getWebsite());
+	                    dto.setCompanyDescription(cp.getAbout());
+	                    
+	                    // Map additional fields that might be useful
+	                    dto.setNumberOfEmployees(parseEmployeeCount(cp.getCompanySize()));
+	                    
+	                    // Handle industries if available in Recruiter entity
+	                    if (r.getIndustries() != null && !r.getIndustries().isEmpty()) {
+	                        dto.setIndustryType(String.join(", ", r.getIndustries()));
+	                    }
+	                }
+	                
+	                return dto;
+	            })
+	            .collect(Collectors.toList());
 
-		// Fetch status counts
-		long pendingCount = recruiterRepository.countByStatus(Status.PENDING);
-		long approvedCount = recruiterRepository.countByStatus(Status.APPROVED);
-		long rejectedCount = recruiterRepository.countByStatus(Status.REJECTED);
+	    // Fetch status counts
+	    long pendingCount = recruiterRepository.countByStatus(Status.PENDING);
+	    long approvedCount = recruiterRepository.countByStatus(Status.APPROVED);
+	    long rejectedCount = recruiterRepository.countByStatus(Status.REJECTED);
 
-		// Prepare the response map
-		Map<String, Object> response = new HashMap<>();
-		response.put("Total PANDING", pendingCount);
-		response.put("Total APPROVED", approvedCount);
-		response.put("Total REJECTED", rejectedCount);
-		response.put("totalRecruiters", recruiterProfiles.size());
-		response.put("recruiters", recruiterProfiles);
+	    // Prepare the response map
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("totalPending", pendingCount);
+	    response.put("totalApproved", approvedCount);
+	    response.put("totalRejected", rejectedCount);
+	    response.put("totalRecruiters", recruiterProfiles.size());
+	    response.put("recruiters", recruiterProfiles);
 
-		return response;
+	    return response;
 	}
 
+	// Helper method to parse company size string into approximate employee count
+	private Integer parseEmployeeCount(String companySize) {
+	    if (companySize == null || companySize.isEmpty()) {
+	        return null;
+	    }
+	    
+	    try {
+	        // Handle ranges like "100-200"
+	        if (companySize.contains("-")) {
+	            String[] parts = companySize.split("-");
+	            return Integer.parseInt(parts[1].trim());
+	        }
+	        // Handle "500+" cases
+	        else if (companySize.contains("+")) {
+	            return Integer.parseInt(companySize.replace("+", "").trim());
+	        }
+	        // Plain number
+	        else {
+	            return Integer.parseInt(companySize.trim());
+	        }
+	    } catch (NumberFormatException e) {
+	        return null; // Return null if parsing fails
+	    }
+	}
 
 	// Update recruter status ex.panding, approve, regected
 	public String updateRecruterStatus(int id, Status status) {

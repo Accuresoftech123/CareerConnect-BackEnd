@@ -1,5 +1,10 @@
 package com.example.dto;
 
+import com.example.enums.Status;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 /**
  * DTO (Data Transfer Object) for handling Recruiter Registration requests. It
  * captures the necessary information required to register a recruiter account.
@@ -7,14 +12,25 @@ package com.example.dto;
 public class RecruiterRegistrationDto {
 
 	// Recruiter's personal details
-	private String firstName; // First name of the recruiter
+	private String fullName; // First name of the recruiter
 	private String lastName; // Last name of the recruiter
 	private String email; // Email address of the recruiter
-	private long phoneNumber; // Contact number of the recruiter
+	private long mobileNumber; // Contact number of the recruiter
 
 	// Password fields
 	private String password; // Password chosen by the recruiter
 	private String confirmPassword; // Confirmation of the password
+	
+	@Enumerated(EnumType.STRING)
+    private Status status;
+
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
 
 	/**
 	 * Default constructor.
@@ -35,25 +51,26 @@ public class RecruiterRegistrationDto {
 	 * @param password        Password entered by the recruiter
 	 * @param confirmPassword Confirmation of the password
 	 */
-	public RecruiterRegistrationDto(String firstName, String lastName, String email, long phoneNumber, String password,
-			String confirmPassword) {
+	public RecruiterRegistrationDto(String fullName, String lastName, String email, long phoneNumber, String password,
+			String confirmPassword, Status status) {
 		super();
-		this.firstName = firstName;
+		this.fullName = fullName;
 		this.lastName = lastName;
 		this.email = email;
-		this.phoneNumber = phoneNumber;
+		this.mobileNumber = phoneNumber;
 		this.password = password;
 		this.confirmPassword = confirmPassword;
+		this.status=status;
 	}
 
 	// Getters and Setters
 
-	public String getFirstName() {
-		return firstName;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
 	public String getLastName() {
@@ -72,12 +89,12 @@ public class RecruiterRegistrationDto {
 		this.email = email;
 	}
 
-	public long getPhoneNo() {
-		return phoneNumber;
+	public long getMobileNumber() {
+		return mobileNumber;
 	}
 
-	public void setPhoneNo(long phoneNo) {
-		this.phoneNumber = phoneNo;
+	public void setMobileNumber(long mobileNumber) {
+		this.mobileNumber = mobileNumber;
 	}
 
 	public String getPassword() {

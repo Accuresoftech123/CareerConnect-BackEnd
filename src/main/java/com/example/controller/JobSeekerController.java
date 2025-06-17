@@ -9,6 +9,7 @@ import com.example.service.EmailService;
 import com.example.service.JobSeekerService;
 import com.example.service.mobileOtpService;
 
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,19 +55,44 @@ public class JobSeekerController {
 	}
 
 	// Email verification controller
+	
+	
+
+	    
+
 	@PostMapping("/verifyOtp")
-	public ResponseEntity<String> verifyOtp(@RequestParam String email, @RequestParam String otp) {
-		String result = emailService.verifyOtp(email, otp);
-		if (result.equals("Email verified successfully!")) {
-			return ResponseEntity.ok(result);
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-		}
+	public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+	    String email = request.get("email");
+	    String otp = request.get("otp");
+
+	    if (email == null || otp == null) {
+	        return ResponseEntity.badRequest().body(Map.of(
+	            "success", false,
+	            "message", "Email and OTP are required."
+	        ));
+	    }
+
+	    String result = emailService.verifyOtp(email, otp);
+
+	    if (EmailService.OTP_SUCCESS.equals(result)) { // this will now match properly
+	        return ResponseEntity.ok(Map.of(
+	            "success", true,
+	            "message", "OTP verified successfully!"
+	        ));
+	    } else {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+	            "success", false,
+	            "message", result
+	        ));
+	    }
+
 	}
+
+	
 
 	// Resend otp controller
 	@PostMapping("/resendOTP")
-	public ResponseEntity<String> resndotp(@RequestParam String email) {
+	public ResponseEntity<String> resendotp(@RequestParam String email) {
 		String result = emailService.resendOtp(email);
 		if (result.equals("New OTP sent successfully!")) {
 			return ResponseEntity.ok(result);
