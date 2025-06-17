@@ -13,4 +13,13 @@ import com.example.entity.jobposting.JobPost;
 @Repository
 public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
 
+	@Query("SELECT j FROM JobPost j WHERE " +
+		       "(:title IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
+		       "(:location IS NULL OR LOWER(j.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
+		       "(:experience IS NULL OR j.experience = :experience)")
+		List<JobPost> searchJobs(
+		        @Param("title") String title,
+		        @Param("location") String location,
+		        @Param("experience") String experience);
+ 
 }

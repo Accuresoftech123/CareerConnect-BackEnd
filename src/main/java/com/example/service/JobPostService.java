@@ -137,6 +137,9 @@ public class JobPostService {
         dto.setApplicants(jobPost.getApplicants());
         return dto;
     }
-  
+    //find by title, location, experience
+    public List<JobPost> searchJobs(String title, String location, String experience) {
+        return jobPostRepository.searchJobs(title, location, experience);
+    }
 
 }
