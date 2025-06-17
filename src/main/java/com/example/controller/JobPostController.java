@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.JobPostDto;
+import com.example.entity.jobposting.JobPost;
 import com.example.service.JobPostService;
 
 @RestController
@@ -50,4 +51,15 @@ public class JobPostController {
         jobPostService.deleteJobPost(id);
         return ResponseEntity.ok("JobPost deleted successfully with ID: " + id);
     }
+    //search
+    @GetMapping("/search")
+    public ResponseEntity<List<JobPost>> searchJobs(
+            @RequestParam(required = false) String title,
+            @RequestParam(required = false) String location,
+            @RequestParam(required = false) String experience) {
+
+        List<JobPost> results = jobPostService.searchJobs(title, location, experience);
+        return ResponseEntity.ok(results);
+    }
+
 }
