@@ -1,11 +1,15 @@
 package com.example.repository;
 
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.example.entity.Applicant;
 import com.example.entity.Recruiter;
 import com.example.enums.Status;
 
@@ -26,4 +30,8 @@ public interface RecruiterRepository extends JpaRepository<Recruiter, Integer> {
     Optional<Recruiter> findByEmail(String email);
     //it is used to countbyStatus
     long countByStatus(Status status);
+    boolean existsByEmail(String email);
+    
+//    @Query("SELECT a FROM Applicant a WHERE a.jobPost.recruiter.id = :recruiterId")
+//    List<Applicant> findApplicantsByRecruiterId(@Param("recruiterId") int recruiterId);
 }

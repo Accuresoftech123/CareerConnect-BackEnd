@@ -1,13 +1,27 @@
 package com.example.service;
 
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import com.example.dto.ApplicantDTO;
 import com.example.dto.RecruiterProfileDto;
+import com.example.dto.RecruiterRegistrationDto;
+import com.example.entity.Applicant;
+import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
+import com.example.entity.profile.CompanyProfile;
+import com.example.enums.ApplicationStatus;
 import com.example.enums.Status;
+import com.example.exception.RecruiterNotFoundException;
+import com.example.repository.ApplicantRepository;
 import com.example.repository.RecruiterRepository;
+
+import jakarta.transaction.Transactional;
 
 /**
  * Service class for handling Recruiter-related business logic.
@@ -26,15 +40,23 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-    public String register(Recruiter newRecruiter) {
-        Recruiter existing = recruiterRepository.findByEmail(newRecruiter.getEmail()).orElse(null);
-        if (existing != null) {
+    public String register(RecruiterRegistrationDto newRecruiter) {
+		Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
+
+        
+        if (existing == null) {
             return "Email already registered";
         }
 
         // Set default status as PENDING before saving
-        newRecruiter.setStatus(Status.PENDING);
-        recruiterRepository.save(newRecruiter);
+        newRecruiter.setStatus(Status.APPROVED);
+        Recruiter recruiter = new Recruiter();
+        recruiter.setFullName(newRecruiter.getFullName());
+        recruiter.setEmail(newRecruiter.getEmail());
+        recruiter.setMobileNumber(newRecruiter.getMobileNumber());
+        recruiter.setPassword(newRecruiter.getPassword());
+        recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
+        recruiterRepository.save(recruiter);
         return "Registration successful";
     }
 
@@ -67,31 +89,32 @@ public class RecruiterService {
      * @param dto the profile data
      * @return update status message
      */
-    public String updateProfile(int id, RecruiterProfileDto dto) {
-        Recruiter recruiter = recruiterRepository.findById(id).orElse(null);
-        if (recruiter == null) {
-            return "Recruiter not found";
+    public Recruiter updateProfile(int id, RecruiterProfileDto profileDto) {
+        Recruiter recruiter = recruiterRepository.findById(id)
+            .orElseThrow(() -> new RecruiterNotFoundException("Recruiter not found"));
+        
+        // Update basic info
+        if (profileDto.getFullName() != null) {
+            recruiter.setFullName(profileDto.getFullName());
         }
-
-        if (isProfileDataEmpty(dto)) {
-            return "Invalid profile data";
+        
+        if (profileDto.getMobileNumber() != 0) {
+            recruiter.setMobileNumber(profileDto.getMobileNumber());
         }
-
-        // Set non-null fields
-        if (dto.getCompanyName() != null) recruiter.setCompanyName(dto.getCompanyName());
-        if (dto.getCompanyAddress() != null) recruiter.setCompanyAddress(dto.getCompanyAddress());
-        if (dto.getCompanyDescription() != null) recruiter.setCompanyDescription(dto.getCompanyDescription());
-        if (dto.getCompanyWebsiteUrl() != null) recruiter.setCompanyWebsiteUrl(dto.getCompanyWebsiteUrl());
-        if (dto.getNumberOfEmployees() > 0) recruiter.setNumberOfEmployees(dto.getNumberOfEmployees());
-        if (dto.getFirstName() != null) recruiter.setFirstName(dto.getFirstName());
-        if (dto.getLastName() != null) recruiter.setLastName(dto.getLastName());
-        if (dto.getCity() != null) recruiter.setCity(dto.getCity());
-        if (dto.getIndustryType() != null) recruiter.setIndustryType(dto.getIndustryType());
-        if (dto.getPhoneNumber() > 0) recruiter.setPhoneNumber(dto.getPhoneNumber());
-
-        recruiterRepository.save(recruiter);
-        return "Profile updated successfully";
+        
+        // Update company profile if exists or create new
+        if (recruiter.getCompanyProfile() == null) {
+            recruiter.setCompanyProfile(new CompanyProfile());
+        }CompanyProfile companyProfile = recruiter.getCompanyProfile();
+        if (profileDto.getCompanyName() != null) {
+            companyProfile.setCompanyName(profileDto.getCompanyName());
+        }
+        
+        
+        return recruiterRepository.save(recruiter);
     }
+    
+   
 
     /**
      * Checks whether all profile fields in the DTO are empty.
@@ -105,11 +128,14 @@ public class RecruiterService {
                dto.getCompanyDescription() == null &&
                dto.getCompanyWebsiteUrl() == null &&
                dto.getNumberOfEmployees() <= 0 &&
-               dto.getFirstName() == null &&
-               dto.getLastName() == null &&
-               dto.getCity() == null&&
+               dto.getFullName() == null &&
+               
+               
             		   dto.getIndustryType() == null &&
-            				   dto.getPhoneNumber() == 0;
+            				   dto.getMobileNumber() == 0;
         
     }
+    
+
+
 }

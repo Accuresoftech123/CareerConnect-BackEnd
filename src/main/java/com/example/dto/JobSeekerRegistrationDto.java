@@ -16,6 +16,14 @@ public class JobSeekerRegistrationDto {
 	private String email; // Job seeker's email address
 	private String mobileNumber; // Job seeker's contact mobile number
 	private String password; // Password for the account
+	private String otp;
+	public String getOtp() {
+		return otp;
+	}
+
+	public void setOtp(String otp) {
+		this.otp = otp;
+	}
 
 	/**
 	 * Transient field not persisted in the database, used only for password
@@ -34,7 +42,7 @@ public class JobSeekerRegistrationDto {
 	 * Parameterized constructor to initialize all fields of the DTO.
 	 */
 	public JobSeekerRegistrationDto(int id, String fullName, String email, String mobileNumber, String password,
-			String confirmPassword) {
+			String confirmPassword,String otp) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -42,6 +50,7 @@ public class JobSeekerRegistrationDto {
 		this.mobileNumber = mobileNumber;
 		this.password = password;
 		this.confirmPassword = confirmPassword;
+		this.otp=otp;
 	}
 
 	// Getter and Setter methods for all fields below

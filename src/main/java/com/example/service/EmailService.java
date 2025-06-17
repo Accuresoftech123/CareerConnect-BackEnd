@@ -19,6 +19,13 @@ public class EmailService {
 	private JavaMailSender mailSender;
 	@Autowired
 	private JobSeekerRepository repo;
+	
+	public static final String OTP_SUCCESS = "OTP Success"; // 🔍 Fixed spelling, proper format
+
+	public static final String OTP_EXPIRED = "OTP has expired. Please click 'Resend OTP' to receive a new OTP.";
+    public static final String OTP_INVALID = "Invalid OTP!";
+    public static final String EMAIL_NOT_FOUND = "Email not found";
+
 
 	public void sendOtpMail(String toEmail, String otp) {
 		SimpleMailMessage message = new SimpleMailMessage();
@@ -47,30 +54,32 @@ public class EmailService {
 
 	// Email verification method..
 
+	
 	public String verifyOtp(String email, String otp) {
-		Optional<JobSeeker> gmail = repo.findByEmail(email);
-		if (gmail.isPresent()) {
-			JobSeeker jobSeeker = gmail.get();
+        Optional<JobSeeker> optionalJobSeeker = repo.findByEmail(email);
 
-			// Check if OTP is expired (valid for 5 mins)
-			if (jobSeeker.getOtpGeneratedTime() == null
-					|| Duration.between(jobSeeker.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
-				return "OTP has expired.\r\n" + "Please click \"Resend OTP\" to receive a new OTP.";
-			}
+        if (optionalJobSeeker.isEmpty()) {
+            return EMAIL_NOT_FOUND;
+        }
 
-			if (jobSeeker.getOtp().equals(otp)) {
-				jobSeeker.setVerified(true);
-				jobSeeker.setOtp(null);// clear otp
-				jobSeeker.setOtpGeneratedTime(null);// clear otpGenerated time..
-				repo.save(jobSeeker);
-				return "Registration successful! ";
-			} else {
-				return "Invalid OTP!";
-			}
-		} else {
-			return "Email not found";
-		}
+        JobSeeker jobSeeker = optionalJobSeeker.get();
+
+        if (jobSeeker.getOtpGeneratedTime() == null ||
+            Duration.between(jobSeeker.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
+            return OTP_EXPIRED;
+        }
+
+        if (otp.equals(jobSeeker.getOtp())) {
+            jobSeeker.setVerified(true);
+            jobSeeker.setOtp(null);
+            jobSeeker.setOtpGeneratedTime(null);
+            repo.save(jobSeeker);
+            return OTP_SUCCESS;
+        } else {
+            return OTP_INVALID;
+        }
 	}
+
 
 	// Resend Otp
 	public String resendOtp(String email) {

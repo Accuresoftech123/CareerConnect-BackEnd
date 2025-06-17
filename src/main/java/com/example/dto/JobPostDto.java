@@ -63,7 +63,7 @@ public class JobPostDto {
     @NotBlank(message = "Education is required")
     private String education;
 
-    private int applicants;
+    private List<Integer> applicants;
 
     public JobPostDto() {
         super();
@@ -72,7 +72,7 @@ public class JobPostDto {
     public JobPostDto(Integer id, String title, String description, String location, double salary, String employmentType,
                       String experience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
                       int numberOfOpenings, String companyName, String jobType, String workLocation, String gender,
-                      String requiredExperience, String skills, String jobShift, String education, int applicants) {
+                      String requiredExperience, String skills, String jobShift, String education, List<Integer> applicants) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -92,7 +92,8 @@ public class JobPostDto {
         this.skills = skills;
         this.jobShift = jobShift;
         this.education = education;
-        this.applicants = applicants;
+        this.applicants=applicants;
+        
     }
 
     // Getters and Setters
@@ -174,6 +175,12 @@ public class JobPostDto {
     public void setEducation(String education) { this.education = education; }
 
     // Applicants
-    public int getApplicants() { return applicants; }
-    public void setApplicants(int applicants) { this.applicants = applicants; }
+    public List<Integer> getApplicants() {
+        return applicants;
+    }
+
+    public void setApplicants(List<Integer> applicants) {
+        this.applicants = applicants;
+    }
+
 }

@@ -68,7 +68,7 @@ public class JobPostService {
         existingJobPost.setSkills(jobPostDto.getSkills());
         existingJobPost.setJobShift(jobPostDto.getJobShift());
         existingJobPost.setEducation(jobPostDto.getEducation());
-        existingJobPost.setApplicants(jobPostDto.getApplicants());
+        
 
         JobPost updatedJobPost = jobPostRepository.save(existingJobPost);
         return mapToDto(updatedJobPost);
@@ -107,7 +107,7 @@ public class JobPostService {
         jobPost.setSkills(jobPostDto.getSkills());
         jobPost.setJobShift(jobPostDto.getJobShift());
         jobPost.setEducation(jobPostDto.getEducation());
-        jobPost.setApplicants(jobPostDto.getApplicants());
+       
 
         return jobPost;
     }
@@ -134,7 +134,7 @@ public class JobPostService {
         dto.setSkills(jobPost.getSkills());
         dto.setJobShift(jobPost.getJobShift());
         dto.setEducation(jobPost.getEducation());
-        dto.setApplicants(jobPost.getApplicants());
+        
         return dto;
     }
 }
