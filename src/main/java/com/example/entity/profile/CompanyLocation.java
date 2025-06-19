@@ -1,6 +1,7 @@
 package com.example.entity.profile;
 
 import com.example.entity.Recruiter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 
@@ -18,6 +19,7 @@ public class CompanyLocation {
     private boolean isHeadquarters;
     
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "recruiter_id")
     private Recruiter recruiter;
 

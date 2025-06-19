@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import com.example.entity.profile.*;
 import com.example.enums.Status;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -45,7 +47,9 @@ public class Recruiter {
 
     // Relationships
     @OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
     private CompanyProfile companyProfile;
+
 
     @OneToMany(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CompanyLocation> companyLocations;

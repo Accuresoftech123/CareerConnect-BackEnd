@@ -3,6 +3,7 @@ package com.example.entity;
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.ApplicationStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -16,10 +17,12 @@ public class Applicant {
     private int id;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "job_seeker_id", nullable = false)
     private JobSeeker jobSeeker;
 

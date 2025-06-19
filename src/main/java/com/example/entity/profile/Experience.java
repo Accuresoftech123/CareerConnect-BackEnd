@@ -3,6 +3,7 @@ package com.example.entity.profile;
 import java.time.LocalDate;
 
 import com.example.entity.JobSeeker;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,6 +30,7 @@ public class Experience {
 	private String keyResponsibilities;
 	
 	@ManyToOne
+	 @JsonBackReference
 	@JoinColumn(name = "job_seeker_id")
 	private JobSeeker jobSeeker;
 
