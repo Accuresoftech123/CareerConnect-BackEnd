@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDate;
 import com.example.entity.Recruiter;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
  * Entity representing a job post created by a recruiter.
@@ -40,6 +41,7 @@ public class JobPost {
     private LocalDate postedDate;
 
     @ManyToOne
+    @JsonBackReference
     @JoinColumn(name = "recruiter_id", nullable = false)
     private Recruiter recruiter;
 

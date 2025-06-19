@@ -2,6 +2,7 @@ package com.example.entity.profile;
 
 
 import com.example.entity.Recruiter;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.*;
 
@@ -90,9 +91,11 @@ public class CompanyProfile {
 		this.recruiter = recruiter;
 	}
 
-	@OneToOne
+	@OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recruiter_id")
+    @JsonManagedReference
     private Recruiter recruiter;
+
     
     
 }

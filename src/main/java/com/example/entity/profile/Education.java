@@ -1,6 +1,7 @@
 package com.example.entity.profile;
 
 import com.example.entity.JobSeeker;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ public class Education {
 	private Long passingYear;
 	
 	@ManyToOne
+	 @JsonBackReference
 	@JoinColumn(name = "job_seeker_id")
 	private JobSeeker jobSeeker;
 
