@@ -64,15 +64,25 @@ public class JobPostDto {
     private String education;
 
     private List<Integer> applicants;
+    
+    private boolean closed; 
 
-    public JobPostDto() {
+    public boolean isClosed() {
+		return closed;
+	}
+
+	public void setClosed(boolean closed) {
+		this.closed = closed;
+	}
+
+	public JobPostDto() {
         super();
     }
 
     public JobPostDto(Integer id, String title, String description, String location, double salary, String employmentType,
                       String experience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
                       int numberOfOpenings, String companyName, String jobType, String workLocation, String gender,
-                      String requiredExperience, String skills, String jobShift, String education, List<Integer> applicants) {
+                      String requiredExperience, String skills, String jobShift, String education, List<Integer> applicants, boolean closed) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -93,6 +103,7 @@ public class JobPostDto {
         this.jobShift = jobShift;
         this.education = education;
         this.applicants=applicants;
+        this.closed=closed;
         
     }
 

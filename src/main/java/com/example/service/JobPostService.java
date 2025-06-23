@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,8 +10,12 @@ import org.springframework.stereotype.Service;
 import com.example.dto.JobPostDto;
 import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
+import com.example.enums.JobPostStatus;
+import com.example.exception.ResourceNotFoundException;
 import com.example.repository.JobPostRepository;
 import com.example.repository.RecruiterRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class JobPostService {
@@ -42,8 +47,19 @@ public class JobPostService {
     public JobPostDto getJobPostById(Integer id) {
         JobPost jobPost = jobPostRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("JobPost not found with id: " + id));
-        return mapToDto(jobPost);
+
+        JobPostDto dto = mapToDto(jobPost);
+
+        // Determine if the job post is closed based on lastDateToApply
+        if (jobPost.getLastDateToApply() != null && jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
+            dto.setClosed(true);
+        } else {
+            dto.setClosed(false);
+        }
+
+        return dto;
     }
+
 
     // Update
     public JobPostDto updateJobPost(Integer id, JobPostDto jobPostDto) {
@@ -141,5 +157,76 @@ public class JobPostService {
     public List<JobPost> searchJobs(String title, String location, String experience) {
         return jobPostRepository.searchJobs(title, location, experience);
     }
+
+    @Transactional
+    public void closeJobPost(Long jobId, Recruiter recruiter) {
+        int updated = jobPostRepository.closeJobPost(jobId, recruiter);
+        if (updated == 0) {
+            throw new ResourceNotFoundException(
+                "Job post not found with id: " + jobId + " for recruiter: " + recruiter.getId());
+        }
+    }
+    
+    public List<JobPostDto> getAllActiveJobPostsForApplicants() {
+        List<JobPost> activeJobPosts = jobPostRepository.findAllActiveJobPosts(LocalDate.now());
+        return activeJobPosts.stream()
+                             .map(this::mapToDto)
+                             .collect(Collectors.toList());
+    }
+    
+    public JobPostDto getActiveJobPostById(Integer id) {
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("JobPost not found with id: " + id));
+
+        if (jobPost.getStatus() == JobPostStatus.CLOSED || jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
+            throw new ResourceNotFoundException("This job post is closed and cannot be viewed by applicants.");
+        }
+
+        return mapToDto(jobPost);
+    }
+    
+    
+    
+ // Get all closed jobs
+    public List<JobPostDto> getAllClosedJobPosts() {
+        List<JobPost> closedJobs = jobPostRepository.findByStatus(JobPostStatus.CLOSED);
+        return closedJobs.stream()
+                       .map(this::mapToDto)
+                       .collect(Collectors.toList());
+    }
+    
+ // Get closed jobs by recruiter
+    public List<JobPostDto> getClosedJobsByRecruiter(Integer recruiterId) {
+        List<JobPost> closedJobs = jobPostRepository.findByRecruiterIdAndStatus(recruiterId, JobPostStatus.CLOSED);
+        return closedJobs.stream()
+                       .map(this::mapToDto)
+                       .collect(Collectors.toList());
+    }
+    
+    // Get closed jobs with filters
+    public List<JobPostDto> getClosedJobsWithFilters(String title, Double minSalary, Double maxSalary) {
+        try {
+            List<JobPost> filteredJobs = jobPostRepository.findClosedJobsWithFilters(
+                title, 
+                minSalary, 
+                maxSalary
+            );
+            return filteredJobs.stream()
+                             .map(this::mapToDto)
+                             .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Error filtering closed jobs: " + e.getMessage(), e);
+        }
+    }
+    // Get jobs closed before a certain date
+    public List<JobPostDto> getJobsClosedBeforeDate(LocalDate date) {
+        List<JobPost> jobs = jobPostRepository.findByStatusAndLastDateToApplyBefore(JobPostStatus.CLOSED, date);
+        return jobs.stream()
+                  .map(this::mapToDto)
+                  .collect(Collectors.toList());
+    }
+    
+    
+
 
 }
