@@ -3,6 +3,8 @@ package com.example.entity.jobposting;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import com.example.entity.Recruiter;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -63,6 +65,9 @@ public class JobPost {
         this.postedDate = LocalDate.now();
         this.applicants = 0; // Default value
     }
+    
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL)
+    private List<SavedJob> savedJobs;
 
     public JobPost() {
         super();
@@ -72,7 +77,8 @@ public class JobPost {
     public JobPost(int id, String title, String description, String location, double salary, String employmentType,
                    String experience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
                    String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
-                   String gender, String requiredExperience, String skills, String jobShift, String education, int applicants) {
+                   String gender, String requiredExperience, String skills, String jobShift, String education,
+                   int applicants,List<SavedJob> savedJobs) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -94,6 +100,7 @@ public class JobPost {
         this.jobShift = jobShift;
         this.education = education;
         this.applicants = applicants;
+        this.savedJobs=savedJobs;
     }
 
     // Getters and Setters for all fields
@@ -160,4 +167,14 @@ public class JobPost {
 
     public int getApplicants() { return applicants; }
     public void setApplicants(int applicants) { this.applicants = applicants; }
+
+	public List<SavedJob> getSavedJobs() {
+		return savedJobs;
+	}
+
+	public void setSavedJobs(List<SavedJob> savedJobs) {
+		this.savedJobs = savedJobs;
+	}
+    
+    
 }

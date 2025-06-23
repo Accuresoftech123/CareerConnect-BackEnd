@@ -3,6 +3,7 @@ package com.example.entity;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.entity.jobposting.SavedJob;
 import com.example.entity.profile.Education;
 import com.example.entity.profile.Experience;
 import com.example.entity.profile.JobPreferences;
@@ -93,6 +94,11 @@ public class JobSeeker {
 	// jobpreference
 	@OneToOne(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
 	private JobPreferences jobPrefeences;
+	
+	
+	// saved job
+	@OneToMany(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	private List<SavedJob> savedJobs;
 
 	public JobSeeker() {
 		super();
@@ -102,7 +108,8 @@ public class JobSeeker {
 	public JobSeeker(int id, String fullName, String email, String mobileNumber, String password,
 			String confirmPassword, JobSeekerPersonalInfo personalInfo, List<Education> educationList,
 			List<Experience> experienceList, List<String> skills, SocialProfile socialProfile,
-			JobPreferences jobPrefeences, boolean isVerified, String otp, LocalDateTime otpGeneratedTime,String mobileOtp,LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified) {
+			JobPreferences jobPrefeences, boolean isVerified, String otp, LocalDateTime otpGeneratedTime,String mobileOtp,
+			LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified , List<SavedJob> savedJobs) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -118,6 +125,7 @@ public class JobSeeker {
 		this.jobPrefeences = jobPrefeences;
 		this.isVerified = isVerified;
 		this.otp = otp;
+		this.savedJobs=savedJobs;
 	}
 
 	public int getId() {
@@ -263,6 +271,16 @@ public class JobSeeker {
 	public void setMobileVerified(boolean isMobileVerified) {
 		this.isMobileVerified = isMobileVerified;
 	}
+
+	public List<SavedJob> getSavedJobs() {
+		return savedJobs;
+	}
+
+	public void setSavedJobs(List<SavedJob> savedJobs) {
+		this.savedJobs = savedJobs;
+	}
+	
+	
 
 	
 }
