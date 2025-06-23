@@ -20,8 +20,59 @@ public class ApplicantDTO {
     private String resumeUrl;
     private LocalDate appliedDate;
     private String status; // From Enum ApplicationStatus (e.g., SUBMITTED, SHORTLISTED)
+ long    DaysSinceApplication;
+ private String jobPostTitle;
+ private String jobPostLocation;
 
-    public Long getApplicationId() {
+    public String getJobPostTitle() {
+	return jobPostTitle;
+}
+
+public void setJobPostTitle(String jobPostTitle) {
+	this.jobPostTitle = jobPostTitle;
+}
+
+public String getJobPostLocation() {
+	return jobPostLocation;
+}
+
+public void JobPostLocation(String jobPostLocation) {
+	this.jobPostLocation = jobPostLocation;
+}
+
+	public ApplicantDTO(Long applicationId, int jobPostId, String coverLetter, String expectedSalary, String availability,
+		String resumeFileName, String jobSeekerName, String email, int totalExperience, List<String> skills,
+		String highestQualification, String resumeUrl, LocalDate appliedDate, String status,
+		long DaysSinceApplication, String jobPostTitle, String jobPostLocation) {
+	super();
+	this.applicationId = applicationId;
+	this.jobPostId = jobPostId;
+	this.coverLetter = coverLetter;
+	this.expectedSalary = expectedSalary;
+	this.availability = availability;
+	this.resumeFileName = resumeFileName;
+	this.jobSeekerName = jobSeekerName;
+	this.email = email;
+	this.totalExperience = totalExperience;
+	this.skills = skills;
+	this.highestQualification = highestQualification;
+	this.resumeUrl = resumeUrl;
+	this.appliedDate = appliedDate;
+	this.status = status;
+	this.DaysSinceApplication = DaysSinceApplication;
+	this.jobPostTitle = jobPostTitle;
+	this.jobPostLocation = jobPostLocation;
+}
+
+	public long getDaysSinceApplication() {
+	return DaysSinceApplication;
+}
+
+public void setDaysSinceApplication(long DaysSinceApplication) {
+	this.DaysSinceApplication = DaysSinceApplication;
+}
+
+	public Long getApplicationId() {
 		return applicationId;
 	}
 
@@ -136,26 +187,9 @@ public class ApplicantDTO {
 	
     public ApplicantDTO() {}
 
-    // Full constructor
-    public ApplicantDTO(Long applicationId, int jobPostId, String coverLetter, String expectedSalary,
-                        String availability, String resumeFileName, String jobSeekerName, String email,
-                        int totalExperience, List<String> skills, String highestQualification,
-                        String resumeUrl, LocalDate appliedDate, String status) {
-        this.applicationId = applicationId;
-        this.jobPostId = jobPostId;
-        this.coverLetter = coverLetter;
-        this.expectedSalary = expectedSalary;
-        this.availability = availability;
-        this.resumeFileName = resumeFileName;
-        this.jobSeekerName = jobSeekerName;
-        this.email = email;
-        this.totalExperience = totalExperience;
-        this.skills = skills;
-        this.highestQualification = highestQualification;
-        this.resumeUrl = resumeUrl;
-        this.appliedDate = appliedDate;
-        this.status = status;
-    }
+    
+
+	
 
     
 }

@@ -1,5 +1,6 @@
 package com.example.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Repository;
 
 import com.example.entity.Applicant;
 import com.example.entity.JobSeeker;
+import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.ApplicationStatus;
 
@@ -49,4 +51,25 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
     @Query("SELECT a FROM Applicant a WHERE a.jobPost.id = :jobPostId ORDER BY a.applicationDate DESC")
     List<Applicant> findRecentApplicationsByJobPostId(@Param("jobPostId") Integer jobPostId);
 	boolean existsByJobPost_Recruiter_Id(int recruiterId);
+	
+	
+	
+    List<Applicant> findByStatus(ApplicationStatus status);
+    List<Applicant> findByJobPost_Recruiter(Recruiter recruiter);
+    List<Applicant> findByApplicationDateBetween(LocalDateTime start, LocalDateTime end);
+    
+    long countByJobPost_RecruiterAndApplicationDateAfter(Recruiter recruiter, LocalDateTime date);
+    
+ // Count by recruiter and status
+    long countByJobPost_RecruiterAndStatus(Recruiter recruiter, ApplicationStatus status);
+
+    // Count recent applications by status
+    long countByJobPost_RecruiterAndStatusAndApplicationDateAfter(
+        Recruiter recruiter, ApplicationStatus status, LocalDateTime date);
+    
+ // Get top 5 most recent applicants for a recruiter
+    List<Applicant> findTop5ByJobPost_RecruiterOrderByApplicationDateDesc(Recruiter recruiter);
+    List<Applicant> findTop5ByJobPostInAndStatusNotOrderByApplicationDateDesc(
+            List<JobPost> jobPosts, ApplicationStatus status);
+  
 }

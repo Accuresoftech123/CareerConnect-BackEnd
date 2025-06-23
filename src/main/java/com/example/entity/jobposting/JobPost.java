@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 import com.example.entity.Recruiter;
+import com.example.enums.JobPostStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 /**
@@ -66,10 +67,23 @@ public class JobPost {
         this.applicants = 0; // Default value
     }
     
+
+    @Enumerated(EnumType.STRING)
+    private JobPostStatus status = JobPostStatus.OPEN;
+
+    public JobPostStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(JobPostStatus status) {
+		this.status = status;
+	}
+
     @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL)
     private List<SavedJob> savedJobs;
 
-    public JobPost() {
+
+	public JobPost() {
         super();
     }
 
@@ -77,8 +91,9 @@ public class JobPost {
     public JobPost(int id, String title, String description, String location, double salary, String employmentType,
                    String experience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
                    String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
-                   String gender, String requiredExperience, String skills, String jobShift, String education,
-                   int applicants,List<SavedJob> savedJobs) {
+
+                   String gender, String requiredExperience, String skills, String jobShift, String education, int applicants, JobPostStatus status ,List<SavedJob> savedJobs) {
+
         this.id = id;
         this.title = title;
         this.description = description;
@@ -100,7 +115,11 @@ public class JobPost {
         this.jobShift = jobShift;
         this.education = education;
         this.applicants = applicants;
+
+        this.status=status;
+
         this.savedJobs=savedJobs;
+
     }
 
     // Getters and Setters for all fields

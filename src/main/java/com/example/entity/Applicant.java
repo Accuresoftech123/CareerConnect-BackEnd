@@ -39,17 +39,30 @@ public class Applicant {
     private String expectedSalary;
     private String availability;
     private String notes; // For recruiter's internal use
+    private String jobPostTitle;
+    private String jobPostLocation;
     
     
 
-    public Applicant() {
-		super();
-		// TODO Auto-generated constructor stub
+    public String getJobPostTitle() {
+		return jobPostTitle;
+	}
+
+	public void setJobPostTitle(String jobPostTitle) {
+		this.jobPostTitle = jobPostTitle;
+	}
+
+	public String getJobPostLocation() {
+		return jobPostLocation;
+	}
+
+	public void setJobPostLocation(String jobPostLocation) {
+		this.jobPostLocation = jobPostLocation;
 	}
 
 	public Applicant(int id, JobPost jobPost, JobSeeker jobSeeker, String coverLetter, ApplicationStatus status,
 			LocalDateTime applicationDate, String resumeFilePath, String expectedSalary, String availability,
-			String notes) {
+			String notes, String jobPostTitle, String jobPostLocation) {
 		super();
 		this.id = id;
 		this.jobPost = jobPost;
@@ -61,7 +74,16 @@ public class Applicant {
 		this.expectedSalary = expectedSalary;
 		this.availability = availability;
 		this.notes = notes;
+		this.jobPostTitle = jobPostTitle;
+		this.jobPostLocation = jobPostLocation;
 	}
+
+	public Applicant() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+
+	
 
 	public JobPost getJobPost() {
 		return jobPost;
