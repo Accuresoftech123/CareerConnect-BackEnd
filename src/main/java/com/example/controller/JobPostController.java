@@ -2,6 +2,8 @@ package com.example.controller;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,7 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import com.example.dto.JobPostDto;
 import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
-
+import com.example.enums.JobPostStatus;
+import com.example.repository.JobPostRepository;
 import com.example.service.JobPostService;
 
 @RestController
@@ -134,6 +137,31 @@ public class JobPostController {
         List<JobPostDto> jobs = jobPostService.getJobsClosedBeforeDate(localDate);
         return ResponseEntity.ok(jobs);
     }
+
+   //get a latest job post added by recruiter 
+    @GetMapping("/recruiters/{recruiterId}/last-post")
+    public ResponseEntity<JobPostDto> getLastAddedJobPost(
+            @PathVariable Integer recruiterId) {
+        Optional<JobPostDto> lastPost = jobPostService.getLastAddedJobPost(recruiterId);
+        return lastPost.map(ResponseEntity::ok)
+                      .orElseGet(() -> ResponseEntity.ok().build());
+    }
+    
+    
+    //save as draft post
+    @PostMapping("/recruiter/{recruiterId}/save-draft")
+    public ResponseEntity<JobPostDto> saveJobPostAsDraft(@RequestBody JobPostDto jobPostDto,
+                                                        @PathVariable Integer recruiterId) {
+        JobPostDto draftJobPost = jobPostService.saveJobPostAsDraft(jobPostDto, recruiterId);
+        return ResponseEntity.ok(draftJobPost);
+    }
+    
+    @GetMapping("/recruiter/{recruiterId}/drafts")
+    public ResponseEntity<List<JobPostDto>> getDraftJobPosts(@PathVariable Integer recruiterId) {
+        List<JobPostDto> drafts = jobPostService.getDraftJobPostsByRecruiter(recruiterId);
+        return ResponseEntity.ok(drafts);
+    }
+
 
 
 }

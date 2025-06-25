@@ -2,6 +2,7 @@ package com.example.service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,7 @@ public class JobPostService {
         JobPost savedJobPost = jobPostRepository.save(jobPost);
         return mapToDto(savedJobPost);
     }
+    
 
     // Read (Get All)
     public List<JobPostDto> getAllJobPosts() {
@@ -69,9 +71,11 @@ public class JobPostService {
         existingJobPost.setTitle(jobPostDto.getTitle());
         existingJobPost.setDescription(jobPostDto.getDescription());
         existingJobPost.setLocation(jobPostDto.getLocation());
-        existingJobPost.setSalary(jobPostDto.getSalary());
+        existingJobPost.setMaxSalary(jobPostDto.getMaxSalary());
+        existingJobPost.setMinSalary(jobPostDto.getMinSalary());
         existingJobPost.setEmploymentType(jobPostDto.getEmploymentType());
-        existingJobPost.setExperience(jobPostDto.getExperience());
+        existingJobPost.setMinExperience(jobPostDto.getMinExperience());
+        existingJobPost.setMaxExperience(jobPostDto.getMaxExperience());
         existingJobPost.setLastDateToApply(jobPostDto.getLastDateToApply());
         existingJobPost.setPostedDate(jobPostDto.getPostedDate());
         existingJobPost.setJobCategory(jobPostDto.getJobCategory());
@@ -80,7 +84,7 @@ public class JobPostService {
         existingJobPost.setJobType(jobPostDto.getJobType());
         existingJobPost.setWorkLocation(jobPostDto.getWorkLocation());
         existingJobPost.setGender(jobPostDto.getGender());
-        existingJobPost.setRequiredExperience(jobPostDto.getRequiredExperience());
+        
         existingJobPost.setSkills(jobPostDto.getSkills());
         existingJobPost.setJobShift(jobPostDto.getJobShift());
         existingJobPost.setEducation(jobPostDto.getEducation());
@@ -108,9 +112,10 @@ public class JobPostService {
         jobPost.setTitle(jobPostDto.getTitle());
         jobPost.setDescription(jobPostDto.getDescription());
         jobPost.setLocation(jobPostDto.getLocation());
-        jobPost.setSalary(jobPostDto.getSalary());
+        jobPost.setSalary(jobPostDto.getMaxSalary());
         jobPost.setEmploymentType(jobPostDto.getEmploymentType());
-        jobPost.setExperience(jobPostDto.getExperience());
+        jobPost.setMaxSalary(jobPostDto.getMaxSalary());
+        jobPost.setMinSalary(jobPostDto.getMinSalary());
         jobPost.setLastDateToApply(jobPostDto.getLastDateToApply());
         jobPost.setPostedDate(jobPostDto.getPostedDate());
         jobPost.setJobCategory(jobPostDto.getJobCategory());
@@ -119,7 +124,8 @@ public class JobPostService {
         jobPost.setJobType(jobPostDto.getJobType());
         jobPost.setWorkLocation(jobPostDto.getWorkLocation());
         jobPost.setGender(jobPostDto.getGender());
-        jobPost.setRequiredExperience(jobPostDto.getRequiredExperience());
+        jobPost.setMinExperience(jobPostDto.getMinExperience());
+        jobPost.setMaxExperience(jobPostDto.getMaxExperience());        
         jobPost.setSkills(jobPostDto.getSkills());
         jobPost.setJobShift(jobPostDto.getJobShift());
         jobPost.setEducation(jobPostDto.getEducation());
@@ -135,9 +141,11 @@ public class JobPostService {
         dto.setTitle(jobPost.getTitle());
         dto.setDescription(jobPost.getDescription());
         dto.setLocation(jobPost.getLocation());
-        dto.setSalary(jobPost.getSalary());
+        dto.setMaxSalary(jobPost.getMaxSalary());
+        dto.setMinSalary(jobPost.getMinSalary());
         dto.setEmploymentType(jobPost.getEmploymentType());
-        dto.setExperience(jobPost.getExperience());
+        dto.setMinExperience(jobPost.getMinExperience());
+        dto.setMaxExperience(jobPost.getMaxExperience());
         dto.setLastDateToApply(jobPost.getLastDateToApply());
         dto.setPostedDate(jobPost.getPostedDate());
         dto.setJobCategory(jobPost.getJobCategory());
@@ -146,7 +154,7 @@ public class JobPostService {
         dto.setJobType(jobPost.getJobType());
         dto.setWorkLocation(jobPost.getWorkLocation());
         dto.setGender(jobPost.getGender());
-        dto.setRequiredExperience(jobPost.getRequiredExperience());
+        
         dto.setSkills(jobPost.getSkills());
         dto.setJobShift(jobPost.getJobShift());
         dto.setEducation(jobPost.getEducation());
@@ -218,6 +226,7 @@ public class JobPostService {
             throw new RuntimeException("Error filtering closed jobs: " + e.getMessage(), e);
         }
     }
+    
     // Get jobs closed before a certain date
     public List<JobPostDto> getJobsClosedBeforeDate(LocalDate date) {
         List<JobPost> jobs = jobPostRepository.findByStatusAndLastDateToApplyBefore(JobPostStatus.CLOSED, date);
@@ -226,6 +235,34 @@ public class JobPostService {
                   .collect(Collectors.toList());
     }
     
+    //get latest added jobpost
+    public Optional<JobPostDto> getLastAddedJobPost(Integer recruiterId) {
+        return jobPostRepository.findLatestByRecruiterId(recruiterId)
+           
+        		.map(this::mapToDto);
+    }
+    
+    //save as draft method
+    
+    public JobPostDto saveJobPostAsDraft(JobPostDto jobPostDto, Integer recruiterId) {
+        Recruiter recruiter = recruiterRepository.findById(recruiterId)
+                .orElseThrow(() -> new RuntimeException("Recruiter not found with id: " + recruiterId));
+
+        JobPost jobPost = mapToEntity(jobPostDto);
+        jobPost.setRecruiter(recruiter);
+        jobPost.setStatus(JobPostStatus.DRAFT); // Mark as Draft
+
+        JobPost savedJobPost = jobPostRepository.save(jobPost);
+        return mapToDto(savedJobPost);
+    }
+    
+    //get all save draft methods
+    public List<JobPostDto> getDraftJobPostsByRecruiter(Integer recruiterId) {
+        List<JobPost> drafts = jobPostRepository.findByRecruiterIdAndStatus(recruiterId, JobPostStatus.DRAFT);
+        return drafts.stream().map(this::mapToDto).collect(Collectors.toList());
+    }
+
+
     
 
 

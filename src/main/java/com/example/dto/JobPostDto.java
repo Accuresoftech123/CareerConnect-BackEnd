@@ -10,62 +10,66 @@ public class JobPostDto {
 
     private Integer id;
 
-    @NotBlank(message = "Title is required")
+    
     private String title;
 
-    @NotBlank(message = "Description is required")
+   
     private String description;
 
-    @NotBlank(message = "Location is required")
+    
     private String location;
 
-    @PositiveOrZero(message = "Salary must be zero or positive")
-    private double salary;
+    
+    private double minSalary;
+    private double maxSalary;
 
-    @NotBlank(message = "Employment Type is required")
+   
     private String employmentType;
 
-    @NotBlank(message = "Experience is required")
-    private String experience;
+   
+    private String minExperience;
+    private String maxExperience;
 
-    @NotNull(message = "Last date to apply is required")
-    private LocalDate lastDateToApply;
+    
+    
+
+	private LocalDate lastDateToApply;
 
     private LocalDate postedDate;
 
-    @NotBlank(message = "Job Category is required")
+    
     private String jobCategory;
 
-    @PositiveOrZero(message = "Number of openings must be zero or positive")
+   
     private int numberOfOpenings;
 
-    @NotBlank(message = "Company Name is required")
+    
     private String companyName;
 
-    @NotBlank(message = "Job Type is required")
+   
     private String jobType;
 
-    @NotBlank(message = "Work Location is required")
+    
     private String workLocation;
 
-    @NotBlank(message = "Gender is required")
+    
     private String gender;
 
-    @NotBlank(message = "Required Experience is required")
-    private String requiredExperience;
+    
+    
+    private List<String> skills;
 
-    @NotBlank(message = "Skills are required")
-    private String skills;
-
-    @NotBlank(message = "Job Shift is required")
+    
     private String jobShift;
 
-    @NotBlank(message = "Education is required")
+    
     private String education;
 
     private List<Integer> applicants;
     
     private boolean closed; 
+    
+    private List<String> benefits;
 
     public boolean isClosed() {
 		return closed;
@@ -79,17 +83,19 @@ public class JobPostDto {
         super();
     }
 
-    public JobPostDto(Integer id, String title, String description, String location, double salary, String employmentType,
-                      String experience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
+    public JobPostDto(Integer id, String title, String description, String location, double minSalary,double maxSalary, String employmentType,
+                      String minExperience,String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
                       int numberOfOpenings, String companyName, String jobType, String workLocation, String gender,
-                      String requiredExperience, String skills, String jobShift, String education, List<Integer> applicants, boolean closed) {
+                      String requiredExperience, List<String> skills, String jobShift, String education, List<Integer> applicants, boolean closed, List<String> benefits) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.location = location;
-        this.salary = salary;
+        this.minSalary = minSalary;
+        this.maxSalary=maxSalary;
         this.employmentType = employmentType;
-        this.experience = experience;
+        this.minExperience = minExperience;
+        this.maxExperience=maxExperience;
         this.lastDateToApply = lastDateToApply;
         this.postedDate = postedDate;
         this.jobCategory = jobCategory;
@@ -98,9 +104,9 @@ public class JobPostDto {
         this.jobType = jobType;
         this.workLocation = workLocation;
         this.gender = gender;
-        this.requiredExperience = requiredExperience;
         this.skills = skills;
         this.jobShift = jobShift;
+        this.benefits=benefits;
         this.education = education;
         this.applicants=applicants;
         this.closed=closed;
@@ -125,17 +131,12 @@ public class JobPostDto {
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
 
-    // Salary
-    public double getSalary() { return salary; }
-    public void setSalary(double salary) { this.salary = salary; }
-
+    
     // Employment Type
     public String getEmploymentType() { return employmentType; }
     public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
 
-    // Experience
-    public String getExperience() { return experience; }
-    public void setExperience(String experience) { this.experience = experience; }
+   
 
     // Last Date To Apply
     public LocalDate getLastDateToApply() { return lastDateToApply; }
@@ -169,17 +170,20 @@ public class JobPostDto {
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }
 
-    // Required Experience
-    public String getRequiredExperience() { return requiredExperience; }
-    public void setRequiredExperience(String requiredExperience) { this.requiredExperience = requiredExperience; }
-
+    
     // Skills
-    public String getSkills() { return skills; }
-    public void setSkills(String skills) { this.skills = skills; }
+    public void setSkills(List<String> skills) {
+		this.skills = skills;
+	}
+    public List<String> getSkills() {
+		return skills;
+	}
 
+    
     // Job Shift
     public String getJobShift() { return jobShift; }
-    public void setJobShift(String jobShift) { this.jobShift = jobShift; }
+    
+	public void setJobShift(String jobShift) { this.jobShift = jobShift; }
 
     // Education
     public String getEducation() { return education; }
@@ -193,5 +197,46 @@ public class JobPostDto {
     public void setApplicants(List<Integer> applicants) {
         this.applicants = applicants;
     }
+
+	public double getMinSalary() {
+		return minSalary;
+	}
+
+	public void setMinSalary(double minSalary) {
+		this.minSalary = minSalary;
+	}
+
+	public double getMaxSalary() {
+		return maxSalary;
+	}
+
+	public void setMaxSalary(double maxSalary) {
+		this.maxSalary = maxSalary;
+	}
+
+	public List<String> getBenefits() {
+		return benefits;
+	}
+
+	public void setBenefits(List<String> benefits) {
+		this.benefits = benefits;
+	}
+    
+	public String getMinExperience() {
+		return minExperience;
+	}
+
+	public void setMinExperience(String minExperience) {
+		this.minExperience = minExperience;
+	}
+
+	public String getMaxExperience() {
+		return maxExperience;
+	}
+
+	public void setMaxExperience(String maxExperience) {
+		this.maxExperience = maxExperience;
+	}
+    
 
 }

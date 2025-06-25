@@ -3,6 +3,8 @@ package com.example.entity.jobposting;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.List;
+
 import com.example.entity.Recruiter;
 import com.example.enums.JobPostStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -34,10 +36,13 @@ public class JobPost {
     private String employmentType;
 
    
-    private String experience;
+    private String minExperience;
+    private String maxExperience;
 
     
-    private LocalDate lastDateToApply;
+    
+
+	private LocalDate lastDateToApply;
 
     private LocalDate postedDate;
 
@@ -54,12 +59,22 @@ public class JobPost {
     private String workLocation;
     private String gender;
     private String requiredExperience;
-    private String skills;
+    @ElementCollection
+    private List<String> skills;
     private String jobShift;
     private String education;
     private int applicants;
 
-    @PrePersist
+    private double minSalary;
+   
+
+	private double maxSalary;
+	@ElementCollection
+	private List<String> benefits;
+    
+    
+
+	@PrePersist
     protected void onCreate() {
         this.postedDate = LocalDate.now();
         this.applicants = 0; // Default value
@@ -71,6 +86,7 @@ public class JobPost {
     public JobPostStatus getStatus() {
 		return status;
 	}
+    
 
 	public void setStatus(JobPostStatus status) {
 		this.status = status;
@@ -82,16 +98,17 @@ public class JobPost {
 
     // All Args Constructor
     public JobPost(int id, String title, String description, String location, double salary, String employmentType,
-                   String experience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
+                   String minExperience, String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
                    String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
-                   String gender, String requiredExperience, String skills, String jobShift, String education, int applicants, JobPostStatus status) {
+                   String gender, String requiredExperience, String jobShift, String education, int applicants, JobPostStatus status,double minSalary,  double maxSalary,List<String> skills,List<String> benefits) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.location = location;
         this.salary = salary;
         this.employmentType = employmentType;
-        this.experience = experience;
+        this.minExperience = minExperience;
+        this.maxExperience=maxExperience;
         this.lastDateToApply = lastDateToApply;
         this.postedDate = postedDate;
         this.recruiter = recruiter;
@@ -102,7 +119,12 @@ public class JobPost {
         this.workLocation = workLocation;
         this.gender = gender;
         this.requiredExperience = requiredExperience;
-        this.skills = skills;
+        this.minSalary=minSalary;
+        this.maxSalary=maxSalary;
+        this.skills=skills;
+        this.benefits=benefits;
+        
+       
         this.jobShift = jobShift;
         this.education = education;
         this.applicants = applicants;
@@ -129,10 +151,10 @@ public class JobPost {
     public String getEmploymentType() { return employmentType; }
     public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
 
-    public String getExperience() { return experience; }
-    public void setExperience(String experience) { this.experience = experience; }
+    
 
-    public LocalDate getLastDateToApply() { return lastDateToApply; }
+   
+	public LocalDate getLastDateToApply() { return lastDateToApply; }
     public void setLastDateToApply(LocalDate lastDateToApply) { this.lastDateToApply = lastDateToApply; }
 
     public LocalDate getPostedDate() { return postedDate; }
@@ -162,8 +184,7 @@ public class JobPost {
     public String getRequiredExperience() { return requiredExperience; }
     public void setRequiredExperience(String requiredExperience) { this.requiredExperience = requiredExperience; }
 
-    public String getSkills() { return skills; }
-    public void setSkills(String skills) { this.skills = skills; }
+    
 
     public String getJobShift() { return jobShift; }
     public void setJobShift(String jobShift) { this.jobShift = jobShift; }
@@ -173,4 +194,52 @@ public class JobPost {
 
     public int getApplicants() { return applicants; }
     public void setApplicants(int applicants) { this.applicants = applicants; }
+    
+    public double getMinSalary() {
+		return minSalary;
+	}
+
+	public void setMinSalary(double minSalary) {
+		this.minSalary = minSalary;
+	}
+
+	public double getMaxSalary() {
+		return maxSalary;
+	}
+
+	public void setMaxSalary(double maxSalary) {
+		this.maxSalary = maxSalary;
+	}
+
+	public void setSkills(List<String> skills) {
+		this.skills = skills;
+	}
+	 public List<String> getSkills() {
+			return skills;
+		}
+
+	
+	public List<String> getBenefits() {
+		return benefits;
+	}
+
+	public void setBenefits(List<String> benefits) {
+		this.benefits = benefits;
+	}
+	
+	public String getMinExperience() {
+		return minExperience;
+	}
+
+	public void setMinExperience(String minExperience) {
+		this.minExperience = minExperience;
+	}
+
+	public String getMaxExperience() {
+		return maxExperience;
+	}
+
+	public void setMaxExperience(String maxExperience) {
+		this.maxExperience = maxExperience;
+	}
 }
