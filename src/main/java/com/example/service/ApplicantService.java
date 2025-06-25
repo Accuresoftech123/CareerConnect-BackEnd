@@ -8,12 +8,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.dto.ApplicantDTO;
+import com.example.dto.SavedJobPostReportDto;
 import com.example.entity.Applicant;
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
 import com.example.entity.profile.Education;
 import com.example.enums.ApplicationStatus;
 import com.example.exception.NotFoundException;
+import com.example.exception.ResourceNotFoundException;
 import com.example.exception.DuplicateApplicationException;
 import com.example.repository.ApplicantRepository;
 import com.example.repository.JobPostRepository;
@@ -140,4 +142,40 @@ public class ApplicantService {
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
     }
+    
+    
+    // get appied job by jobseeker
+    public List<SavedJobPostReportDto> getAppliedJobsByJobSeeker(int jobSeekerId) {
+        JobSeeker seeker = jobSeekerRepository.findById(jobSeekerId)
+            .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
+
+        List<Applicant> applicants = applicantRepository.findByJobSeeker(seeker);
+
+        return applicants.stream()
+            .map(applicant -> {
+                JobPost post = applicant.getJobPost();
+                return new SavedJobPostReportDto(
+                		post.getId(),
+                		post.getTitle(),
+                		post.getCompanyName(),
+                		post.getLocation(),
+                		post.getSalary(),
+                		post.getJobType(),
+                		post.getSkills()
+                );
+            })
+            .collect(Collectors.toList());
+    }
+    
+    // count of applied jobes  by jobseeker
+    public long countAppliedJobs(int jobSeekerId) {
+        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
+                .orElseThrow(() -> new ResourceNotFoundException("JobSeeker with ID " + jobSeekerId + " not found"));
+
+        return applicantRepository.countByJobSeeker(jobSeeker);
+    }
+    
+    
+    
+    
 }

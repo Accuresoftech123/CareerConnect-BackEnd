@@ -4,7 +4,9 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -284,79 +286,54 @@ public class JobSeekerService {
 	}
 
 
-//    /**
-//     * Updates an existing job seeker's profile with the provided data.
-//     *
-//     * @param id  ID of the job seeker
-//     * @param dto DTO containing the profile information to be updated
-//     * @return status message
-//     */
-//    public String updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
-//        JobSeeker jobSeeker = repo.findById(id).orElse(null);
-//
-//        if (jobSeeker == null) {
-//            return "Job Seeker not found with ID: " + id;
-//        }
-//
-//        // Proceed only if DTO contains data
-//        if (!isDtoEmpty(dto)) {
-//            // Update non-null and valid fields
-//            if (dto.getFullName() != null) jobSeeker.setFullName(dto.getFullName());         
-//            if (dto.getMobileNumber() != null) jobSeeker.setMobileNumber(dto.getMobileNumber());
-//            if (dto.getAddress() != null) jobSeeker.setAddress(dto.getAddress());
-//            if (dto.getGender() != null) jobSeeker.setGender(dto.getGender());
-//            if (dto.getDateOfBirth() != null) jobSeeker.setDateOfBirth(dto.getDateOfBirth());
-//            if (dto.getProfileSummary() != null) jobSeeker.setProfileSummary(dto.getProfileSummary());
-//            if (dto.getHighestEducationQualification() != null) jobSeeker.setHighestEducationQualification(dto.getHighestEducationQualification());
-//            if (dto.getYearOfPassing() != null) jobSeeker.setYearOfPassing(dto.getYearOfPassing());
-//            if (dto.getCollegeName() != null) jobSeeker.setCollegeName(dto.getCollegeName());
-//            if (dto.getSkills() != null) jobSeeker.setSkills(dto.getSkills());
-//            if (dto.getYearsOfExperience() > 0) jobSeeker.setYearsOfExperience(dto.getYearsOfExperience());
-//            if (dto.getResumeUrl() != null) jobSeeker.setResumeUrl(dto.getResumeUrl());
-//            if (dto.getGithubProfileUrl()!= null) jobSeeker.setGithubProfileUrl(dto.getGithubProfileUrl());
-//            if (dto.getProfileImageUrl() != null) jobSeeker.setProfileImageUrl(dto.getProfileImageUrl());
-//            if (dto.getPreferredJobLocation() != null) jobSeeker.setPreferredJobLocation(dto.getPreferredJobLocation());
-//            if (dto.getNoticePeriod() != null) jobSeeker.setNoticePeriod(dto.getNoticePeriod());
-//            if (dto.getCurrentCtc() != null) jobSeeker.setCurrentCtc(dto.getCurrentCtc());
-//            if (dto.getExpectedCtc() != null) jobSeeker.setExpectedCtc(dto.getExpectedCtc());
-//
-//            jobSeeker.setProfileComplete(dto.isProfileComplete());
-//
-//            jobSeeker.setUpdatedAt(LocalDateTime.now());
-//
-//            // Save the updated entity
-//            repo.save(jobSeeker);
-//            return "Job Seeker profile updated successfully!";
-//        } else {
-//            return "Profile data is empty.";
-//        }
-//    }
-//
-//    /**
-//     * Checks if the JobSeekerProfileDto is completely empty (i.e., no data to update).
-//     *
-//     * @param dto the DTO to check
-//     * @return true if empty, false otherwise
-//     */
-//    private boolean isDtoEmpty(JobSeekerProfileDto dto) {
-//        return dto.getFullName() == null &&          
-//               dto.getMobileNumber() == null &&
-//               dto.getAddress() == null &&
-//               dto.getGender() == null &&
-//               dto.getDateOfBirth() == null &&
-//               dto.getProfileSummary() == null &&
-//               dto.getHighestEducationQualification() == null &&
-//               dto.getYearOfPassing() == null &&
-//               dto.getCollegeName() == null &&
-//               dto.getSkills() == null &&
-//               dto.getYearsOfExperience() <= 0 &&
-//               dto.getResumeUrl() == null &&
-//               dto.getGithubProfileUrl() == null &&
-//               dto.getProfileImageUrl() == null &&
-//               dto.getPreferredJobLocation() == null &&
-//               dto.getNoticePeriod() == null &&
-//               dto.getCurrentCtc() == null &&
-//               dto.getExpectedCtc() == null &&
-//               !dto.isProfileComplete();  // false means profile is complete → not empty
-//    }
+
+	
+	
+	//track profile
+	public Map<String, Object> getProfileCompletionStatus(JobSeeker jobSeeker) {
+	    int totalFields = 9;
+	    int filledFields = 0;
+	    List<String> emptyFields = new ArrayList<>();
+
+	    if (jobSeeker.getFullName() != null && !jobSeeker.getFullName().isBlank()) filledFields++;
+	    else emptyFields.add("Full Name");
+
+	    if (jobSeeker.getMobileNumber() != null && !jobSeeker.getMobileNumber().isBlank()) filledFields++;
+	    else emptyFields.add("Mobile Number");
+
+	    if (jobSeeker.getPersonalInfo() != null &&
+	        jobSeeker.getPersonalInfo().getCity() != null &&
+	        !jobSeeker.getPersonalInfo().getCity().isBlank()) filledFields++;
+	    else emptyFields.add("Personal Info");
+
+	    if (jobSeeker.getEducationList() != null && !jobSeeker.getEducationList().isEmpty()) filledFields++;
+	    else emptyFields.add("Education");
+
+	    if (jobSeeker.getExperienceList() != null && !jobSeeker.getExperienceList().isEmpty()) filledFields++;
+	    else emptyFields.add("Experience");
+
+	    if (jobSeeker.getSkills() != null && !jobSeeker.getSkills().isEmpty()) filledFields++;
+	    else emptyFields.add("Skills");
+
+	    if (jobSeeker.getSocialProfile() != null &&
+	        jobSeeker.getSocialProfile().getLinkedinUrl() != null &&
+	        !jobSeeker.getSocialProfile().getLinkedinUrl().isBlank()) filledFields++;
+	    else emptyFields.add("Social Profile");
+
+	    if (jobSeeker.getJobPrefeences() != null &&
+	        jobSeeker.getJobPrefeences().getDesiredJobTitle() != null &&
+	        !jobSeeker.getJobPrefeences().getDesiredJobTitle().isBlank()) filledFields++;
+	    else emptyFields.add("Job Preferences");
+
+	    if (jobSeeker.isVerified()) filledFields++;
+	    else emptyFields.add("Email Verification");
+
+	    int percentage = (filledFields * 100) / totalFields;
+
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("completionPercentage", percentage);
+	    response.put("missingFields", emptyFields);
+
+	    return response;
+	}
 }

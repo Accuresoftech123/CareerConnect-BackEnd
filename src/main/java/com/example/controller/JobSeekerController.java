@@ -149,4 +149,14 @@ public class JobSeekerController {
 	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mobile number not found!");
 	        }
 	    }
+	    
+	  // track the profile
+	    @GetMapping("/{id}/profile-completion")
+	    public ResponseEntity<Map<String, Object>> getProfileCompletion(@PathVariable int id) {
+	        JobSeeker jobSeeker = repo.findById(id)
+	                .orElseThrow(() -> new RuntimeException("JobSeeker not found with ID: " + id));
+
+	        Map<String, Object> status = jobSeekerService.getProfileCompletionStatus(jobSeeker);
+	        return ResponseEntity.ok(status);
+	    }
 }
