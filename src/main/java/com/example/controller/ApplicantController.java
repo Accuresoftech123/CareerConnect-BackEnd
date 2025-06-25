@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.ApplicantDTO;
+import com.example.dto.SavedJobPostReportDto;
 import com.example.entity.Applicant;
 import com.example.enums.ApplicationStatus;
 import com.example.service.ApplicantService;
@@ -73,4 +74,20 @@ public class ApplicantController {
         applicantService.withdrawApplication(applicationId);
         return ResponseEntity.noContent().build();
     }
+    
+    
+    // get appied job by jobseeker
+    @GetMapping("/jobseeker/{jobSeekerId}/applied-jobs")
+    public ResponseEntity<List<SavedJobPostReportDto>> getAppliedJobs(@PathVariable int jobSeekerId) {
+        List<SavedJobPostReportDto> jobs = applicantService.getAppliedJobsByJobSeeker(jobSeekerId);
+        return ResponseEntity.ok(jobs);
+    }
+    
+    // count of applied jobes  by jobseeker
+    @GetMapping("/jobseeker/{jobSeekerId}/applied-jobs/count")
+    public ResponseEntity<Long> getAppliedJobsCount(@PathVariable int jobSeekerId) {
+        long count = applicantService.countAppliedJobs(jobSeekerId);
+        return ResponseEntity.ok(count);
+    }
+
 }
