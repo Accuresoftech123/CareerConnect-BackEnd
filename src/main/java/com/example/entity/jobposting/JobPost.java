@@ -80,6 +80,7 @@ public class JobPost {
         this.applicants = 0; // Default value
     }
     
+
     @Enumerated(EnumType.STRING)
     private JobPostStatus status = JobPostStatus.OPEN;
 
@@ -92,6 +93,10 @@ public class JobPost {
 		this.status = status;
 	}
 
+    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL)
+    private List<SavedJob> savedJobs;
+
+
 	public JobPost() {
         super();
     }
@@ -100,7 +105,14 @@ public class JobPost {
     public JobPost(int id, String title, String description, String location, double salary, String employmentType,
                    String minExperience, String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
                    String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
-                   String gender, String requiredExperience, String jobShift, String education, int applicants, JobPostStatus status,double minSalary,  double maxSalary,List<String> skills,List<String> benefits) {
+
+                   String gender, String requiredExperience, String jobShift, String education, JobPostStatus status,double minSalary,
+                   double maxSalary,List<String> skills,List<String> benefits,  int applicants, List<SavedJob> savedJobs) {
+
+
+                   
+
+
         this.id = id;
         this.title = title;
         this.description = description;
@@ -128,7 +140,11 @@ public class JobPost {
         this.jobShift = jobShift;
         this.education = education;
         this.applicants = applicants;
+
         this.status=status;
+
+        this.savedJobs=savedJobs;
+
     }
 
     // Getters and Setters for all fields
@@ -194,7 +210,7 @@ public class JobPost {
 
     public int getApplicants() { return applicants; }
     public void setApplicants(int applicants) { this.applicants = applicants; }
-    
+
     public double getMinSalary() {
 		return minSalary;
 	}
@@ -242,4 +258,16 @@ public class JobPost {
 	public void setMaxExperience(String maxExperience) {
 		this.maxExperience = maxExperience;
 	}
+
+
+	public List<SavedJob> getSavedJobs() {
+		return savedJobs;
+	}
+
+	public void setSavedJobs(List<SavedJob> savedJobs) {
+		this.savedJobs = savedJobs;
+	}
+    
+    
+
 }
