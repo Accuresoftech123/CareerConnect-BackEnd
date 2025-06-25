@@ -2,6 +2,6 @@ package com.example.enums;
 
 public enum JobPostStatus {
 	
-	OPEN, CLOSED
+	OPEN, CLOSED, DRAFT
 
 }

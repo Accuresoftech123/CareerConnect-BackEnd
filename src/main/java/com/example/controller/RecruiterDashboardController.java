@@ -24,13 +24,14 @@ import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.ApplicationStatus;
 import com.example.exception.ResourceNotFoundException;
+import com.example.repository.RecruiterRepository;
 import com.example.service.ApplicantService;
 import com.example.service.RecruiterDashboardService;
 
 
 
 @RestController
-@RequestMapping("/api/recruiter")
+@RequestMapping("/recruiter")
 public class RecruiterDashboardController {
 	
 	
@@ -39,11 +40,17 @@ public class RecruiterDashboardController {
     @Autowired
     private RecruiterDashboardService dashboardService;
     
-    @GetMapping("/dashboard/summary")
-    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(
-             Recruiter recruiter) {
+    @Autowired
+    RecruiterRepository RecRepo;
+    
+    @GetMapping("/dashboard/summary/{recruiterId}")
+    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(@PathVariable Integer recruiterId) {
+        Recruiter recruiter = RecRepo.findById(recruiterId)
+                .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found with id: " + recruiterId));
+        
         return ResponseEntity.ok(dashboardService.getDashboardSummary(recruiter));
     }
+
     
  
     @GetMapping("/recent-applicants")
