@@ -1,5 +1,6 @@
 package com.example.dto;
 
+import java.util.List;
 
 public class SavedJobPostReportDto {
 	
@@ -9,9 +10,14 @@ public class SavedJobPostReportDto {
 	 private String location;
 	 private double salary;
 	 private String jobType;
-	 private String skills;
+	 private List<String> skills;
 	 
 	 
+	public void setSkills(List<String> skills) {
+		this.skills = skills;
+	}
+
+
 	public SavedJobPostReportDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -19,7 +25,7 @@ public class SavedJobPostReportDto {
 
 
 	public SavedJobPostReportDto(int id, String title, String companyName, String location, double salary, String jobType,
-			String skills) {
+			List<String> skills) {
 		super();
 		this.id=id;
 		this.title = title;
@@ -91,14 +97,7 @@ public class SavedJobPostReportDto {
 	}
 
 
-	public String getSkills() {
-		return skills;
-	}
-
-
-	public void setSkills(String skills) {
-		this.skills = skills;
-	}
+	
 	 
 	 
 
