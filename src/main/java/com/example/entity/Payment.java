@@ -8,6 +8,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,16 +24,22 @@ public class Payment {
 	private String currency;
 	private String receipt;
 	private String status;
-	
+	  @ManyToOne
+	    @JoinColumn(name = "job_seeker_id")
+	    private JobSeeker jobSeeker;
 
+ 
     @CreationTimestamp
 	private LocalDateTime createdAt;
 	public Payment() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+
+
 	public Payment(Long id, String paymentId, double amount, String currency, String receipt, String status,
-			LocalDateTime createdAt) {
+			JobSeeker jobSeeker, LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.paymentId = paymentId;
@@ -39,8 +47,12 @@ public class Payment {
 		this.currency = currency;
 		this.receipt = receipt;
 		this.status = status;
+		this.jobSeeker = jobSeeker;
 		this.createdAt = createdAt;
 	}
+
+
+
 	public Long getId() {
 		return id;
 	}
@@ -83,6 +95,20 @@ public class Payment {
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+
+
+
+	public JobSeeker getJobSeeker() {
+		return jobSeeker;
+	}
+
+
+
+	public void setJobSeeker(JobSeeker jobSeeker) {
+		this.jobSeeker = jobSeeker;
+	}
+
+
 	
 	
 	

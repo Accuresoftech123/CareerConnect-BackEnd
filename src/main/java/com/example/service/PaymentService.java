@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,19 +59,32 @@ public class PaymentService {
 	}
 	
     
-
 	public void processSuccessfulPayment(int userId, double amount) {
 	    try {
-	        // Fetch user email
+	        // Fetch user by ID
 	        Optional<JobSeeker> optionalUser = jobSeekerRepository.findById(userId);
 	        if (optionalUser.isPresent()) {
-	            String email = optionalUser.get().getEmail();
-	            receiptService.generateSendAndSaveReceipt(email, amount);
+	            JobSeeker jobSeeker = optionalUser.get();
+
+	            // Create and save Payment
+	            Payment payment = new Payment();
+	            payment.setAmount(amount);
+	            payment.setCurrency("INR");
+	            payment.setStatus("SUCCESS");
+	            payment.setPaymentId(UUID.randomUUID().toString());
+	            payment.setReceipt("RCP-" + System.currentTimeMillis());
+	            payment.setJobSeeker(jobSeeker);
+
+	            paymentRepository.save(payment);
+
+	            // Now generate and save Receipt, passing payment and jobSeeker
+	            receiptService.generateSendAndSaveReceipt(jobSeeker.getEmail(), amount, payment, jobSeeker);
+
 	        } else {
 	            throw new RuntimeException("User not found for id: " + userId);
 	        }
 	    } catch (Exception e) {
 	        e.printStackTrace();
 	    }
-
-}}
+	}
+}
