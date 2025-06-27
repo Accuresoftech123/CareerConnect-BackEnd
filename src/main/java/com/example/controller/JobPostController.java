@@ -16,6 +16,7 @@ import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.JobPostStatus;
 import com.example.repository.JobPostRepository;
+import com.example.service.ApplicantService;
 import com.example.service.JobPostService;
 
 @RestController
@@ -70,11 +71,11 @@ public class JobPostController {
         return ResponseEntity.ok(results);
     }
 
+    
+    //jobpost close  
     @PutMapping("/{jobId}/close")
-    public ResponseEntity<Void> closeJobPost(
-            @PathVariable Long jobId,
-            @RequestBody Recruiter recruiter) {
-        jobPostService.closeJobPost(jobId, recruiter);
+    public ResponseEntity<Void> closeJobPost(@PathVariable Long jobId, @RequestParam Integer recruiterId) {
+        jobPostService.closeJobPost(jobId, recruiterId);
         return ResponseEntity.ok().build();
     }
 
@@ -160,6 +161,23 @@ public class JobPostController {
     public ResponseEntity<List<JobPostDto>> getDraftJobPosts(@PathVariable Integer recruiterId) {
         List<JobPostDto> drafts = jobPostService.getDraftJobPostsByRecruiter(recruiterId);
         return ResponseEntity.ok(drafts);
+    }
+    
+    
+    //shoertlist applicants
+    @PutMapping("/{applicantId}/shortlist")
+    public ResponseEntity<String> shortlistApplicant(@PathVariable Integer applicantId) {
+        jobPostService.shortlistApplicant(applicantId);
+        return ResponseEntity.ok("Applicant with ID " + applicantId + " has been shortlisted.");
+    }
+    
+    
+ // Add endpoint for previous jobs
+    @GetMapping("/recruiter/{recruiterId}/previous-jobs")
+    public ResponseEntity<List<JobPostDto>> getPreviousJobPosts(
+            @PathVariable Integer recruiterId) {
+        List<JobPostDto> previousJobs = jobPostService.getPreviousJobPostsByRecruiter(recruiterId);
+        return ResponseEntity.ok(previousJobs);
     }
 
 

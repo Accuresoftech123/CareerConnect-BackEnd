@@ -58,7 +58,7 @@ public class JobPost {
     private String jobType;
     private String workLocation;
     private String gender;
-    private String requiredExperience;
+    
     @ElementCollection
     private List<String> skills;
     private String jobShift;
@@ -71,6 +71,12 @@ public class JobPost {
 	private double maxSalary;
 	@ElementCollection
 	private List<String> benefits;
+	
+	 @Transient
+	    private boolean prefillRequest;
+	    
+	 @Transient
+	    private Integer prefillFromJobId;
     
     
 
@@ -106,8 +112,8 @@ public class JobPost {
                    String minExperience, String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
                    String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
 
-                   String gender, String requiredExperience, String jobShift, String education, JobPostStatus status,double minSalary,
-                   double maxSalary,List<String> skills,List<String> benefits,  int applicants, List<SavedJob> savedJobs) {
+                   String gender, String jobShift, String education, JobPostStatus status,double minSalary,
+                   double maxSalary,List<String> skills,List<String> benefits,  int applicants, List<SavedJob> savedJobs,boolean prefillRequest,Integer prefillFromJobId) {
 
 
                    
@@ -130,7 +136,7 @@ public class JobPost {
         this.jobType = jobType;
         this.workLocation = workLocation;
         this.gender = gender;
-        this.requiredExperience = requiredExperience;
+       
         this.minSalary=minSalary;
         this.maxSalary=maxSalary;
         this.skills=skills;
@@ -144,6 +150,9 @@ public class JobPost {
         this.status=status;
 
         this.savedJobs=savedJobs;
+        this.prefillRequest=prefillRequest;
+        this.prefillFromJobId=prefillFromJobId;
+        
 
     }
 
@@ -196,10 +205,6 @@ public class JobPost {
 
     public String getGender() { return gender; }
     public void setGender(String gender) { this.gender = gender; }
-
-    public String getRequiredExperience() { return requiredExperience; }
-    public void setRequiredExperience(String requiredExperience) { this.requiredExperience = requiredExperience; }
-
     
 
     public String getJobShift() { return jobShift; }
@@ -268,6 +273,21 @@ public class JobPost {
 		this.savedJobs = savedJobs;
 	}
     
+	public boolean isPrefillRequest() {
+        return prefillRequest;
+    }
+    
+    public void setPrefillRequest(boolean prefillRequest) {
+        this.prefillRequest = prefillRequest;
+    }
+    
+    public Integer getPrefillFromJobId() {
+        return prefillFromJobId;
+    }
+    
+    public void setPrefillFromJobId(Integer prefillFromJobId) {
+        this.prefillFromJobId = prefillFromJobId;
+    }
     
 
 }

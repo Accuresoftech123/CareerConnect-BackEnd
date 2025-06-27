@@ -70,7 +70,8 @@ public class RecruiterDashboardController {
             return ResponseEntity.internalServerError().build();
         }
     }
-//    
+    
+// 
     @GetMapping("/job-posts/active")
     public ResponseEntity<List<JobPost>> getActiveJobPosts(
              Recruiter recruiter) {
