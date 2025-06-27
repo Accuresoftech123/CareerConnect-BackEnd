@@ -159,9 +159,13 @@ public class ApplicantService {
                 		post.getTitle(),
                 		post.getCompanyName(),
                 		post.getLocation(),
-                		post.getSalary(),
                 		post.getJobType(),
-                		post.getSkills()
+                		post.getMinSalary(),
+                		post.getMaxSalary(),
+                		post.getMinExperience(),
+                		post.getMaxExperience(),
+                		post.getSkills(),
+                		post.getPostedDate()
                 );
             })
             .collect(Collectors.toList());

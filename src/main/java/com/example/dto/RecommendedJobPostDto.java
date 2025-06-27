@@ -1,9 +1,8 @@
 package com.example.dto;
 
-import java.time.LocalDate;
 import java.util.List;
 
-public class SavedJobPostReportDto {
+public class RecommendedJobPostDto {
 	
 	 private int id;
 	 private String title;
@@ -12,21 +11,17 @@ public class SavedJobPostReportDto {
 	 private String jobType;
 	 private double minSalary; 
 	 private double maxSalary;
-     private String minExperience;
-     private String maxExperience;
 	 private List<String> skills;
-	 private LocalDate postedDate;
 	 
 	 
-	public SavedJobPostReportDto() {
+	public RecommendedJobPostDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
 
-	public SavedJobPostReportDto(int id, String title, String companyName, String location, String jobType,
-			double minSalary, double maxSalary, String minExperience, String maxExperience, List<String> skills,
-			LocalDate postedDate) {
+	public RecommendedJobPostDto(int id, String title, String companyName, String location, String jobType,
+			double minSalary, double maxSalary, List<String> skills) {
 		super();
 		this.id = id;
 		this.title = title;
@@ -35,10 +30,7 @@ public class SavedJobPostReportDto {
 		this.jobType = jobType;
 		this.minSalary = minSalary;
 		this.maxSalary = maxSalary;
-		this.minExperience = minExperience;
-		this.maxExperience = maxExperience;
 		this.skills = skills;
-		this.postedDate = postedDate;
 	}
 
 
@@ -112,26 +104,6 @@ public class SavedJobPostReportDto {
 	}
 
 
-	public String getMinExperience() {
-		return minExperience;
-	}
-
-
-	public void setMinExperience(String minExperience) {
-		this.minExperience = minExperience;
-	}
-
-
-	public String getMaxExperience() {
-		return maxExperience;
-	}
-
-
-	public void setMaxExperience(String maxExperience) {
-		this.maxExperience = maxExperience;
-	}
-
-
 	public List<String> getSkills() {
 		return skills;
 	}
@@ -140,22 +112,7 @@ public class SavedJobPostReportDto {
 	public void setSkills(List<String> skills) {
 		this.skills = skills;
 	}
-
-
-	public LocalDate getPostedDate() {
-		return postedDate;
-	}
-
-
-	public void setPostedDate(LocalDate postedDate) {
-		this.postedDate = postedDate;
-	}
-	 
 	
 
-
-	
 	 
-	 
-
 }
