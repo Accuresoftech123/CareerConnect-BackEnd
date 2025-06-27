@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -9,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.JobPostDto;
+import com.example.dto.RecommendedJobPostDto;
+import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.JobPostStatus;
 import com.example.exception.ResourceNotFoundException;
 import com.example.repository.JobPostRepository;
+import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
 
 import jakarta.transaction.Transactional;
@@ -26,6 +30,10 @@ public class JobPostService {
 
     @Autowired
     private RecruiterRepository recruiterRepository;
+    @Autowired
+    private JobSeekerRepository jobSeekerRepository;
+    
+   
 
     // Create
     public JobPostDto createJobPost(JobPostDto jobPostDto, Integer recruiterId) {
@@ -261,6 +269,82 @@ public class JobPostService {
         List<JobPost> drafts = jobPostRepository.findByRecruiterIdAndStatus(recruiterId, JobPostStatus.DRAFT);
         return drafts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
+    
+    
+    
+    // Recommended jobs for job seekers 
+    public List<RecommendedJobPostDto> getRecommendedJobsForJobSeeker(int jobSeekerId){
+    	
+    	// Step 1: Fetch JobSeeker by ID
+        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
+                .orElseThrow(() -> new RuntimeException("JobSeeker not found with ID: " + jobSeekerId));
+        
+       // Step 2: Get seeker’s skills and preferred location
+        List<String> jobSeekersSkills = jobSeeker.getSkills();
+        String preferredLocation = jobSeeker.getJobPrefeences().getPreferredLocation();
+        
+       // Step 3: get all jobes 
+        List<JobPostDto> allJobs = getAllActiveJobPostsForApplicants();
+        
+       // Step 4: filter matching jobs
+        
+        
+        List<RecommendedJobPostDto> recommendedJobs = new ArrayList<>();
+        
+        for(JobPostDto job : allJobs) 
+        {
+        	
+        	boolean matchesSkill = false;
+        	
+        	if(jobSeekersSkills != null && job.getSkills() != null) {
+        		
+        		for(String skill : jobSeekersSkills) {
+        			
+        			for (String jobSkill : job.getSkills()) {
+                        if (skill != null && jobSkill != null &&
+                        		skill.trim().equalsIgnoreCase(jobSkill.trim())) {
+                            matchesSkill = true;
+                            break;
+                        }
+        			}
+        		}
+        	}
+        	
+        	 boolean matchesLocation = preferredLocation == null || 
+        			 job.getLocation().equalsIgnoreCase(preferredLocation);
+        	 System.out.println(matchesSkill);
+        	 System.out.println(matchesLocation);
+        	 System.out.println("Seeker Skills: " + jobSeekersSkills);
+        	 
+        	 System.out.println("Job Skills: " + job.getSkills());
+        	 if(matchesSkill && matchesLocation) {
+        		 recommendedJobs.add(convertRecommendedJobPostDto(job));
+        	 }
+        	 
+        	 // limit to 5 jobs
+        	 if(recommendedJobs.size() >= 5) {
+        		 break;
+        	 }
+        }
+        
+       return recommendedJobs;
+    }
+    
+    // convert jobpost object to recommendejob post object
+   private RecommendedJobPostDto convertRecommendedJobPostDto(JobPostDto job){
+	   
+	   RecommendedJobPostDto dto = new RecommendedJobPostDto();
+	   dto.setId(job.getId());
+	   dto.setTitle(job.getTitle());
+	   dto.setCompanyName(job.getCompanyName());
+	   dto.setLocation(job.getLocation());
+	   dto.setJobType(job.getJobType());
+	   dto.setMinSalary(job.getMinSalary());
+	   dto.setMaxSalary(job.getMaxSalary());
+	   dto.setSkills(job.getSkills());
+	   
+	   return dto;
+   }
 
 
     
