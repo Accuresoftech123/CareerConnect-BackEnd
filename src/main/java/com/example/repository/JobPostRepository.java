@@ -21,7 +21,7 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     @Query("SELECT j FROM JobPost j WHERE " +
            "(:title IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
            "(:location IS NULL OR LOWER(j.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
-           "(:experience IS NULL OR j.requiredExperience = :experience)")
+           "(:experience IS NULL OR j.minExperience = :experience)")
     List<JobPost> searchJobs(
             @Param("title") String title,
             @Param("location") String location,
@@ -38,10 +38,13 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
 
   //close jobpost
     
+    boolean existsByIdAndRecruiterIdAndStatus(Long jobId, Integer recruiterId, JobPostStatus status);
+
     @Modifying
-    @Query("UPDATE JobPost j SET j.status = 'CLOSED' WHERE j.id = :jobId AND j.recruiter = :recruiter")
-    int closeJobPost(@Param("jobId") Long jobId, @Param("recruiter") Recruiter recruiter);
-//    
+    @Query("UPDATE JobPost j SET j.status = :status WHERE j.id = :jobId AND j.recruiter.id = :recruiterId")
+    int updateStatus(@Param("jobId") Long jobId,
+                     @Param("recruiterId") Integer recruiterId,
+                     @Param("status") JobPostStatus status);
 
     // Find all active (open) job posts
     @Query("SELECT jp FROM JobPost jp WHERE jp.status = 'OPEN' AND jp.lastDateToApply >= :currentDate")
@@ -71,4 +74,14 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     //get latest added jobpost
     @Query("SELECT j FROM JobPost j WHERE j.recruiter.id = :recruiterId ORDER BY j.postedDate DESC LIMIT 1")
     Optional<JobPost> findLatestByRecruiterId(@Param("recruiterId") Integer recruiterId);
+    
+    
+    
+ // Add this method to find non-draft jobs by recruiter
+    List<JobPost> findByRecruiterIdAndStatusNot(Integer recruiterId, JobPostStatus status);
+    
+    @Query("SELECT j FROM JobPost j WHERE j.recruiter.id = :recruiterId ORDER BY j.postedDate DESC")
+    List<JobPost> findAllByRecruiterIdOrderByPostedDateDesc(@Param("recruiterId") Integer recruiterId);
+
+    
 }

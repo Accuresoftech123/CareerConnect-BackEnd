@@ -70,6 +70,8 @@ public class JobPostDto {
     private boolean closed; 
     
     private List<String> benefits;
+    
+    private Integer prefillFromJobId;
 
     public boolean isClosed() {
 		return closed;
@@ -86,7 +88,7 @@ public class JobPostDto {
     public JobPostDto(Integer id, String title, String description, String location, double minSalary,double maxSalary, String employmentType,
                       String minExperience,String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
                       int numberOfOpenings, String companyName, String jobType, String workLocation, String gender,
-                      String requiredExperience, List<String> skills, String jobShift, String education, List<Integer> applicants, boolean closed, List<String> benefits) {
+                      List<String> skills, String jobShift, String education, List<Integer> applicants, boolean closed, List<String> benefits,boolean prefillFromExisting) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -110,6 +112,7 @@ public class JobPostDto {
         this.education = education;
         this.applicants=applicants;
         this.closed=closed;
+        this.prefillFromExisting=prefillFromExisting;
         
     }
 
@@ -237,6 +240,19 @@ public class JobPostDto {
 	public void setMaxExperience(String maxExperience) {
 		this.maxExperience = maxExperience;
 	}
+	
+	// Add prefill option flag
+	private boolean prefillFromExisting;
+	public boolean isPrefillFromExisting() { return prefillFromExisting; }
+	public void setPrefillFromExisting(boolean prefill) { this.prefillFromExisting = prefill; }
+	
+	public Integer getPrefillFromJobId() {
+        return prefillFromJobId;
+    }
+    
+    public void setPrefillFromJobId(Integer prefillFromJobId) {
+        this.prefillFromJobId = prefillFromJobId;
+    }
     
 
 }

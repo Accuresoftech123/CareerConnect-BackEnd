@@ -50,8 +50,6 @@ public class RecruiterDashboardService {
  summary.setShortlisted(applicantRepository.countByJobPost_RecruiterAndStatus(
             recruiter, ApplicationStatus.SHORTLISTED));
         
-        // Count saved profiles (you'll need to implement this in JobSeekerRepository)
-        // summary.setSavedProfiles(...);
         
         // Total views across recruiter's jobs
         summary.setTotalViews(jobPostRepository.findByRecruiter(recruiter)
@@ -82,7 +80,7 @@ public class RecruiterDashboardService {
 
         // Get recent applicants with additional filters
         List<Applicant> applicants = applicantRepository
-            .findTop5ByJobPostInAndStatusNotOrderByApplicationDateDesc(
+            .findTop9ByJobPostInAndStatusNotOrderByApplicationDateDesc(
                 activeJobPosts, 
                 ApplicationStatus.REJECTED);
 
@@ -162,11 +160,10 @@ public class RecruiterDashboardService {
    
     
     
-//    
+//  get Active jobs   
     public List<JobPost> getActiveJobPosts(Recruiter recruiter) {
         return jobPostRepository.findByRecruiterAndLastDateToApplyAfter(
             recruiter, LocalDate.now());
-    }
-//    
+    }   
     
 }

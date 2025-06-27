@@ -68,8 +68,8 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
         Recruiter recruiter, ApplicationStatus status, LocalDateTime date);
     
  // Get top 5 most recent applicants for a recruiter
-    List<Applicant> findTop5ByJobPost_RecruiterOrderByApplicationDateDesc(Recruiter recruiter);
-    List<Applicant> findTop5ByJobPostInAndStatusNotOrderByApplicationDateDesc(
+    List<Applicant> findTop9ByJobPost_RecruiterOrderByApplicationDateDesc(Recruiter recruiter);
+    List<Applicant> findTop9ByJobPostInAndStatusNotOrderByApplicationDateDesc(
             List<JobPost> jobPosts, ApplicationStatus status);
   
 }

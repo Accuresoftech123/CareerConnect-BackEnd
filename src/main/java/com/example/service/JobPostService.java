@@ -10,12 +10,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.JobPostDto;
+
+import com.example.entity.Applicant;
+
 import com.example.dto.RecommendedJobPostDto;
 import com.example.entity.JobSeeker;
+
 import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
+import com.example.enums.ApplicationStatus;
 import com.example.enums.JobPostStatus;
 import com.example.exception.ResourceNotFoundException;
+import com.example.repository.ApplicantRepository;
 import com.example.repository.JobPostRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
@@ -30,10 +36,16 @@ public class JobPostService {
 
     @Autowired
     private RecruiterRepository recruiterRepository;
+
+    
+    @Autowired
+    private ApplicantRepository applicantRepository;
+
     @Autowired
     private JobSeekerRepository jobSeekerRepository;
     
    
+
 
     // Create
     public JobPostDto createJobPost(JobPostDto jobPostDto, Integer recruiterId) {
@@ -174,14 +186,21 @@ public class JobPostService {
         return jobPostRepository.searchJobs(title, location, experience);
     }
 
+    
+    //close jobpost
+    
     @Transactional
-    public void closeJobPost(Long jobId, Recruiter recruiter) {
-        int updated = jobPostRepository.closeJobPost(jobId, recruiter);
-        if (updated == 0) {
-            throw new ResourceNotFoundException(
-                "Job post not found with id: " + jobId + " for recruiter: " + recruiter.getId());
+    public void closeJobPost(Long jobId, Integer recruiterId) {
+        boolean exists = jobPostRepository.existsByIdAndRecruiterIdAndStatus(jobId, recruiterId, JobPostStatus.OPEN);
+        if (!exists) {
+            throw new ResourceNotFoundException("Job post not found or not open for recruiter with id: " + recruiterId);
+        }
+
+        int updated = jobPostRepository.updateStatus(jobId, recruiterId, JobPostStatus.CLOSED);
+        if (updated == 0) { throw new ResourceNotFoundException("Failed to close job post with id: " + jobId);
         }
     }
+
     
     public List<JobPostDto> getAllActiveJobPostsForApplicants() {
         List<JobPost> activeJobPosts = jobPostRepository.findAllActiveJobPosts(LocalDate.now());
@@ -270,6 +289,17 @@ public class JobPostService {
         return drafts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
     
+
+    //Shortlist Applicant
+    @Transactional
+    public void shortlistApplicant(Integer applicantId) {
+        Applicant applicant = applicantRepository.findById(applicantId)
+                .orElseThrow(() -> new ResourceNotFoundException("Applicant not found"));
+
+        applicant.setStatus(ApplicationStatus.SHORTLISTED);
+        applicantRepository.save(applicant);
+    }
+
     
     
     // Recommended jobs for job seekers 
@@ -347,6 +377,16 @@ public class JobPostService {
    }
 
 
+
+ // Add method to get previous jobs for prefill
+    public List<JobPostDto> getPreviousJobPostsByRecruiter(Integer recruiterId) {
+        List<JobPost> previousJobs = jobPostRepository.findAllByRecruiterIdOrderByPostedDateDesc(recruiterId);
+        
+        return previousJobs.stream()
+            .map(this::mapToDto)
+            .collect(Collectors.toList());
+    }
+    
     
 
 
