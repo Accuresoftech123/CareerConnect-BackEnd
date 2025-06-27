@@ -65,9 +65,13 @@ public class SavedJobService {
                     		job.getTitle(),
                     		job.getCompanyName(),
                     		job.getLocation(),
-                    		job.getSalary(),
                     		job.getJobType(),
-                    		job.getSkills()
+                    		job.getMinSalary(),
+                    		job.getMaxSalary(),
+                    		job.getMinExperience(),
+                    		job.getMaxExperience(),
+                    		job.getSkills(),
+                    		job.getPostedDate()
                     		);
                 })
                 .collect(Collectors.toList());

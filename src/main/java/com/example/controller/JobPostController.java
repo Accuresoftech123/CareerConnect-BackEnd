@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.dto.JobPostDto;
+import com.example.dto.RecommendedJobPostDto;
 import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.JobPostStatus;
@@ -163,6 +164,7 @@ public class JobPostController {
         return ResponseEntity.ok(drafts);
     }
     
+
     
     //shoertlist applicants
     @PutMapping("/{applicantId}/shortlist")
@@ -179,6 +181,15 @@ public class JobPostController {
         List<JobPostDto> previousJobs = jobPostService.getPreviousJobPostsByRecruiter(recruiterId);
         return ResponseEntity.ok(previousJobs);
     }
+
+    //for recommended jobs 
+    @GetMapping("/jobseeker/{jobSeekerId}/recommended")
+    public ResponseEntity<List<RecommendedJobPostDto>> getRecommendedJobs(@PathVariable int jobSeekerId) {
+        List<RecommendedJobPostDto> recommendedJobs = jobPostService.getRecommendedJobsForJobSeeker(jobSeekerId);
+        return ResponseEntity.ok(recommendedJobs);
+    }
+
+
 
 
 
