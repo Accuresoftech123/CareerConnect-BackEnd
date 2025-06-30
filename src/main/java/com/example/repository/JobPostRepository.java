@@ -82,6 +82,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     
     @Query("SELECT j FROM JobPost j WHERE j.recruiter.id = :recruiterId ORDER BY j.postedDate DESC")
     List<JobPost> findAllByRecruiterIdOrderByPostedDateDesc(@Param("recruiterId") Integer recruiterId);
+    
+    long countByStatus(JobPostStatus status);
+
+    
 
     
 }
