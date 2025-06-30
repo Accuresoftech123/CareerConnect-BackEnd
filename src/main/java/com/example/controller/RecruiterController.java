@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/recruiters") // Plural for RESTful consistency
+@CrossOrigin(origins = "http://localhost:3000")
 public class RecruiterController {
 
 	@Autowired
