@@ -387,7 +387,13 @@ public class JobPostService {
             .collect(Collectors.toList());
     }
     
-    
-
+    //Get Count of Active Jobs
+    public long getActiveJobPostCount() {
+        return jobPostRepository.countByStatus(JobPostStatus.OPEN);
+    }
+//get Count of close Jobs
+    public long getCloseJobPost() {
+    	return jobPostRepository.countByStatus(JobPostStatus.CLOSED);
+    }
 
 }

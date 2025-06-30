@@ -189,8 +189,18 @@ public class JobPostController {
         return ResponseEntity.ok(recommendedJobs);
     }
 
+    //TO FEATCH COUNT
+   
+    @GetMapping("/active/count")
+    public ResponseEntity<Long> getActiveJobPostCount() {
+        return ResponseEntity.ok(jobPostService.getActiveJobPostCount());
+    }
 
 
+    @GetMapping("/Close/count")
+    public ResponseEntity<Long> GetcloseJobPost() {
+        return ResponseEntity.ok(jobPostService.getCloseJobPost());
+    }
 
 
 }
