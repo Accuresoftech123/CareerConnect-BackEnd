@@ -11,7 +11,9 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
 import com.example.entity.JobSeeker;
+import com.example.entity.Recruiter;
 import com.example.repository.JobSeekerRepository;
+import com.example.repository.RecruiterRepository;
 
 @Service
 public class EmailService {
@@ -19,6 +21,8 @@ public class EmailService {
 	private JavaMailSender mailSender;
 	@Autowired
 	private JobSeekerRepository repo;
+	@Autowired
+	private RecruiterRepository recruiterRepository;
 	
 	public static final String OTP_SUCCESS = "OTP Success"; // 🔍 Fixed spelling, proper format
 
@@ -94,5 +98,59 @@ public class EmailService {
 
 		return "New OTP sent successfully!";
 	}
+
+    // ====================== Recruiter Email OTP Methods =====================
+
+    public void sendRecruiterOtpMail(String toEmail, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Your Recruiter Email Verification OTP");
+        message.setText("Your OTP is: " + otp + "\nIt will expire in 5 minutes. Please do not share it.");
+        mailSender.send(message);
+    }
+
+    public void generateAndSendOtp(Recruiter recruiter) {
+        String otp = String.valueOf(100000 + new Random().nextInt(900000));
+        recruiter.setOtp(otp);
+        recruiter.setOtpGeneratedTime(LocalDateTime.now());
+        recruiterRepository.save(recruiter);
+        sendRecruiterOtpMail(recruiter.getEmail(), otp);
+    }
+
+    public String verifyRecruiterOtp(String email, String otp) {
+        Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
+        if (optionalRecruiter.isEmpty()) {
+            return EMAIL_NOT_FOUND;
+        }
+
+        Recruiter recruiter = optionalRecruiter.get();
+
+        if (recruiter.getOtpGeneratedTime() == null ||
+            Duration.between(recruiter.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
+            return OTP_EXPIRED;
+        }
+
+        if (otp.equals(recruiter.getOtp())) {
+            recruiter.setVerified(true);
+            recruiter.setOtp(null);
+            recruiter.setOtpGeneratedTime(null);
+            recruiterRepository.save(recruiter);
+            return OTP_SUCCESS;
+        } else {
+            return OTP_INVALID;
+        }
+    }
+
+    public String resendRecruiterOtp(String email) {
+        Optional<Recruiter> recruiterOpt = recruiterRepository.findByEmail(email);
+        if (recruiterOpt.isEmpty()) {
+            return EMAIL_NOT_FOUND;
+        }
+
+        Recruiter recruiter = recruiterOpt.get();
+        generateAndSendOtp(recruiter);
+        return "New OTP sent successfully!";
+    }
+
 
 }
