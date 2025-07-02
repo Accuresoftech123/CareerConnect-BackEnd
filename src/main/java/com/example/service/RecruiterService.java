@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,6 +33,8 @@ public class RecruiterService {
 
     @Autowired
     private RecruiterRepository recruiterRepository;
+    @Autowired
+    private EmailService emailService;
 
     /**
      * Registers a new recruiter.
@@ -41,24 +44,31 @@ public class RecruiterService {
      * @return registration status message
      */
     public String register(RecruiterRegistrationDto newRecruiter) {
-		Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
+        Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 
-        
-        if (existing == null) {
+        if (existing.isPresent()) {
             return "Email already registered";
         }
 
-        // Set default status as PENDING before saving
+        // Set default status before saving
         newRecruiter.setStatus(Status.APPROVED);
+
         Recruiter recruiter = new Recruiter();
         recruiter.setFullName(newRecruiter.getFullName());
         recruiter.setEmail(newRecruiter.getEmail());
         recruiter.setMobileNumber(newRecruiter.getMobileNumber());
         recruiter.setPassword(newRecruiter.getPassword());
         recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
-        recruiterRepository.save(recruiter);
-        return "Registration successful";
+
+        // Save recruiter
+        Recruiter savedRecruiter = recruiterRepository.save(recruiter);
+
+        // Generate OTP and send email
+        emailService.generateAndSendOtp(savedRecruiter);
+
+        return "Please verify your email! OTP sent to your email.";
     }
+
 
     /**
      * Validates recruiter credentials for login.
@@ -67,21 +77,25 @@ public class RecruiterService {
      * @param password password of the recruiter
      * @return recruiter object if valid, otherwise null
      */
-    public ResponseEntity<?> login(String email, String password) {
-        Recruiter existing = recruiterRepository.findByEmail(email).orElse(null);
-        if (existing != null && existing.getPassword().equals(password)) {
-        	
-        	 if (existing.getStatus() == Status.APPROVED) {
-                 return ResponseEntity.ok(existing);
-             }else {
-            	 return ResponseEntity.ok("Access Denied.Your application status is "+existing.getStatus());
-             }
-          
-        }
-       
-        return null;
-    }
+    public String login(String email, String password) {
+        Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
 
+        if (optionalRecruiter.isEmpty()) {
+            return "Recruiter not found.";
+        }
+
+        Recruiter recruiter = optionalRecruiter.get();
+
+        if (!recruiter.isVerified()) {
+            return "Please verify your email before logging in.";
+        }
+
+        if (!recruiter.getPassword().equals(password)) {
+            return "Invalid password.";
+        }
+
+        return "Login successful!";
+    }
     /**
      * Updates the profile details of a recruiter.
      *
@@ -135,7 +149,38 @@ public class RecruiterService {
             				   dto.getMobileNumber() == 0;
         
     }
-    
 
+    //Forgot Password 
+    
+    public String forgotPassword(String email) {
+    	Recruiter recruiter = recruiterRepository.findByEmail(email)
+    			.orElseThrow(()->new RuntimeException("Recruiter not found with email: " + email));
+    	emailService.generateAndSendOtp(recruiter);
+    	return  "OTP sent to registered email.";
+    }
+   
+
+    public String validateOtpAndResetPassword(String email, String otp, String newPassword) {
+    	Recruiter recruiter=recruiterRepository.findByEmail(email).orElseThrow(()-> new RuntimeException("Recruiter Not Found"));
+    	
+    	if(recruiter.getOtp()==null|| recruiter.getOtpGeneratedTime()==null) {
+    		return "OTP not found";
+    	}
+    	
+    	if(!recruiter.getOtp().equals(otp)) {
+    		return "Invalid OTP";
+    	}
+    	
+    	if(recruiter.getOtpGeneratedTime().plusMinutes(10).isBefore(LocalDateTime.now())) {
+    		return "OTP expired";
+    	}
+    	recruiter.setPassword(newPassword);
+    	recruiter.setOtp(null);
+    	recruiter.setOtpGeneratedTime(null);
+    	recruiterRepository.save(recruiter);
+    	
+    	return "Password reset successful.";
+    	
+    }
 
 }

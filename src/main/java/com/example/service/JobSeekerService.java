@@ -336,4 +336,28 @@ public class JobSeekerService {
 
 	    return response;
 	}
+	//Forgate password
+	//Validate Otp and reset password
+	
+	
+	public boolean validateOtpAndResetPassword(String email, String inputOtp, String newPassword ) {
+		JobSeeker seeker = repo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		if(seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
+			return false;
+		}
+		
+		if(seeker.getOtp().equals(inputOtp)) {
+			seeker.setPassword(newPassword);
+			seeker.setOtp(null);
+			seeker.setOtpGeneratedTime(null);
+			repo.save(seeker);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
 }
