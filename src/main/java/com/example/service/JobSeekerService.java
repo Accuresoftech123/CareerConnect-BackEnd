@@ -11,6 +11,8 @@ import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.JobSeekerEducationDto;
@@ -46,12 +48,13 @@ public class JobSeekerService {
 	 * @return message indicating registration success or failure
 	 */
 
-	public String register(JobSeekerRegistrationDto newJobSeeker) {
+	public ResponseEntity<?> register(JobSeekerRegistrationDto newJobSeeker) {
 		// Check if a JobSeeker with the given email already exists
 		Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
 
 		if (existing.isPresent()) {
-			return "Email already registered!";
+			 return ResponseEntity.status(HttpStatus.CONFLICT)
+                     .body("Email already registered!");
 		}
 
 		// Create a new JobSeeker entity from DTO
@@ -65,7 +68,13 @@ public class JobSeekerService {
 		// calling OTP generation method from email service.......
 		emailService.generateAndSendOtp(jobSeeker);
 
-		return "OTP has been sent to your email. Please verify your account to complete the registration process.";
+		// pass the id to fronted
+		Map<String, Object> response = new HashMap<>();
+	    response.put("message", "OTP sent. Please verify your account.");
+	    response.put("jobSeekerId", jobSeeker.getId());
+
+	    
+	    return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	/**
@@ -88,13 +97,14 @@ public class JobSeekerService {
 
 	// update jobseeker profile
 
-	public String updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
+	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
 
 		JobSeeker jobSeeker = repo.findById(id).orElse(null);
 
 		if (jobSeeker == null) {
 
-			return "Job Seeker not found with ID: " + id;
+			 return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                     .body("Job Seeker not found with ID: ");
 		}
 
 		// update registration data
@@ -140,14 +150,14 @@ public class JobSeekerService {
 		// update education
 
 		// seperate the educationdto from profile dto
-		List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
+		//List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
 
-		if (educationDtoList != null) {
+		if (dto.getEducationList() != null) {
 
 			// store the new education object
 			List<Education> updateEducations = new ArrayList<>();
 
-			for (JobSeekerEducationDto num : educationDtoList) {
+			for (JobSeekerEducationDto num : dto.getEducationList()) {
 
 				Education education = new Education();
 
@@ -174,14 +184,14 @@ public class JobSeekerService {
 
 		// update experience
 
-		List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
+	//	List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
 
-		if (experienceDtoList != null) {
+		if (dto.getExperienceList() != null) {
 
 			// store the new experience object
 			List<Experience> updateExperienceList = new ArrayList<>();
 
-			for (JobSeekerExperienceDto num : experienceDtoList) {
+			for (JobSeekerExperienceDto num : dto.getExperienceList()) {
 
 				// create object of experience to access the data
 				Experience experience = new Experience();
@@ -282,7 +292,7 @@ public class JobSeekerService {
 
 		repo.save(jobSeeker);
 
-		return "Profile updated successfully";
+		return ResponseEntity.ok("Profile updated successfully");
 	}
 
 
@@ -336,4 +346,28 @@ public class JobSeekerService {
 
 	    return response;
 	}
+	//Forgate password
+	//Validate Otp and reset password
+	
+	
+	public boolean validateOtpAndResetPassword(String email, String inputOtp, String newPassword ) {
+		JobSeeker seeker = repo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+		if(seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
+			return false;
+		}
+		
+		if(seeker.getOtp().equals(inputOtp)) {
+			seeker.setPassword(newPassword);
+			seeker.setOtp(null);
+			seeker.setOtpGeneratedTime(null);
+			repo.save(seeker);
+			return true;
+		}
+		return false;
+	}
+	
+	
+	
+	
+	
 }

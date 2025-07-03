@@ -49,9 +49,8 @@ public class JobSeekerController {
 	 * @return Success message
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<String> registerJobSeeker(@RequestBody JobSeekerRegistrationDto registerDto) {
-		String result = jobSeekerService.register(registerDto);
-		return ResponseEntity.ok(result);
+	public ResponseEntity<?> registerJobSeeker(@RequestBody JobSeekerRegistrationDto registerDto) {
+	    return jobSeekerService.register(registerDto);
 	}
 
 	// Email verification controller
@@ -126,11 +125,9 @@ public class JobSeekerController {
 	 * @return Success message
 	 */
 	@PutMapping("/{id}/profile")
-	public ResponseEntity<String> updateJobSeekerProfile(@PathVariable Integer id,
-			@RequestBody JobSeekerProfileDto profileDto) {
-
-		String result = jobSeekerService.updateJobSeekerProfile(id, profileDto);
-		return ResponseEntity.ok(result);
+	public ResponseEntity<?> updateJobSeekerProfile(@PathVariable Integer id,
+	                                                @RequestBody JobSeekerProfileDto profileDto) {
+	    return jobSeekerService.updateJobSeekerProfile(id, profileDto);
 	}
 	
 	//Send mobile phone verification code
@@ -158,5 +155,31 @@ public class JobSeekerController {
 
 	        Map<String, Object> status = jobSeekerService.getProfileCompletionStatus(jobSeeker);
 	        return ResponseEntity.ok(status);
+	    }
+	    
+
+	    // Forgot Password — Send OTP
+	    @PostMapping("/forgot-password")
+	    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
+	        JobSeeker seeker = repo.findByEmail(email)
+	                .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
+
+	        emailService.generateAndSendOtp(seeker);
+
+	        return ResponseEntity.ok("OTP sent to your registered email.");
+	    }
+	    
+
+	    @PostMapping("/reset-password")
+	    public ResponseEntity<String> resetPassword(
+	        @RequestParam String email,
+	        @RequestParam String otp,
+	        @RequestParam String newPassword) {
+
+	        boolean isValid = jobSeekerService.validateOtpAndResetPassword(email, otp, newPassword);
+	        if (!isValid) {
+	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired OTP.");
+	        }
+	        return ResponseEntity.ok("Password reset successfully.");
 	    }
 }
