@@ -6,13 +6,20 @@ import com.example.entity.profile.*;
 import com.example.enums.Status;
 import com.example.exception.ResourceNotFoundException;
 import com.example.repository.*;
+
+
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,57 +42,66 @@ public class RecruiterProfileService {
     
     
 
-    @Transactional
-    public RecruiterDTO createRecruiterProfile(RecruiterDTO recruiterDTO) {
-        // Validate password match
-        if (!recruiterDTO.getPassword().equals(recruiterDTO.getConfirmPassword())) {
-            throw new IllegalArgumentException("Password and confirm password do not match");
-        }
+    
+  
+    public ResponseEntity<Map<String, Object>> createProfile(int recruiterId, RecruiterProfileDto dto) {
+        Map<String, Object> response = new HashMap<>();
 
-        // Create and save Recruiter entity
-        Recruiter recruiter = new Recruiter();
-        recruiter.setFullName(recruiterDTO.getFullName());
-        recruiter.setEmail(recruiterDTO.getEmail());
-        recruiter.setMobileNumber(recruiterDTO.getMobileNumber());
-        recruiter.setPassword(recruiterDTO.getPassword());
-        recruiter.setStatus(Status.PENDING);
-        recruiter.setVerified(false);
-        recruiter.setMobileVerified(false);
+        /// 1. Fetch recruiter by ID
+        Optional<Recruiter> existingRecruiter = recruiterRepository.findById(recruiterId);
         
-        // Generate and set OTP (implementation depends on your OTP service)
-        // recruiter.setOtp(generateOtp());
-        // recruiter.setOtpGeneratedTime(LocalDateTime.now());
+        if (!existingRecruiter.isPresent()) {
+            response.put("success", false);
+            response.put("message", "Recruiter not found with ID: " + recruiterId);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // 2. Proceed with profile creation since email is registered
+        Recruiter recruiter = existingRecruiter.get();
+     // Update recruiter details
+        recruiter.setFullName(dto.getFullName());
+        // Handle company profile
+        CompanyProfile companyProfile = recruiter.getCompanyProfile() != null ? 
+            recruiter.getCompanyProfile() : new CompanyProfile();
         
-        recruiter = recruiterRepository.save(recruiter);
+        companyProfile.setCompanyName(dto.getCompanyProfile().getCompanyName());
+        companyProfile.setWebsite(dto.getCompanyProfile().getWebsite());
+        companyProfile.setIndustryType(dto.getCompanyProfile().getIndustryType());
+        companyProfile.setAbout(dto.getCompanyProfile().getAbout());
+        companyProfile.setImg(dto.getCompanyProfile().getImg());
+        companyProfile.setCompanyEmail(dto.getCompanyProfile().getCompanyEmail());
+        companyProfile.setCompanySize(dto.getCompanyProfile().getCompanySize());
+        companyProfile.setFoundingYear(dto.getCompanyProfile().getFoundingYear());
+        companyProfile.setHrContactEmail(dto.getCompanyProfile().getHrContactEmail());
+        companyProfile.setHrContactMobileNumber(dto.getCompanyProfile().getHrContactMobileNumber());
+        
+        
+        companyProfile.setRecruiter(recruiter);
+        recruiter.setCompanyProfile(companyProfile);// Handle locations (clear existing and add new)
+        recruiter.getCompanyLocations().clear();
+        dto.getCompanyLocation().forEach(locationDto -> {
+            CompanyLocation location = new CompanyLocation();
+            location.setCity(locationDto.getCity());
+            location.setState(locationDto.getState());
+            location.setCountry(locationDto.getCountry());
+            location.setAddress(locationDto.getAddress());
+            location.setRecruiter(recruiter);
+            recruiter.getCompanyLocations().add(location);
+        });
 
-        // Save company profile if provided
-        if (recruiterDTO.getCompanyProfile() != null) {
-            saveCompanyProfile(recruiter, recruiterDTO.getCompanyProfile());
-        }
+        recruiterRepository.save(recruiter);
 
-        // Save company locations if provided
-        if (recruiterDTO.getCompanyLocations() != null && !recruiterDTO.getCompanyLocations().isEmpty()) {
-            saveCompanyLocations(recruiter, recruiterDTO.getCompanyLocations());
-        }
-
-        // Save industries if provided
-        if (recruiterDTO.getIndustries() != null && !recruiterDTO.getIndustries().isEmpty()) {
-            recruiter.setIndustries(recruiterDTO.getIndustries());
-            recruiter = recruiterRepository.save(recruiter);
-        }
-
-        // Save personal info if provided
-        if (recruiterDTO.getPersonalInfo() != null) {
-            savePersonalInfo(recruiter, recruiterDTO.getPersonalInfo());
-        }
-
-        // Save social profile if provided
-        if (recruiterDTO.getSocialProfile() != null) {
-            saveSocialProfile(recruiter, recruiterDTO.getSocialProfile());
-        }
-
-        return convertToDTO(recruiter);
+        response.put("success", true);
+        response.put("message", "Profile updated successfully");
+        return ResponseEntity.ok(response);
     }
+
+    
+    
+    
+
+    
+    
 
     public RecruiterDTO getRecruiterProfile(Integer recruiterId) {
         Recruiter recruiter = recruiterRepository.findById(recruiterId)

@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.dto.*;
 import com.example.service.RecruiterProfileService;
+import com.example.service.RecruiterService;
+
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,9 +11,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/recruitersProfile")
+@CrossOrigin(origins = "http://localhost:3000")
 public class RecruiterProfileController {
 
     private final RecruiterProfileService recruiterProfileService;
@@ -21,11 +25,15 @@ public class RecruiterProfileController {
         this.recruiterProfileService = recruiterProfileService;
     }
 
-    @PostMapping
-    public ResponseEntity<RecruiterDTO> createRecruiterProfile(@RequestBody RecruiterDTO recruiterDTO) {
-        RecruiterDTO createdProfile = recruiterProfileService.createRecruiterProfile(recruiterDTO);
-        return new ResponseEntity<>(createdProfile, HttpStatus.CREATED);
+    @PostMapping("/create-profile/{recruiterId}")
+    public ResponseEntity<Map<String, Object>> createProfile(
+            @PathVariable int recruiterId,
+            @RequestBody RecruiterProfileDto profileDto) {
+
+        return recruiterProfileService.createProfile(recruiterId, profileDto);
     }
+
+    
 
     @GetMapping("/{recruiterId}")
     public ResponseEntity<RecruiterDTO> getRecruiterProfile(@PathVariable Integer recruiterId) {
