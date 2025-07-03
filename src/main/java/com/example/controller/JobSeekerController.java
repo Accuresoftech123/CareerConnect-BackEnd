@@ -49,9 +49,8 @@ public class JobSeekerController {
 	 * @return Success message
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<String> registerJobSeeker(@RequestBody JobSeekerRegistrationDto registerDto) {
-		String result = jobSeekerService.register(registerDto);
-		return ResponseEntity.ok(result);
+	public ResponseEntity<?> registerJobSeeker(@RequestBody JobSeekerRegistrationDto registerDto) {
+	    return jobSeekerService.register(registerDto);
 	}
 
 	// Email verification controller
@@ -126,11 +125,9 @@ public class JobSeekerController {
 	 * @return Success message
 	 */
 	@PutMapping("/{id}/profile")
-	public ResponseEntity<String> updateJobSeekerProfile(@PathVariable Integer id,
-			@RequestBody JobSeekerProfileDto profileDto) {
-
-		String result = jobSeekerService.updateJobSeekerProfile(id, profileDto);
-		return ResponseEntity.ok(result);
+	public ResponseEntity<?> updateJobSeekerProfile(@PathVariable Integer id,
+	                                                @RequestBody JobSeekerProfileDto profileDto) {
+	    return jobSeekerService.updateJobSeekerProfile(id, profileDto);
 	}
 	
 	//Send mobile phone verification code

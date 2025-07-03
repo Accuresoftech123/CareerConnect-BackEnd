@@ -9,6 +9,8 @@ import com.example.entity.profile.Experience;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
@@ -73,14 +75,17 @@ public class JobSeeker {
 
 	// personalInfo
 	@OneToOne(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private JobSeekerPersonalInfo personalInfo;
 
 	// education
 	@OneToMany(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<Education> educationList;
 
 	// experience
 	@OneToMany(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private List<Experience> experienceList;
 
 	// skills
@@ -89,10 +94,12 @@ public class JobSeeker {
 
 	// social profile
 	@OneToOne(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private SocialProfile socialProfile;
 
 	// jobpreference
 	@OneToOne(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
+	@JsonManagedReference
 	private JobPreferences jobPrefeences;
 	
 	

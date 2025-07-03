@@ -22,7 +22,7 @@ public class Education {
 	private Long passingYear;
 	
 	@ManyToOne
-	 @JsonBackReference
+	@JsonBackReference
 	@JoinColumn(name = "job_seeker_id")
 	private JobSeeker jobSeeker;
 

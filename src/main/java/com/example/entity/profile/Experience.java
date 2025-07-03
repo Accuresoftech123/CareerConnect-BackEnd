@@ -30,7 +30,7 @@ public class Experience {
 	private String keyResponsibilities;
 	
 	@ManyToOne
-	 @JsonBackReference
+	@JsonBackReference
 	@JoinColumn(name = "job_seeker_id")
 	private JobSeeker jobSeeker;
 
