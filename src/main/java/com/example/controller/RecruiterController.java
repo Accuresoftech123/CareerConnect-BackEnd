@@ -59,8 +59,8 @@ public class RecruiterController {
 	 * @return Recruiter info if successful; error message otherwise
 	 */
     @PostMapping("/login")
-    public ResponseEntity<String> loginRecruiter(@RequestParam String email, @RequestParam String password) {
-        String result = recruiterService.login(email, password);
+    public ResponseEntity<?> loginRecruiter(@RequestParam String email, @RequestParam String password) {
+        ResponseEntity<?> result = recruiterService.login(email, password);
         return ResponseEntity.ok(result);
     }
 
@@ -103,15 +103,15 @@ public class RecruiterController {
         return ResponseEntity.ok(result);
     }
     
-    @PostMapping("Forget-Password")
-    public ResponseEntity<String>forgotpassword(@RequestParam String email){
-    	String result = recruiterService.forgotPassword(email);
-    	return ResponseEntity.ok(result);
-    }
-    
-    @PostMapping("Verify-reset")
-    public ResponseEntity<String>VerifyAndResetPassword(@RequestParam String email, @RequestParam String otp, @RequestParam String newPassword){
-    	String result = recruiterService.validateOtpAndResetPassword(email, otp, newPassword);
-    	return ResponseEntity.ok(result);
-    }
+//    @PostMapping("Forget-Password")
+//    public ResponseEntity<String>forgotpassword(@RequestParam String email){
+//    	String result = recruiterService.forgotPassword(email);
+//    	return ResponseEntity.ok(result);
+//    }
+//    
+//    @PostMapping("Verify-reset")
+//    public ResponseEntity<String>VerifyAndResetPassword(@RequestParam String email, @RequestParam String otp, @RequestParam String newPassword){
+//    	String result = recruiterService.validateOtpAndResetPassword(email, otp, newPassword);
+//    	return ResponseEntity.ok(result);
+//    }
 }
