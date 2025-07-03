@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.dto.CompanyProfileDTO;
 import com.example.dto.JobSeekerEducationDto;
 import com.example.dto.JobSeekerExperienceDto;
 import com.example.dto.JobSeekerJonPreferencesDto;
@@ -140,72 +141,70 @@ public class AdminService {
 	 */
 	@Transactional(readOnly = true)
 	public Map<String, Object> getRecruitersReportWithCount() {
-	    // Convert each Recruiter entity to a RecruiterProfileDto
-	    List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream()
-	            .map(r -> {
-	                RecruiterProfileDto dto = new RecruiterProfileDto();
-	                dto.setFullName(r.getFullName());
-	                dto.setMobileNumber(r.getMobileNumber());
-	                
-	                // Map company profile information if available
-	                if (r.getCompanyProfile() != null) {
-	                    CompanyProfile cp = r.getCompanyProfile();
-	                    dto.setCompanyName(cp.getCompanyName());
-	                    dto.setCompanyWebsiteUrl(cp.getWebsite());
-	                    dto.setCompanyDescription(cp.getAbout());
-	                    
-	                    // Map additional fields that might be useful
-	                    dto.setNumberOfEmployees(parseEmployeeCount(cp.getCompanySize()));
-	                    
-	                    // Handle industries if available in Recruiter entity
-	                    if (r.getIndustries() != null && !r.getIndustries().isEmpty()) {
-	                        dto.setIndustryType(String.join(", ", r.getIndustries()));
-	                    }
-	                }
-	                
-	                return dto;
-	            })
-	            .collect(Collectors.toList());
+		List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream().map(r -> {
+			RecruiterProfileDto dto = new RecruiterProfileDto();
+			dto.setFullName(r.getFullName());
+			dto.setMobileNumber(r.getMobileNumber());
+			dto.setRecruiterEmail(r.getEmail());
 
-	    // Fetch status counts
-	    long pendingCount = recruiterRepository.countByStatus(Status.PENDING);
-	    long approvedCount = recruiterRepository.countByStatus(Status.APPROVED);
-	    long rejectedCount = recruiterRepository.countByStatus(Status.REJECTED);
+			// Map company profile to DTO
+			if (r.getCompanyProfile() != null) {
+				CompanyProfile cp = r.getCompanyProfile();
 
-	    // Prepare the response map
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("totalPending", pendingCount);
-	    response.put("totalApproved", approvedCount);
-	    response.put("totalRejected", rejectedCount);
-	    response.put("totalRecruiters", recruiterProfiles.size());
-	    response.put("recruiters", recruiterProfiles);
+				CompanyProfileDTO companyDTO = new CompanyProfileDTO();
+				companyDTO.setCompanyName(cp.getCompanyName());
+				companyDTO.setWebsite(cp.getWebsite());
+				companyDTO.setAbout(cp.getAbout());
+				companyDTO.setCompanySize(cp.getCompanySize());
+				companyDTO.setIndustryType(cp.getIndustryType());
+				companyDTO.setFoundingYear(cp.getFoundingYear());
 
-	    return response;
+			}
+
+			// Optionally map location or other nested info here
+
+			return dto;
+		}).collect(Collectors.toList());
+
+		// Fetch status counts
+		long pendingCount = recruiterRepository.countByStatus(Status.PENDING);
+		long approvedCount = recruiterRepository.countByStatus(Status.APPROVED);
+		long rejectedCount = recruiterRepository.countByStatus(Status.REJECTED);
+
+		// Prepare the response map
+		Map<String, Object> response = new HashMap<>();
+		response.put("totalPending", pendingCount);
+		response.put("totalApproved", approvedCount);
+		response.put("totalRejected", rejectedCount);
+		response.put("totalRecruiters", recruiterProfiles.size());
+		response.put("recruiters", recruiterProfiles);
+
+		return response;
 	}
 
 	// Helper method to parse company size string into approximate employee count
 	private Integer parseEmployeeCount(String companySize) {
-	    if (companySize == null || companySize.isEmpty()) {
-	        return null;
-	    }
-	    
-	    try {
-	        // Handle ranges like "100-200"
-	        if (companySize.contains("-")) {
-	            String[] parts = companySize.split("-");
-	            return Integer.parseInt(parts[1].trim());
-	        }
-	        // Handle "500+" cases
-	        else if (companySize.contains("+")) {
-	            return Integer.parseInt(companySize.replace("+", "").trim());
-	        }
-	        // Plain number
-	        else {
-	            return Integer.parseInt(companySize.trim());
-	        }
-	    } catch (NumberFormatException e) {
-	        return null; // Return null if parsing fails
-	    }
+		if (companySize == null || companySize.isEmpty()) {
+			return null;
+		}
+
+		try {
+			// Handle ranges like "100-200"
+			if (companySize.contains("-")) {
+				String[] parts = companySize.split("-");
+				return Integer.parseInt(parts[1].trim());
+			}
+			// Handle "500+" cases
+			else if (companySize.contains("+")) {
+				return Integer.parseInt(companySize.replace("+", "").trim());
+			}
+			// Plain number
+			else {
+				return Integer.parseInt(companySize.trim());
+			}
+		} catch (NumberFormatException e) {
+			return null; // Return null if parsing fails
+		}
 	}
 
 	// Update recruter status ex.panding, approve, regected
@@ -221,7 +220,6 @@ public class AdminService {
 			return "Recruter not found with id: " + id;
 		}
 	}
-
 
 	// This deletes JobSeeker and cascades delete to related entities
 	public void deleteJobSeekerById(int id) {

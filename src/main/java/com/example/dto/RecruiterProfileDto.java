@@ -1,83 +1,78 @@
 package com.example.dto;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.validation.constraints.*;
 
-
-
 public class RecruiterProfileDto {
-    private String fullName;
-    private long mobileNumber;
-    
-    // Company info
-    private String companyName;
-    private String companyAddress;
-    private String companyDescription;
-    private String companyWebsiteUrl;
-    private Integer numberOfEmployees;
-    private String industryType;
+	private String fullName;
+	private long mobileNumber;
+	private String recruiterEmail;
+
+	// Company info
+	CompanyProfileDTO CompanyProfile;
+	private List<CompanyLocationDTO> companyLocation;
+
 	public RecruiterProfileDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public RecruiterProfileDto(String fullName, long mobileNumber, String companyName, String companyAddress,
-			String companyDescription, String companyWebsiteUrl, Integer numberOfEmployees, String industryType) {
+
+	public RecruiterProfileDto(String fullName, long mobileNumber, CompanyProfileDTO companyProfile,
+			List<CompanyLocationDTO> companyLocation, String recruiterEmail) {
 		super();
 		this.fullName = fullName;
 		this.mobileNumber = mobileNumber;
-		this.companyName = companyName;
-		this.companyAddress = companyAddress;
-		this.companyDescription = companyDescription;
-		this.companyWebsiteUrl = companyWebsiteUrl;
-		this.numberOfEmployees = numberOfEmployees;
-		this.industryType = industryType;
+		this.CompanyProfile = companyProfile;
+		this.companyLocation = companyLocation;
+		this.recruiterEmail = recruiterEmail;
 	}
+
 	public String getFullName() {
 		return fullName;
 	}
+
 	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
+
 	public long getMobileNumber() {
 		return mobileNumber;
 	}
+
 	public void setMobileNumber(long mobileNumber) {
 		this.mobileNumber = mobileNumber;
 	}
-	public String getCompanyName() {
-		return companyName;
-	}
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
-	}
-	public String getCompanyAddress() {
-		return companyAddress;
-	}
-	public void setCompanyAddress(String companyAddress) {
-		this.companyAddress = companyAddress;
-	}
-	public String getCompanyDescription() {
-		return companyDescription;
-	}
-	public void setCompanyDescription(String companyDescription) {
-		this.companyDescription = companyDescription;
-	}
-	public String getCompanyWebsiteUrl() {
-		return companyWebsiteUrl;
-	}
-	public void setCompanyWebsiteUrl(String companyWebsiteUrl) {
-		this.companyWebsiteUrl = companyWebsiteUrl;
-	}
-	public Integer getNumberOfEmployees() {
-		return numberOfEmployees;
-	}
-	public void setNumberOfEmployees(Integer numberOfEmployees) {
-		this.numberOfEmployees = numberOfEmployees;
-	}
-	public String getIndustryType() {
-		return industryType;
-	}
-	public void setIndustryType(String industryType) {
-		this.industryType = industryType;
-	}
+
 	
+
+	public CompanyProfileDTO getCompanyProfile() {
+		return CompanyProfile;
+	}
+
+	public void setCompanyProfile(CompanyProfileDTO companyProfile) {
+		CompanyProfile = companyProfile;
+	}
+
+	
+
+	public List<CompanyLocationDTO> getCompanyLocation() {
+		return companyLocation;
+	}
+
+	public void setCompanyLocation(List<CompanyLocationDTO> companyLocation) {
+		this.companyLocation = companyLocation;
+	}
+
+	public String getRecruiterEmail() {
+		return recruiterEmail;
+	}
+
+	public void setRecruiterEmail(String recruiterEmail) {
+		this.recruiterEmail = recruiterEmail;
+	}
+	public void setCompanyLocations(List<CompanyLocationDTO> companyLocations) {
+        this.companyLocation = companyLocations != null ? companyLocations : new ArrayList<>();
+    }
 }

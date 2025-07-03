@@ -27,7 +27,10 @@ public interface RecruiterRepository extends JpaRepository<Recruiter, Integer> {
      * @param email - email of the recruiter
      * @return Optional containing Recruiter if found, or empty if not
      */
-    Optional<Recruiter> findByEmail(String email);
+	
+  Optional<Recruiter> findByEmail(String email);
+
+
     //it is used to countbyStatus
     long countByStatus(Status status);
     boolean existsByEmail(String email);

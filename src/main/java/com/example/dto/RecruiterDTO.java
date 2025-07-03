@@ -3,59 +3,47 @@ package com.example.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.enums.Status;
 
-
 public class RecruiterDTO {
-    private Integer id;
+	private Integer id;
 
-    
-    private String fullName;
+	private String fullName;
 
-   
-    
-    private String email;
+	private String email;
 
-    
-    private long mobileNumber;
+	private long mobileNumber;
 
-   
-    private String password;
+	private String password;
 
-    
-    private String confirmPassword;
+	private String confirmPassword;
 
-    // Verification fields
-    private Boolean isVerified = false;
-    private String otp;
-    private LocalDateTime otpGeneratedTime;
-    private String mobileOtp;
-    private LocalDateTime mobileOtpGeneratedTime;
-    private Boolean isMobileVerified = false;
-    private Status status;
+	// Verification fields
+	private Boolean isVerified = false;
+	private String otp;
+	private LocalDateTime otpGeneratedTime;
+	private String mobileOtp;
+	private LocalDateTime mobileOtpGeneratedTime;
+	private Boolean isMobileVerified = false;
+	private Status status;
 
-    // Profile sections
-    
-    private CompanyProfileDTO companyProfile;
+	// Profile sections
 
-    
-    private List< CompanyLocationDTO> companyLocations;
+	private CompanyProfileDTO companyProfile;
 
-    
-    private List< String> industries;
+	private List<CompanyLocationDTO> companyLocations;
 
-    
-    private RecruiterPersonalInfoDTO personalInfo;
+	private List<String> industries;
 
-    
-    private RecruiterSocialProfileDTO socialProfile;
+	private RecruiterPersonalInfoDTO personalInfo;
 
-    // Additional fields from the PDF form
-    private String website; // Company website
+	private RecruiterSocialProfileDTO socialProfile;
+
+	// Additional fields from the PDF form
+	private String website; // Company website
 
 	public RecruiterDTO() {
 		super();
@@ -240,6 +228,5 @@ public class RecruiterDTO {
 	public void setWebsite(String website) {
 		this.website = website;
 	}
-    
-    
+
 }

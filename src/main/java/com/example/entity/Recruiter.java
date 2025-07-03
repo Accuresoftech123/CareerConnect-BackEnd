@@ -2,6 +2,8 @@ package com.example.entity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+
+import com.example.dto.CompanyProfileDTO;
 import com.example.entity.profile.*;
 import com.example.enums.Status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -13,60 +15,56 @@ import jakarta.persistence.*;
 
 public class Recruiter {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Integer id;
 
-   
-    private String fullName;
+	private String fullName;
 
-    @Column( unique = true)
-    private String email;
+	@Column(unique = true)
+	private String email;
 
-   
-    private long mobileNumber;
+	private long mobileNumber;
 
-    @Column(nullable = false)
-    private String password;
+	
+	private String password;
 
-    @Transient
-    private transient String confirmPassword;
+	@Transient
+	private transient String confirmPassword;
 
-    // Verification fields
-    private boolean isVerified = false;
-    private String otp;
-    private LocalDateTime otpGeneratedTime;
-    private String mobileOtp;
-    private LocalDateTime mobileOtpGeneratedTime;
-    private boolean isMobileVerified = false;
+	// Verification fields
+	private boolean isVerified = false;
+	private String otp;
+	private LocalDateTime otpGeneratedTime;
+	private String mobileOtp;
+	private LocalDateTime mobileOtpGeneratedTime;
+	private boolean isMobileVerified = false;
 
-    // Status field with enum
-    @Enumerated(EnumType.STRING)
-    
-    private Status status = Status.PENDING;
+	// Status field with enum
+	@Enumerated(EnumType.STRING)
 
-    // Relationships
-    @OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonBackReference
-    private CompanyProfile companyProfile;
+	private Status status;
 
+	// Relationships
+	@OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonBackReference
+	private CompanyProfile companyProfile;
 
-    @OneToMany(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<CompanyLocation> companyLocations;
+	@OneToMany(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<CompanyLocation> companyLocations;
 
-    @ElementCollection
-    @CollectionTable(name = "recruiter_industries", joinColumns = @JoinColumn(name = "recruiter_id"))
-    @Column(name = "industry")
-    private List<String> industries;
+	@ElementCollection
+	@CollectionTable(name = "recruiter_industries", joinColumns = @JoinColumn(name = "recruiter_id"))
+	@Column(name = "industry")
+	private List<String> industries;
 
-    @OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private RecruiterSocialProfile socialProfile;
+	@OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
+	private RecruiterSocialProfile socialProfile;
 
-    @OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
-    private RecruiterPersonalInfo personalInfo;
+	@OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
+	private RecruiterPersonalInfo personalInfo;
 
-    
-    public Recruiter() {
+	public Recruiter() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
@@ -242,14 +240,13 @@ public class Recruiter {
 	}
 
 	public void addCompanyLocation(CompanyLocation location) {
-        location.setRecruiter(this);
-        this.companyLocations.add(location);
-    }
+		location.setRecruiter(this);
+		this.companyLocations.add(location);
+	}
 
-    public void removeCompanyLocation(CompanyLocation location) {
-        location.setRecruiter(null);
-        this.companyLocations.remove(location);
-    }
-    
-    
+	public void removeCompanyLocation(CompanyLocation location) {
+		location.setRecruiter(null);
+		this.companyLocations.remove(location);
+	}
+
 }

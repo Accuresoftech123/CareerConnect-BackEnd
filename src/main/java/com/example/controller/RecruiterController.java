@@ -30,9 +30,13 @@ public class RecruiterController {
 	 * @return Success or failure message
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<String> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiter) {
-		String result = recruiterService.register(recruiter);
-		return ResponseEntity.ok(result);
+	public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
+		try {
+			Recruiter savedRecruiter = recruiterService.register(recruiterDto);
+			return ResponseEntity.ok(savedRecruiter);
+		} catch (RuntimeException e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
 	}
 
 	/**
