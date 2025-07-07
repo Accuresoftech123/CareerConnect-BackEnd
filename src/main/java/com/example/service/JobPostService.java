@@ -20,6 +20,7 @@ import com.example.entity.Recruiter;
 import com.example.entity.jobposting.JobPost;
 import com.example.enums.ApplicationStatus;
 import com.example.enums.JobPostStatus;
+import com.example.enums.Status;
 import com.example.exception.ResourceNotFoundException;
 import com.example.repository.ApplicantRepository;
 import com.example.repository.JobPostRepository;
@@ -48,16 +49,60 @@ public class JobPostService {
 
 
     // Create
+    // CREATE JobPost
     public JobPostDto createJobPost(JobPostDto jobPostDto, Integer recruiterId) {
         Recruiter recruiter = recruiterRepository.findById(recruiterId)
-                .orElseThrow(() -> new RuntimeException("Recruiter not found with id: " + recruiterId));
+                .orElseThrow(() -> new RuntimeException("Recruiter not found with ID: " + recruiterId));
 
-        JobPost jobPost = mapToEntity(jobPostDto);
+        JobPost jobPost = new JobPost();
+        jobPost.setTitle(jobPostDto.getTitle());
+        jobPost.setDescription(jobPostDto.getDescription());
+        jobPost.setLocation(jobPostDto.getLocation());
+        jobPost.setEmploymentType(jobPostDto.getEmploymentType());
+        jobPost.setMinExperience(jobPostDto.getMinExperience());
+        jobPost.setMaxExperience(jobPostDto.getMaxExperience());
+        jobPost.setLastDateToApply(jobPostDto.getLastDateToApply());
+        jobPost.setMinSalary(jobPostDto.getMinSalary());
+        jobPost.setMaxSalary(jobPostDto.getMaxSalary());
+        jobPost.setSkills(jobPostDto.getSkills());
+        jobPost.setBenefits(jobPostDto.getBenefits());
+        jobPost.setNumberOfOpenings(jobPostDto.getNumberOfOpenings());
+        jobPost.setStatus(JobPostStatus.OPEN);
         jobPost.setRecruiter(recruiter);
-        JobPost savedJobPost = jobPostRepository.save(jobPost);
-        return mapToDto(savedJobPost);
+        jobPost.setPrefillRequest(jobPostDto.isPrefillRequest());
+        jobPost.setPrefillFromJobId(jobPostDto.getPrefillFromJobId());
+
+        JobPost savedPost = jobPostRepository.save(jobPost);
+
+        // Convert back to DTO if needed
+        return convertToDto(savedPost); // You need to implement this mapping method
     }
-    
+
+    private JobPostDto convertToDto(JobPost jobPost) {
+        JobPostDto dto = new JobPostDto();
+
+        dto.setId(jobPost.getId());
+        dto.setTitle(jobPost.getTitle());
+        dto.setDescription(jobPost.getDescription());
+        dto.setLocation(jobPost.getLocation());
+        dto.setEmploymentType(jobPost.getEmploymentType());
+        dto.setMinExperience(jobPost.getMinExperience());
+        dto.setMaxExperience(jobPost.getMaxExperience());
+        dto.setLastDateToApply(jobPost.getLastDateToApply());
+        dto.setPostedDate(jobPost.getPostedDate());
+        dto.setMinSalary(jobPost.getMinSalary());
+        dto.setMaxSalary(jobPost.getMaxSalary());
+        dto.setSkills(jobPost.getSkills());
+        dto.setBenefits(jobPost.getBenefits());
+        dto.setNumberOfOpenings(jobPost.getNumberOfOpenings());
+        dto.setStatus(jobPost.getStatus());
+        dto.setPrefillRequest(jobPost.isPrefillRequest());
+        dto.setPrefillFromJobId(jobPost.getPrefillFromJobId());
+        dto.setRecruiterId(jobPost.getRecruiter().getId());  // recruiter ID only
+
+        return dto;
+    }
+
 
     // Read (Get All)
     public List<JobPostDto> getAllJobPosts() {
@@ -65,22 +110,22 @@ public class JobPostService {
         return jobPosts.stream().map(this::mapToDto).collect(Collectors.toList());
     }
 
-    // Read (Get by ID)
-    public JobPostDto getJobPostById(Integer id) {
-        JobPost jobPost = jobPostRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("JobPost not found with id: " + id));
-
-        JobPostDto dto = mapToDto(jobPost);
-
-        // Determine if the job post is closed based on lastDateToApply
-        if (jobPost.getLastDateToApply() != null && jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
-            dto.setClosed(true);
-        } else {
-            dto.setClosed(false);
-        }
-
-        return dto;
-    }
+//    // Read (Get by ID)
+//    public JobPostDto getJobPostById(Integer id) {
+//        JobPost jobPost = jobPostRepository.findById(id)
+//                .orElseThrow(() -> new RuntimeException("JobPost not found with id: " + id));
+//
+//        JobPostDto dto = mapToDto(jobPost);
+//
+//        // Determine if the job post is closed based on lastDateToApply
+//        if (jobPost.getLastDateToApply() != null && jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
+//            dto.setStatus(null);
+//        } else {
+//            dto.setStatus(Status);
+//        }
+//
+//        return dto;
+//    }
 
 
     // Update
@@ -98,16 +143,16 @@ public class JobPostService {
         existingJobPost.setMaxExperience(jobPostDto.getMaxExperience());
         existingJobPost.setLastDateToApply(jobPostDto.getLastDateToApply());
         existingJobPost.setPostedDate(jobPostDto.getPostedDate());
-        existingJobPost.setJobCategory(jobPostDto.getJobCategory());
+        
         existingJobPost.setNumberOfOpenings(jobPostDto.getNumberOfOpenings());
-        existingJobPost.setCompanyName(jobPostDto.getCompanyName());
-        existingJobPost.setJobType(jobPostDto.getJobType());
-        existingJobPost.setWorkLocation(jobPostDto.getWorkLocation());
-        existingJobPost.setGender(jobPostDto.getGender());
+       // existingJobPost.setCompanyName(jobPostDto.getCompanyName());
+        //existingJobPost.setJobType(jobPostDto.getJobType());
+        //existingJobPost.setWorkLocation(jobPostDto.getWorkLocation());
+        //existingJobPost.setGender(jobPostDto.getGender());
         
         existingJobPost.setSkills(jobPostDto.getSkills());
-        existingJobPost.setJobShift(jobPostDto.getJobShift());
-        existingJobPost.setEducation(jobPostDto.getEducation());
+       // existingJobPost.setJobShift(jobPostDto.getJobShift());
+        //existingJobPost.setEducation(jobPostDto.getEducation());
         
 
         JobPost updatedJobPost = jobPostRepository.save(existingJobPost);
@@ -125,30 +170,26 @@ public class JobPostService {
     public JobPost mapToEntity(JobPostDto jobPostDto) {
         JobPost jobPost = new JobPost();
         
-        if (jobPostDto.getId() != null) {
+        if (jobPostDto.getId() != 0) {
             jobPost.setId(jobPostDto.getId());
         }
         
         jobPost.setTitle(jobPostDto.getTitle());
         jobPost.setDescription(jobPostDto.getDescription());
         jobPost.setLocation(jobPostDto.getLocation());
-        jobPost.setSalary(jobPostDto.getMaxSalary());
+       
         jobPost.setEmploymentType(jobPostDto.getEmploymentType());
         jobPost.setMaxSalary(jobPostDto.getMaxSalary());
         jobPost.setMinSalary(jobPostDto.getMinSalary());
         jobPost.setLastDateToApply(jobPostDto.getLastDateToApply());
         jobPost.setPostedDate(jobPostDto.getPostedDate());
-        jobPost.setJobCategory(jobPostDto.getJobCategory());
+      
         jobPost.setNumberOfOpenings(jobPostDto.getNumberOfOpenings());
-        jobPost.setCompanyName(jobPostDto.getCompanyName());
-        jobPost.setJobType(jobPostDto.getJobType());
-        jobPost.setWorkLocation(jobPostDto.getWorkLocation());
-        jobPost.setGender(jobPostDto.getGender());
+      
         jobPost.setMinExperience(jobPostDto.getMinExperience());
         jobPost.setMaxExperience(jobPostDto.getMaxExperience());        
         jobPost.setSkills(jobPostDto.getSkills());
-        jobPost.setJobShift(jobPostDto.getJobShift());
-        jobPost.setEducation(jobPostDto.getEducation());
+        jobPost.setBenefits(jobPostDto.getBenefits());
        
 
         return jobPost;
@@ -168,19 +209,15 @@ public class JobPostService {
         dto.setMaxExperience(jobPost.getMaxExperience());
         dto.setLastDateToApply(jobPost.getLastDateToApply());
         dto.setPostedDate(jobPost.getPostedDate());
-        dto.setJobCategory(jobPost.getJobCategory());
+       
         dto.setNumberOfOpenings(jobPost.getNumberOfOpenings());
-        dto.setCompanyName(jobPost.getCompanyName());
-        dto.setJobType(jobPost.getJobType());
-        dto.setWorkLocation(jobPost.getWorkLocation());
-        dto.setGender(jobPost.getGender());
-        
+  
         dto.setSkills(jobPost.getSkills());
-        dto.setJobShift(jobPost.getJobShift());
-        dto.setEducation(jobPost.getEducation());
-        
+        dto.setBenefits(jobPost.getBenefits());     
         return dto;
     }
+    
+    
     //find by title, location, experience
     public List<JobPost> searchJobs(String title, String location, String experience) {
         return jobPostRepository.searchJobs(title, location, experience);
@@ -366,9 +403,9 @@ public class JobPostService {
 	   RecommendedJobPostDto dto = new RecommendedJobPostDto();
 	   dto.setId(job.getId());
 	   dto.setTitle(job.getTitle());
-	   dto.setCompanyName(job.getCompanyName());
+	  // dto.setCompanyName(job.getCompanyName());
 	   dto.setLocation(job.getLocation());
-	   dto.setJobType(job.getJobType());
+	   //dto.setJobType(job.getJobType());
 	   dto.setMinSalary(job.getMinSalary());
 	   dto.setMaxSalary(job.getMaxSalary());
 	   dto.setSkills(job.getSkills());

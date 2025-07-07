@@ -21,18 +21,19 @@ import com.example.service.ApplicantService;
 import com.example.service.JobPostService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/jobposts")
 public class JobPostController {
 
     @Autowired
     private JobPostService jobPostService;
 
-    // create a job post by recruiter
     @PostMapping("/recruiter/{recruiterId}/jobposts")
     public ResponseEntity<JobPostDto> createJobPost(@RequestBody JobPostDto jobPostDto, @PathVariable Integer recruiterId) {
-        JobPostDto createdJobPost = jobPostService.createJobPost(jobPostDto, recruiterId);
+        JobPostDto createdJobPost = jobPostService.createJobPost(jobPostDto, recruiterId); // Pass recruiterId separately
         return ResponseEntity.ok(createdJobPost);
     }
+
 
     // fetch all job post by recruiter
     @GetMapping("/recruiters/jobposts")
@@ -42,11 +43,11 @@ public class JobPostController {
     }
 
     // fetch job post according to specific id 
-    @GetMapping("/recruiters/{id}/jobposts")
-    public ResponseEntity<JobPostDto> getJobPostById(@PathVariable Integer id) {
-        JobPostDto jobPost = jobPostService.getJobPostById(id);
-        return ResponseEntity.ok(jobPost);
-    }
+//    @GetMapping("/recruiters/{id}/jobposts")
+//    public ResponseEntity<JobPostDto> getJobPostById(@PathVariable Integer id) {
+//        JobPostDto jobPost = jobPostService.getJobPostById(id);
+//        return ResponseEntity.ok(jobPost);
+//    }
 
     // update existing job post by recruiter
     @PutMapping("/recruiters/{id}/update-jobpost")
