@@ -1,5 +1,7 @@
 package com.example.service;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -34,57 +36,63 @@ public class PaymentService {
 	@Value("${razorpay.key_secret}")
 	private String keySecret;
 	
-	
-	public String createOrder(double amount) throws Exception {
-	
-		RazorpayClient razorpayClient=new RazorpayClient(keyId,keySecret);
-		JSONObject orderRequest = new JSONObject();
-		orderRequest.put("amount", (int)(amount * 100)); // in paise
-		orderRequest.put("currency", "INR");
-		orderRequest.put("receipt", "txn_" + System.currentTimeMillis());
-		orderRequest.put("payment_capture", 1); // auto-capture
+	  // ✅ 1️⃣ Create Order and save Payment with status CREATED
+    public Map<String, Object> createOrder(int userId, double amount) throws Exception {
+
+        RazorpayClient razorpayClient = new RazorpayClient(keyId, keySecret);
+
+        JSONObject orderRequest = new JSONObject();
+        orderRequest.put("amount", (int) (amount * 100)); // in paise
+        orderRequest.put("currency", "INR");
+        orderRequest.put("receipt", "txn_" + System.currentTimeMillis());
+        orderRequest.put("payment_capture", 1);
 
         Order order = razorpayClient.orders.create(orderRequest);
-        
-        //Save Payment details in database
-        Payment payment=new Payment();
-        payment.setPaymentId(order.get("id"));
+
+        // Fetch JobSeeker
+        JobSeeker jobSeeker = jobSeekerRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found for id: " + userId));
+
+        // Save Payment with status CREATED
+        Payment payment = new Payment();
+        payment.setPaymentId(order.get("id")); // Razorpay Order ID
         payment.setAmount(amount);
         payment.setCurrency(order.get("currency"));
         payment.setReceipt(order.get("receipt"));
-        payment.setStatus(order.get("status"));
+        payment.setStatus("CREATED");
+        payment.setJobSeeker(jobSeeker);
+
         paymentRepository.save(payment);
-        
-        return order.toString(); // return JSON
-	}
-	
-    
-	public void processSuccessfulPayment(int userId, double amount) {
-	    try {
-	        // Fetch user by ID
-	        Optional<JobSeeker> optionalUser = jobSeekerRepository.findById(userId);
-	        if (optionalUser.isPresent()) {
-	            JobSeeker jobSeeker = optionalUser.get();
 
-	            // Create and save Payment
-	            Payment payment = new Payment();
-	            payment.setAmount(amount);
-	            payment.setCurrency("INR");
-	            payment.setStatus("SUCCESS");
-	            payment.setPaymentId(UUID.randomUUID().toString());
-	            payment.setReceipt("RCP-" + System.currentTimeMillis());
-	            payment.setJobSeeker(jobSeeker);
+        // Prepare response for frontend
+        Map<String, Object> response = new HashMap<>();
+        response.put("id", order.get("id"));
+        response.put("amount", order.get("amount"));
+        response.put("currency", order.get("currency"));
 
-	            paymentRepository.save(payment);
+        return response;
+    }
 
-	            // Now generate and save Receipt, passing payment and jobSeeker
-	            receiptService.generateSendAndSaveReceipt(jobSeeker.getEmail(), amount, payment, jobSeeker);
+    // ✅ 2️⃣ Process Successful Payment — Update existing Payment to SUCCESS
+    public void processSuccessfulPayment(String paymentId) {
+        try {
+            // Fetch existing Payment by paymentId (Razorpay Order ID)
+            Payment payment = paymentRepository.findByPaymentId(paymentId)
+                    .orElseThrow(() -> new RuntimeException("Payment not found for id: " + paymentId));
 
-	        } else {
-	            throw new RuntimeException("User not found for id: " + userId);
-	        }
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }
-	}
-}
+            // Update status to SUCCESS
+            payment.setStatus("SUCCESS");
+            paymentRepository.save(payment);
+
+            // Send receipt email etc.
+            receiptService.generateSendAndSaveReceipt(
+                    payment.getJobSeeker().getEmail(),
+                    payment.getAmount(),
+                    payment,
+                    payment.getJobSeeker()
+            );
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }}
