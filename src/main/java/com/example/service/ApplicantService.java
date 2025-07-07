@@ -145,31 +145,29 @@ public class ApplicantService {
     
     
     // get appied job by jobseeker
-    public List<SavedJobPostReportDto> getAppliedJobsByJobSeeker(int jobSeekerId) {
-        JobSeeker seeker = jobSeekerRepository.findById(jobSeekerId)
-            .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
-
-        List<Applicant> applicants = applicantRepository.findByJobSeeker(seeker);
-
-        return applicants.stream()
-            .map(applicant -> {
-                JobPost post = applicant.getJobPost();
-                return new SavedJobPostReportDto(
-                		post.getId(),
-                		post.getTitle(),
-                		post.getCompanyName(),
-                		post.getLocation(),
-                		post.getJobType(),
-                		post.getMinSalary(),
-                		post.getMaxSalary(),
-                		post.getMinExperience(),
-                		post.getMaxExperience(),
-                		post.getSkills(),
-                		post.getPostedDate()
-                );
-            })
-            .collect(Collectors.toList());
-    }
+//    public List<SavedJobPostReportDto> getAppliedJobsByJobSeeker(int jobSeekerId) {
+//        JobSeeker seeker = jobSeekerRepository.findById(jobSeekerId)
+//            .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
+//
+//        List<Applicant> applicants = applicantRepository.findByJobSeeker(seeker);
+//
+//        return applicants.stream()
+//            .map(applicant -> {
+//                JobPost post = applicant.getJobPost();
+//                return new SavedJobPostReportDto(
+//                		post.getId(),
+//                		post.getTitle(),
+//                		post.getLocation(),
+//                		post.getMinSalary(),
+//                		post.getMaxSalary(),
+//                		post.getMinExperience(),
+//                		post.getMaxExperience(),
+//                		post.getSkills(),
+//                		post.getPostedDate()
+//                );
+//            })
+//            .collect(Collectors.toList());
+//    }
     
     // count of applied jobes  by jobseeker
     public long countAppliedJobs(int jobSeekerId) {

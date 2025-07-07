@@ -92,6 +92,7 @@ public class RecruiterService {
         dto.setId(existing.getId());
         dto.setFullName(existing.getFullName());
         dto.setEmail(existing.getEmail());
+        
 
         return ResponseEntity.ok(dto);
     }

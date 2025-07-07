@@ -52,9 +52,9 @@ public class RecruiterDashboardService {
         
         
         // Total views across recruiter's jobs
-        summary.setTotalViews(jobPostRepository.findByRecruiter(recruiter)
-            .stream().mapToInt(JobPost::getApplicants).sum());
-        
+//        summary.setTotalViews(jobPostRepository.findByRecruiter(recruiter)
+//            .stream().mapToInt(JobPost::getApplicants).sum());
+//        
         return summary;
     }
     
