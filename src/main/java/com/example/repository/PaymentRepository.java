@@ -1,5 +1,7 @@
 package com.example.repository;
 
+import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -12,5 +14,7 @@ public interface PaymentRepository  extends JpaRepository<Payment,Long>{
 	 // To get total collected amount
     @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.status = 'captured'")
     Double getTotalCollectedAmount();
+    
+    Optional<Payment> findByPaymentId(String paymentId);
 
 }

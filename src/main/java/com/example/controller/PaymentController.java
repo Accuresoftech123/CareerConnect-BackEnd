@@ -1,11 +1,14 @@
 package com.example.controller;
 
 import java.io.BufferedReader;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,11 +36,23 @@ public class PaymentController {
 	PaymentService paymentService;
 	@Autowired
 	PaymentRepository paymentRepository;
-	
-	@PostMapping("/create-order")
-    public String createOrder(@RequestParam double amount) throws Exception {
-        return paymentService.createOrder(amount);
+
+    // ✅ 1️⃣ API to Create Razorpay Order (and create Payment record with status CREATED)
+    @PostMapping("/create-order")
+    public ResponseEntity<Map<String, Object>> createOrder(
+            @RequestParam int userId,
+            @RequestParam double amount) {
+        try {
+            Map<String, Object> response = paymentService.createOrder(userId, amount);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonMap("error", "Failed to create order"));
+        }
     }
+
+
 	 // 📌 Simple Webhook endpoint for Razorpay
     @PostMapping("/webhook")
     public ResponseEntity<String> handleWebhook(HttpServletRequest request) {
@@ -85,16 +100,16 @@ public class PaymentController {
     @Autowired
     ReceiptService receiptService;
 
-   
+    // ✅ 2️⃣ API to Confirm Payment (update existing Payment record to SUCCESS)
     @PostMapping("/confirm-payment")
-    public ResponseEntity<String> confirmPayment(@RequestBody PaymentConformDto request) {
+    public ResponseEntity<String> confirmPayment(@RequestParam String paymentId) {
         try {
-            paymentService.processSuccessfulPayment(request.getUserId(), request.getAmount());
-            return ResponseEntity.ok("Receipt generated, emailed, and saved.");
+            paymentService.processSuccessfulPayment(paymentId);
+            return ResponseEntity.ok("Payment confirmed successfully");
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Failed to generate receipt.");
+                    .body("Failed to confirm payment");
         }
     }
 

@@ -35,6 +35,9 @@ public class RecruiterService {
     @Autowired
     private RecruiterRepository recruiterRepository;
 
+    
+    @Autowired
+    private EmailService emailService;
     /**
      * Registers a new recruiter.
      * Checks for duplicate email before saving.
@@ -42,7 +45,7 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-    public Recruiter register(RecruiterRegistrationDto newRecruiter) {
+    public String register(RecruiterRegistrationDto newRecruiter) {
         Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 
         if (existing.isPresent()) {
@@ -56,8 +59,9 @@ public class RecruiterService {
         recruiter.setPassword(newRecruiter.getPassword());
         recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
         recruiter.setStatus(Status.APPROVED);
-
-        return recruiterRepository.save(recruiter); // return saved object
+        emailService.generateAndSendOtp(recruiter);
+        return " OTP has been send to your registerd email!."
+        ; // return saved object
     }
 
 
@@ -74,7 +78,10 @@ public class RecruiterService {
         if (existing == null || !existing.getPassword().equals(password)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
-
+      if(!existing.isVerified()){
+    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please verify your email before logging in.");
+    	  
+      }
         if (existing.getStatus() != Status.APPROVED) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access Denied. Your application status is " + existing.getStatus());

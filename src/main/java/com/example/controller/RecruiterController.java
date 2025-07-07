@@ -4,6 +4,7 @@ import com.example.dto.RecruiterLoginDto;
 import com.example.dto.RecruiterProfileDto;
 import com.example.dto.RecruiterRegistrationDto;
 import com.example.entity.Recruiter;
+import com.example.service.EmailService;
 import com.example.service.RecruiterService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,9 @@ public class RecruiterController {
 
 	@Autowired
 	private RecruiterService recruiterService;
+@Autowired
+private EmailService emailService;
+
 
 	/**
 	 * Registers a new recruiter.
@@ -30,13 +34,10 @@ public class RecruiterController {
 	 * @return Success or failure message
 	 */
 	@PostMapping("/register")
-	public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
-		try {
-			Recruiter savedRecruiter = recruiterService.register(recruiterDto);
-			return ResponseEntity.ok(savedRecruiter);
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}
+	public String registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
+		
+			return recruiterService.register(recruiterDto);
+		
 	}
 
 	/**
@@ -63,5 +64,11 @@ public class RecruiterController {
 
 		Recruiter result = recruiterService.updateProfile(id, profileDto);
 		return ResponseEntity.ok(result);
+	}
+	@PostMapping("Verify-recruiter")
+	public String verifyOtp(@RequestParam String email, @RequestParam String otp) {
+		 
+		return 	emailService.verifyRecruiterOtp(email, otp);
+				
 	}
 }
