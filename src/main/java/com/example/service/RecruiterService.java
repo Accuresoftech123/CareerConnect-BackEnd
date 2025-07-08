@@ -1,6 +1,8 @@
 package com.example.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -45,11 +47,14 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-    public String register(RecruiterRegistrationDto newRecruiter) {
+    public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
         Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 
         if (existing.isPresent()) {
-            throw new RuntimeException("Email already registered");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "success", false,
+                "message", "Email already registered"
+            ));
         }
 
         Recruiter recruiter = new Recruiter();
@@ -59,11 +64,17 @@ public class RecruiterService {
         recruiter.setPassword(newRecruiter.getPassword());
         recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
         recruiter.setStatus(Status.APPROVED);
-        emailService.generateAndSendOtp(recruiter);
-        return " OTP has been send to your registerd email!."
-        ; // return saved object
-    }
 
+        Recruiter savedRecruiter = recruiterRepository.save(recruiter);
+
+        emailService.generateAndSendOtp(savedRecruiter);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "OTP sent. Please verify your account.");
+        response.put("recruiterId", savedRecruiter.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
     /**
      * Validates recruiter credentials for login.
@@ -131,13 +142,6 @@ public class RecruiterService {
     
    
 
-    /**
-     * Checks whether all profile fields in the DTO are empty.
-     *
-     * @param dto the profile DTO
-     * @return true if all fields are empty; false otherwise
-     */
    
-
 
 }
