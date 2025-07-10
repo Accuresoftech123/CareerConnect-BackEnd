@@ -44,7 +44,7 @@ public class EmailService {
 	// OTP Generation function
 	public void generateAndSendOtp(JobSeeker jobSeeker) {
 		// Generate 6-digit OTP
-		String otp = String.valueOf(100000 + new Random().nextInt(900000));
+		String otp = String.valueOf(100000 + new Random().nextInt(999999));
 
 		// Set OTP and generation time
 		jobSeeker.setOtp(otp);

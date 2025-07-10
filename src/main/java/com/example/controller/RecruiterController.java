@@ -68,6 +68,7 @@ private EmailService emailService;
 		return ResponseEntity.ok(result);
 	}
 	
+
 	
 	
 	//verify otp 
@@ -99,6 +100,7 @@ private EmailService emailService;
 	        ));
 	    }
 	}
+
 
 
 }
