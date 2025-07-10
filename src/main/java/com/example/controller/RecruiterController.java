@@ -65,10 +65,5 @@ private EmailService emailService;
 		Recruiter result = recruiterService.updateProfile(id, profileDto);
 		return ResponseEntity.ok(result);
 	}
-	@PostMapping("Verify-recruiter")
-	public String verifyOtp(@RequestParam String email, @RequestParam String otp) {
-		 
-		return 	emailService.verifyRecruiterOtp(email, otp);
-				
-	}
+	
 }
