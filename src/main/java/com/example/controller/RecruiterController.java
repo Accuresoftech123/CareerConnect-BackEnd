@@ -7,6 +7,8 @@ import com.example.entity.Recruiter;
 import com.example.service.EmailService;
 import com.example.service.RecruiterService;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +36,7 @@ private EmailService emailService;
 	 * @return Success or failure message
 	 */
 	@PostMapping("/register")
-	public String registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
+	public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
 		
 			return recruiterService.register(recruiterDto);
 		
@@ -66,4 +68,39 @@ private EmailService emailService;
 		return ResponseEntity.ok(result);
 	}
 	
+
+	
+	
+	//verify otp 
+	@PostMapping("/verify-otp")
+	public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+	    System.out.println("Incoming OTP verification request: " + request);
+
+	    String email = request.get("email");
+	    String otp = request.get("otp");
+
+	    if (email == null || otp == null) {
+	        return ResponseEntity.badRequest().body(Map.of(
+	            "success", false,
+	            "message", "Email and OTP are required."
+	        ));
+	    }
+
+	    String result = emailService.verifyRecruiterOtp(email, otp);
+
+	    if (EmailService.OTP_SUCCESS.equals(result)) {
+	        return ResponseEntity.ok(Map.of(
+	            "success", true,
+	            "message", "OTP verified successfully!"
+	        ));
+	    } else {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+	            "success", false,
+	            "message", result
+	        ));
+	    }
+	}
+
+
+
 }

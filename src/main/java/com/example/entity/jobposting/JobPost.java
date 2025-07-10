@@ -16,207 +16,185 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 @Table(name = "job_posts")
 public class JobPost {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private int id;
 
-    
-    private String title;
+	private String title;
 
-   
-    private String description;
+	private String description;
 
-    
-    private String location;
+	private String location;
 
-    
-    private double salary;
+	private String employmentType;
 
-    
-    private String employmentType;
-
-   
-    private String minExperience;
-    private String maxExperience;
-
-    
-    
+	private String minExperience;
+	private String maxExperience;
 
 	private LocalDate lastDateToApply;
 
-    private LocalDate postedDate;
+	private LocalDate postedDate;
 
-    @ManyToOne
-    @JsonBackReference
-    @JoinColumn(name = "recruiter_id", nullable = false)
-    private Recruiter recruiter;
+	@ManyToOne
+	@JsonBackReference
+	@JoinColumn(name = "recruiter_id", nullable = false)
+	private Recruiter recruiter;
 
-    // New Fields Added
-    private String jobCategory;
-    private int numberOfOpenings;
-    private String companyName;
-    private String jobType;
-    private String workLocation;
-    private String gender;
-    
-    @ElementCollection
-    private List<String> skills;
-    private String jobShift;
-    private String education;
-    private int applicants;
+	
+	private int numberOfOpenings;
+	
 
-    private double minSalary;
-   
+	@ElementCollection
+	private List<String> skills;
+	
+
+	private double minSalary;
 
 	private double maxSalary;
 	@ElementCollection
 	private List<String> benefits;
-	
-	 @Transient
-	    private boolean prefillRequest;
-	    
-	 @Transient
-	    private Integer prefillFromJobId;
-    
-    
+
+	@Transient
+	private boolean prefillRequest;
+
+	@Transient
+	private Integer prefillFromJobId;
 
 	@PrePersist
-    protected void onCreate() {
-        this.postedDate = LocalDate.now();
-        this.applicants = 0; // Default value
-    }
-    
+	protected void onCreate() {
+		this.postedDate = LocalDate.now();
+		// this.applicants = 0; // Default value
+	}
 
-    @Enumerated(EnumType.STRING)
-    private JobPostStatus status = JobPostStatus.OPEN;
+	@Enumerated(EnumType.STRING)
+	private JobPostStatus status = JobPostStatus.OPEN;
 
-    public JobPostStatus getStatus() {
+	public JobPostStatus getStatus() {
 		return status;
 	}
-    
 
 	public void setStatus(JobPostStatus status) {
 		this.status = status;
 	}
 
-    @OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL)
-    private List<SavedJob> savedJobs;
-
+	@OneToMany(mappedBy = "jobPost", cascade = CascadeType.ALL)
+	private List<SavedJob> savedJobs;
 
 	public JobPost() {
-        super();
-    }
+		super();
+	}
 
-    // All Args Constructor
-    public JobPost(int id, String title, String description, String location, double salary, String employmentType,
-                   String minExperience, String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, Recruiter recruiter,
-                   String jobCategory, int numberOfOpenings, String companyName, String jobType, String workLocation,
+	// All Args Constructor
+	public JobPost(int id, String title, String description, String location, String employmentType,
+			String minExperience, String maxExperience, LocalDate lastDateToApply, LocalDate postedDate,
+			Recruiter recruiter, int numberOfOpenings,
 
-                   String gender, String jobShift, String education, JobPostStatus status,double minSalary,
-                   double maxSalary,List<String> skills,List<String> benefits,  int applicants, List<SavedJob> savedJobs,boolean prefillRequest,Integer prefillFromJobId) {
+			JobPostStatus status, double minSalary, double maxSalary, List<String> skills, List<String> benefits,
+			List<SavedJob> savedJobs, boolean prefillRequest, Integer prefillFromJobId) {
 
+		this.id = id;
+		this.title = title;
+		this.description = description;
+		this.location = location;
+		this.employmentType = employmentType;
+		this.minExperience = minExperience;
+		this.maxExperience = maxExperience;
+		this.lastDateToApply = lastDateToApply;
+		this.postedDate = postedDate;
+		this.recruiter = recruiter;
 
-                   
+		this.numberOfOpenings = numberOfOpenings;
 
+		// this.jobType = jobType;
 
-        this.id = id;
-        this.title = title;
-        this.description = description;
-        this.location = location;
-        this.salary = salary;
-        this.employmentType = employmentType;
-        this.minExperience = minExperience;
-        this.maxExperience=maxExperience;
-        this.lastDateToApply = lastDateToApply;
-        this.postedDate = postedDate;
-        this.recruiter = recruiter;
-        this.jobCategory = jobCategory;
-        this.numberOfOpenings = numberOfOpenings;
-        this.companyName = companyName;
-        this.jobType = jobType;
-        this.workLocation = workLocation;
-        this.gender = gender;
-       
-        this.minSalary=minSalary;
-        this.maxSalary=maxSalary;
-        this.skills=skills;
-        this.benefits=benefits;
-        
-       
-        this.jobShift = jobShift;
-        this.education = education;
-        this.applicants = applicants;
+		this.minSalary = minSalary;
+		this.maxSalary = maxSalary;
+		this.skills = skills;
+		this.benefits = benefits;
 
-        this.status=status;
+		this.status = status;
 
-        this.savedJobs=savedJobs;
-        this.prefillRequest=prefillRequest;
-        this.prefillFromJobId=prefillFromJobId;
-        
+		this.savedJobs = savedJobs;
+		this.prefillRequest = prefillRequest;
+		this.prefillFromJobId = prefillFromJobId;
 
-    }
+	}
 
-    // Getters and Setters for all fields
+	// Getters and Setters for all fields
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+	public int getId() {
+		return id;
+	}
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+	public void setId(int id) {
+		this.id = id;
+	}
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+	public String getTitle() {
+		return title;
+	}
 
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public double getSalary() { return salary; }
-    public void setSalary(double salary) { this.salary = salary; }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getEmploymentType() { return employmentType; }
-    public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    
+	public String getLocation() {
+		return location;
+	}
 
-   
-	public LocalDate getLastDateToApply() { return lastDateToApply; }
-    public void setLastDateToApply(LocalDate lastDateToApply) { this.lastDateToApply = lastDateToApply; }
+	public void setLocation(String location) {
+		this.location = location;
+	}
 
-    public LocalDate getPostedDate() { return postedDate; }
-    public void setPostedDate(LocalDate postedDate) { this.postedDate = postedDate; }
+	public String getEmploymentType() {
+		return employmentType;
+	}
 
-    public Recruiter getRecruiter() { return recruiter; }
-    public void setRecruiter(Recruiter recruiter) { this.recruiter = recruiter; }
+	public void setEmploymentType(String employmentType) {
+		this.employmentType = employmentType;
+	}
 
-    public String getJobCategory() { return jobCategory; }
-    public void setJobCategory(String jobCategory) { this.jobCategory = jobCategory; }
+	public LocalDate getLastDateToApply() {
+		return lastDateToApply;
+	}
 
-    public int getNumberOfOpenings() { return numberOfOpenings; }
-    public void setNumberOfOpenings(int numberOfOpenings) { this.numberOfOpenings = numberOfOpenings; }
+	public void setLastDateToApply(LocalDate lastDateToApply) {
+		this.lastDateToApply = lastDateToApply;
+	}
 
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+	public LocalDate getPostedDate() {
+		return postedDate;
+	}
 
-    public String getJobType() { return jobType; }
-    public void setJobType(String jobType) { this.jobType = jobType; }
+	public void setPostedDate(LocalDate postedDate) {
+		this.postedDate = postedDate;
+	}
 
-    public String getWorkLocation() { return workLocation; }
-    public void setWorkLocation(String workLocation) { this.workLocation = workLocation; }
+	public Recruiter getRecruiter() {
+		return recruiter;
+	}
 
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
-    
+	public void setRecruiter(Recruiter recruiter) {
+		this.recruiter = recruiter;
+	}
 
-    public String getJobShift() { return jobShift; }
-    public void setJobShift(String jobShift) { this.jobShift = jobShift; }
+	public int getNumberOfOpenings() {
+		return numberOfOpenings;
+	}
 
-    public String getEducation() { return education; }
-    public void setEducation(String education) { this.education = education; }
+	public void setNumberOfOpenings(int numberOfOpenings) {
+		this.numberOfOpenings = numberOfOpenings;
+	}
 
-    public int getApplicants() { return applicants; }
-    public void setApplicants(int applicants) { this.applicants = applicants; }
-
-    public double getMinSalary() {
+	public double getMinSalary() {
 		return minSalary;
 	}
 
@@ -235,11 +213,11 @@ public class JobPost {
 	public void setSkills(List<String> skills) {
 		this.skills = skills;
 	}
-	 public List<String> getSkills() {
-			return skills;
-		}
 
-	
+	public List<String> getSkills() {
+		return skills;
+	}
+
 	public List<String> getBenefits() {
 		return benefits;
 	}
@@ -247,7 +225,7 @@ public class JobPost {
 	public void setBenefits(List<String> benefits) {
 		this.benefits = benefits;
 	}
-	
+
 	public String getMinExperience() {
 		return minExperience;
 	}
@@ -264,7 +242,6 @@ public class JobPost {
 		this.maxExperience = maxExperience;
 	}
 
-
 	public List<SavedJob> getSavedJobs() {
 		return savedJobs;
 	}
@@ -272,22 +249,21 @@ public class JobPost {
 	public void setSavedJobs(List<SavedJob> savedJobs) {
 		this.savedJobs = savedJobs;
 	}
-    
+
 	public boolean isPrefillRequest() {
-        return prefillRequest;
-    }
-    
-    public void setPrefillRequest(boolean prefillRequest) {
-        this.prefillRequest = prefillRequest;
-    }
-    
-    public Integer getPrefillFromJobId() {
-        return prefillFromJobId;
-    }
-    
-    public void setPrefillFromJobId(Integer prefillFromJobId) {
-        this.prefillFromJobId = prefillFromJobId;
-    }
-    
+		return prefillRequest;
+	}
+
+	public void setPrefillRequest(boolean prefillRequest) {
+		this.prefillRequest = prefillRequest;
+	}
+
+	public Integer getPrefillFromJobId() {
+		return prefillFromJobId;
+	}
+
+	public void setPrefillFromJobId(Integer prefillFromJobId) {
+		this.prefillFromJobId = prefillFromJobId;
+	}
 
 }
