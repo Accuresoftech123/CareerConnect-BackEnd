@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
  * registration, login, and profile update.
  */
 @RestController
-@RequestMapping("/recruiters") // Plural for RESTful consistency
+@RequestMapping("/api/recruiters") // Plural for RESTful consistency
 @CrossOrigin(origins = "http://localhost:3000")
 public class RecruiterController {
 
@@ -29,15 +29,10 @@ public class RecruiterController {
 	 * @param recruiter Recruiter data from request body
 	 * @return Success or failure message
 	 */
-	@PostMapping("/register")
-	public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
-		try {
-			Recruiter savedRecruiter = recruiterService.register(recruiterDto);
-			return ResponseEntity.ok(savedRecruiter);
-		} catch (RuntimeException e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}
-	}
+	 @PostMapping("/register")
+	    public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
+	        return recruiterService.register(recruiterDto);
+	    }
 
 	/**
 	 * Authenticates a recruiter login.

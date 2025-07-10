@@ -13,6 +13,8 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.JobSeekerEducationDto;
@@ -28,18 +30,37 @@ import com.example.entity.profile.Experience;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.example.enums.Role;
 import com.example.repository.JobSeekerRepository;
+import com.example.security.CustomUserDetails;
+import com.example.security.CustomUserDetailsService;
+import com.example.security.JwtUtil;
 
 /**
  * Service class to manage Job Seeker registration, login, and profile updates.
  */
 @Service
 public class JobSeekerService {
+	
+	
+	    @Autowired
+	    private JwtUtil jwtUtil;
+
+	    @Autowired
+	    private CustomUserDetailsService userDetailsService;
+	    
+	    @Autowired
+	    private PasswordEncoder passwordEncoder;
+	
+	
 
 	@Autowired
 	private JobSeekerRepository repo;
 	@Autowired
 	private EmailService emailService;
+	
+	
+	
 
 	/**
 	 * Registers a new job seeker if the email is not already taken.
@@ -62,8 +83,19 @@ public class JobSeekerService {
 		jobSeeker.setFullName(newJobSeeker.getFullName());
 		jobSeeker.setEmail(newJobSeeker.getEmail());
 		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-		jobSeeker.setPassword(newJobSeeker.getPassword());
+		
+		 // ✅ Encrypt password before saving
+	    String encodedPassword = passwordEncoder.encode(newJobSeeker.getPassword());
+	    jobSeeker.setPassword(encodedPassword);
+	    
+	    // (Optional) You don't need to store confirm password, but if you must:
+	   // jobSeeker.setConfirmPassword(encodedPassword);
+	    
 		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+		jobSeeker.setRole(Role.ROLE_JOBSEEKER);
+		
+		 // ✅ Save job seeker first so it has an ID before sending OTP
+	    repo.save(jobSeeker);
 
 		// calling OTP generation method from email service.......
 		emailService.generateAndSendOtp(jobSeeker);
@@ -84,15 +116,40 @@ public class JobSeekerService {
 	 * @param password the password
 	 * @return JobSeeker object if login is successful, otherwise null
 	 */
-	public JobSeeker login(String email, String password) {
-		// Find JobSeeker by email
-		JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
-
-		// Verify password match
-		if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
-			return existingJobSeeker;
+//	public JobSeeker login(String email, String password) {
+//		// Find JobSeeker by email
+//		JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
+//
+//		// Verify password match
+//		if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
+//			return existingJobSeeker;
+//		}
+//		return null;
+//	}
+	
+	public ResponseEntity<?> login(String email, String password) {
+	
+		JobSeeker jobSeeker = repo.findByEmail(email).orElse(null);
+		
+		if (jobSeeker == null || !passwordEncoder.matches(password, jobSeeker.getPassword())) {
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
 		}
-		return null;
+		
+		 // ✅ Load user details for JWT
+		
+		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+		 CustomUserDetails customUser = (CustomUserDetails) userDetails;
+		 
+		  // Generate JWT token with role
+	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+	      
+	      // ✅ Return token and role
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("token", token);
+	      response.put("role", jobSeeker.getRole().name());
+	      response.put("id", jobSeeker.getId());
+	      
+	      return ResponseEntity.ok(response);
 	}
 
 	// update jobseeker profile
@@ -357,7 +414,7 @@ public class JobSeekerService {
 		}
 		
 		if(seeker.getOtp().equals(inputOtp)) {
-			seeker.setPassword(newPassword);
+			seeker.setPassword(passwordEncoder.encode(newPassword));
 			seeker.setOtp(null);
 			seeker.setOtpGeneratedTime(null);
 			repo.save(seeker);

@@ -15,7 +15,7 @@ import com.example.dto.SavedJobPostReportDto;
 import com.example.service.SavedJobService;
 
 @RestController
-@RequestMapping("/jobseekers/saved-jobs")
+@RequestMapping("/api/jobseekers/saved-jobs")
 public class SavedJobController {
 	
 	@Autowired
@@ -33,7 +33,7 @@ public class SavedJobController {
 	/**
      * Get all saved jobs for a job seeker.
      */
-	@GetMapping("/saved-jobs/{jobSeekerId}")
+	@GetMapping("/list/{jobSeekerId}")
     public ResponseEntity<List<SavedJobPostReportDto>> getSavedJobs(@PathVariable int jobSeekerId) {
         List<SavedJobPostReportDto> jobPosts = savedJobService.getSavedJobPostDtos(jobSeekerId);
         return ResponseEntity.ok(jobPosts);

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/recruitersProfile")
+@RequestMapping("/api/recruiters/profile")
 @CrossOrigin(origins = "http://localhost:3000")
 public class RecruiterProfileController {
 
@@ -25,7 +25,7 @@ public class RecruiterProfileController {
         this.recruiterProfileService = recruiterProfileService;
     }
 
-    @PostMapping("/create-profile/{recruiterId}")
+    @PostMapping("/create/{recruiterId}")
     public ResponseEntity<Map<String, Object>> createProfile(
             @PathVariable int recruiterId,
             @RequestBody RecruiterProfileDto profileDto) {

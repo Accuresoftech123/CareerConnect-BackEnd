@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.dto.CompanyProfileDTO;
 import com.example.entity.profile.*;
+import com.example.enums.Role;
 import com.example.enums.Status;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -42,7 +43,6 @@ public class Recruiter {
 
 	// Status field with enum
 	@Enumerated(EnumType.STRING)
-
 	private Status status;
 
 	// Relationships
@@ -64,6 +64,10 @@ public class Recruiter {
 	@OneToOne(mappedBy = "recruiter", cascade = CascadeType.ALL, orphanRemoval = true)
 	private RecruiterPersonalInfo personalInfo;
 
+	// role of user
+    @Enumerated(EnumType.STRING)
+	private Role role;
+	
 	public Recruiter() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -73,7 +77,8 @@ public class Recruiter {
 			String confirmPassword, boolean isVerified, String otp, LocalDateTime otpGeneratedTime, String mobileOtp,
 			LocalDateTime mobileOtpGeneratedTime, boolean isMobileVerified, Status status,
 			CompanyProfile companyProfile, List<CompanyLocation> companyLocations, List<String> industries,
-			RecruiterSocialProfile socialProfile, RecruiterPersonalInfo personalInfo) {
+			RecruiterSocialProfile socialProfile, RecruiterPersonalInfo personalInfo,
+			Role role) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -93,6 +98,7 @@ public class Recruiter {
 		this.industries = industries;
 		this.socialProfile = socialProfile;
 		this.personalInfo = personalInfo;
+		this.role=role;
 	}
 
 	public Integer getId() {
@@ -248,5 +254,15 @@ public class Recruiter {
 		location.setRecruiter(null);
 		this.companyLocations.remove(location);
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	
+	
 
 }

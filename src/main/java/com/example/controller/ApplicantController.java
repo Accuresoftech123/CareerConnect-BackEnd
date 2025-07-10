@@ -13,7 +13,7 @@ import com.example.enums.ApplicationStatus;
 import com.example.service.ApplicantService;
 
 @RestController
-@RequestMapping("/applications")
+@RequestMapping("/api/applications")
 public class ApplicantController {
 
     private final ApplicantService applicantService;

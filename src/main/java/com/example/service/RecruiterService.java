@@ -1,12 +1,16 @@
 package com.example.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.ApplicantDTO;
@@ -18,10 +22,14 @@ import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
 import com.example.entity.profile.CompanyProfile;
 import com.example.enums.ApplicationStatus;
+import com.example.enums.Role;
 import com.example.enums.Status;
 import com.example.exception.RecruiterNotFoundException;
 import com.example.repository.ApplicantRepository;
 import com.example.repository.RecruiterRepository;
+import com.example.security.CustomUserDetails;
+import com.example.security.CustomUserDetailsService;
+import com.example.security.JwtUtil;
 
 import jakarta.transaction.Transactional;
 
@@ -31,6 +39,20 @@ import jakarta.transaction.Transactional;
  */
 @Service
 public class RecruiterService {
+	
+	
+
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private CustomUserDetailsService userDetailsService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    
+    
 
     @Autowired
     private RecruiterRepository recruiterRepository;
@@ -42,23 +64,32 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-    public Recruiter register(RecruiterRegistrationDto newRecruiter) {
-        Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
+    public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
+		Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
+		if (existing.isPresent()) {
+			return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
+		}
 
-        if (existing.isPresent()) {
-            throw new RuntimeException("Email already registered");
-        }
+		Recruiter recruiter = new Recruiter();
+		recruiter.setFullName(newRecruiter.getFullName());
+		recruiter.setEmail(newRecruiter.getEmail());
+		recruiter.setMobileNumber(newRecruiter.getMobileNumber());
+		// Encrypt password before saving
+		String encodedPassword = passwordEncoder.encode(newRecruiter.getPassword());
+		recruiter.setPassword(encodedPassword);
+		recruiter.setConfirmPassword(encodedPassword);
+		recruiter.setStatus(Status.APPROVED);
+		recruiter.setRole(Role.ROLE_RECRUITER);
 
-        Recruiter recruiter = new Recruiter();
-        recruiter.setFullName(newRecruiter.getFullName());
-        recruiter.setEmail(newRecruiter.getEmail());
-        recruiter.setMobileNumber(newRecruiter.getMobileNumber());
-        recruiter.setPassword(newRecruiter.getPassword());
-        recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
-        recruiter.setStatus(Status.APPROVED);
+		recruiterRepository.save(recruiter);
 
-        return recruiterRepository.save(recruiter); // return saved object
-    }
+		// pass the id to fronted
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", "Recruiter registered successfully");
+		response.put("jobSeekerId", recruiter.getId());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	}
 
 
     /**
@@ -71,7 +102,7 @@ public class RecruiterService {
     public ResponseEntity<?> login(String email, String password) {
         Recruiter existing = recruiterRepository.findByEmail(email).orElse(null);
 
-        if (existing == null || !existing.getPassword().equals(password)) {
+        if (existing == null || !passwordEncoder.matches(password, existing.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
 
@@ -79,14 +110,22 @@ public class RecruiterService {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access Denied. Your application status is " + existing.getStatus());
         }
+        
+        // ✅ Load user details for JWT
+		
+		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+		 CustomUserDetails customUser = (CustomUserDetails) userDetails;
+		 
+		  // Generate JWT token with role
+	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
 
-        // Map entity to DTO
-        RecruiterDTO dto = new RecruiterDTO();
-        dto.setId(existing.getId());
-        dto.setFullName(existing.getFullName());
-        dto.setEmail(existing.getEmail());
+	      // Prepare response
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("token", token);
+	      response.put("role", existing.getRole().name());
+	      response.put("id", existing.getId());
 
-        return ResponseEntity.ok(dto);
+        return ResponseEntity.ok(response);
     }
 
 

@@ -9,12 +9,15 @@ import com.example.entity.profile.Experience;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.example.enums.Role;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -106,6 +109,10 @@ public class JobSeeker {
 	// saved job
 	@OneToMany(mappedBy = "jobSeeker", cascade = CascadeType.ALL)
 	private List<SavedJob> savedJobs;
+	
+	// role of user
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 	public JobSeeker() {
 		super();
@@ -116,7 +123,8 @@ public class JobSeeker {
 			String confirmPassword, JobSeekerPersonalInfo personalInfo, List<Education> educationList,
 			List<Experience> experienceList, List<String> skills, SocialProfile socialProfile,
 			JobPreferences jobPrefeences, boolean isVerified, String otp, LocalDateTime otpGeneratedTime,String mobileOtp,
-			LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified , List<SavedJob> savedJobs) {
+			LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified , List<SavedJob> savedJobs
+			, Role role) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -133,6 +141,7 @@ public class JobSeeker {
 		this.isVerified = isVerified;
 		this.otp = otp;
 		this.savedJobs=savedJobs;
+		this.role=role;
 	}
 
 	public int getId() {
@@ -286,6 +295,16 @@ public class JobSeeker {
 	public void setSavedJobs(List<SavedJob> savedJobs) {
 		this.savedJobs = savedJobs;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	
+	
 	
 	
 

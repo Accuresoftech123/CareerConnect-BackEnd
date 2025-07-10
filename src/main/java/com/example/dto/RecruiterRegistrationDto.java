@@ -1,5 +1,6 @@
 package com.example.dto;
 
+import com.example.enums.Role;
 import com.example.enums.Status;
 
 import jakarta.persistence.EnumType;
@@ -23,6 +24,9 @@ public class RecruiterRegistrationDto {
 	
 	@Enumerated(EnumType.STRING)
     private Status status;
+	
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
 	public Status getStatus() {
 		return status;

@@ -26,5 +26,7 @@ public interface JobSeekerRepository extends JpaRepository<JobSeeker, Integer> {
      */
     Optional<JobSeeker> findByEmail(String email);
     Optional<JobSeeker> findByMobileNumber(String mobileNumber);
+    
+   
 
 }
