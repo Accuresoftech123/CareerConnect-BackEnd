@@ -3,17 +3,23 @@ package com.example.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.entity.Recruiter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.validation.constraints.*;
 
 public class RecruiterProfileDto {
+	
 	private String fullName;
 	private long mobileNumber;
 	private String recruiterEmail;
+	private int recruiterId;
 
 	// Company info
 	CompanyProfileDTO CompanyProfile;
 	private List<CompanyLocationDTO> companyLocation;
-
+	
+	private RecruiterDTO recruiter;
 	public RecruiterProfileDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -75,4 +81,23 @@ public class RecruiterProfileDto {
 	public void setCompanyLocations(List<CompanyLocationDTO> companyLocations) {
         this.companyLocation = companyLocations != null ? companyLocations : new ArrayList<>();
     }
+
+	public RecruiterDTO getRecruiter() {
+		return recruiter;
+	}
+
+	public void setRecruiter(RecruiterDTO recruiter) {
+		this.recruiter = recruiter;
+	}
+
+	public int getRecruiterId() {
+		return recruiterId;
+	}
+
+	public void setRecruiterId(int recruiterId) {
+		this.recruiterId = recruiterId;
+	}
+	
+	
+	
 }

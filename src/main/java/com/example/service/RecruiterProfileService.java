@@ -13,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,11 +42,11 @@ public class RecruiterProfileService {
     @Autowired
     private RecruiterSocialProfileRepository socialProfileRepository;
     
-    
-
-    
+    @Autowired
+    private CloudinaryService cloudinaryService;
   
-    public ResponseEntity<Map<String, Object>> createProfile(int recruiterId, RecruiterProfileDto dto) {
+    public ResponseEntity<Map<String, Object>> createProfile(int recruiterId, RecruiterProfileDto dto, MultipartFile imageFile)
+{
         Map<String, Object> response = new HashMap<>();
 
         /// 1. Fetch recruiter by ID
@@ -75,7 +77,17 @@ public class RecruiterProfileService {
         companyProfile.setHrContactEmail(dto.getCompanyProfile().getHrContactEmail());
         companyProfile.setHrContactMobileNumber(dto.getCompanyProfile().getHrContactMobileNumber());
         
-        
+     // Upload image to Cloudinary
+        try {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String uploadedImageUrl = cloudinaryService.uploadFile(imageFile, "recruiter/company_profiles");
+                companyProfile.setImg(uploadedImageUrl);
+            }
+        } catch (IOException e) {
+            response.put("success", false);
+            response.put("message", "Error uploading image to Cloudinary: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
         companyProfile.setRecruiter(recruiter);
         recruiter.setCompanyProfile(companyProfile);// Handle locations (clear existing and add new)
         recruiter.getCompanyLocations().clear();
