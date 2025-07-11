@@ -26,7 +26,9 @@ public class JwtUtil {
  // ✅ Overloaded method to generate token from username and role
     public String generateToken(String username, String role) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("role", role); // e.g. ROLE_RECRUITER
+       // claims.put("role", role); // e.g. ROLE_RECRUITER
+        
+        claims.put("role", role.replace("ROLE_", "")); // Store only "RECRUITER"
         return createToken(claims, username);
     }
     

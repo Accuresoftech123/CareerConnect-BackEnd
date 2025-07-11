@@ -57,6 +57,8 @@ public class SecurityConfig {
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
         	                
+        	               
+        	                
         	                "/api/auth/google-login",
         	                
         	                "/api/jobposts/search",

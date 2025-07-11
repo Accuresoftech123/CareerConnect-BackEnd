@@ -21,7 +21,7 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     @Query("SELECT j FROM JobPost j WHERE " +
            "(:title IS NULL OR LOWER(j.title) LIKE LOWER(CONCAT('%', :title, '%'))) AND " +
            "(:location IS NULL OR LOWER(j.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
-           "(:experience IS NULL OR j.minExperience = :experience)")
+           "(:experience IS NULL OR j.minExperience = :experience OR j.maxExperience = :experience)")
     List<JobPost> searchJobs(
             @Param("title") String title,
             @Param("location") String location,
