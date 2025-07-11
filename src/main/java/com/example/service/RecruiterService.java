@@ -57,6 +57,9 @@ public class RecruiterService {
     @Autowired
     private RecruiterRepository recruiterRepository;
 
+    
+    @Autowired
+    private EmailService emailService;
     /**
      * Registers a new recruiter.
      * Checks for duplicate email before saving.
@@ -64,13 +67,14 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-    public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
+     public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
+
 		Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 		if (existing.isPresent()) {
 			return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
 		}
 
-		Recruiter recruiter = new Recruiter();
+       Recruiter recruiter = new Recruiter();
 		recruiter.setFullName(newRecruiter.getFullName());
 		recruiter.setEmail(newRecruiter.getEmail());
 		recruiter.setMobileNumber(newRecruiter.getMobileNumber());
@@ -81,15 +85,18 @@ public class RecruiterService {
 		recruiter.setStatus(Status.APPROVED);
 		recruiter.setRole(Role.ROLE_RECRUITER);
 
+
 		recruiterRepository.save(recruiter);
 
-		// pass the id to fronted
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", "Recruiter registered successfully");
-		response.put("jobSeekerId", recruiter.getId());
+	
+        emailService.generateAndSendOtp(recruiter);
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
-	}
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "OTP sent. Please verify your account.");
+        response.put("recruiterId", recruiter.getId());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
 
 
     /**
@@ -105,12 +112,15 @@ public class RecruiterService {
         if (existing == null || !passwordEncoder.matches(password, existing.getPassword())) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
         }
-
+      if(!existing.isVerified()){
+    	  return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Please verify your email before logging in.");
+    	  
+      }
         if (existing.getStatus() != Status.APPROVED) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body("Access Denied. Your application status is " + existing.getStatus());
         }
-        
+           
         // ✅ Load user details for JWT
 		
 		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
@@ -119,12 +129,19 @@ public class RecruiterService {
 		  // Generate JWT token with role
 	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
 
+
 	      // Prepare response
 	      Map<String, Object> response = new HashMap<>();
 	      response.put("token", token);
 	      response.put("role", existing.getRole().name());
 	      response.put("id", existing.getId());
+        // Map entity to DTO
+        RecruiterDTO dto = new RecruiterDTO();
+        dto.setId(existing.getId());
+        dto.setFullName(existing.getFullName());
+        dto.setEmail(existing.getEmail());
 
+       // return ResponseEntity.ok(dto);
         return ResponseEntity.ok(response);
     }
 
@@ -162,13 +179,6 @@ public class RecruiterService {
     
    
 
-    /**
-     * Checks whether all profile fields in the DTO are empty.
-     *
-     * @param dto the profile DTO
-     * @return true if all fields are empty; false otherwise
-     */
    
-
 
 }

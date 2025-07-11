@@ -46,6 +46,7 @@ public class EmailService {
 	public static final String OTP_EXPIRED = "OTP has expired. Please click 'Resend OTP' to receive a new OTP.";
     public static final String OTP_INVALID = "Invalid OTP!";
     public static final String EMAIL_NOT_FOUND = "Email not found";
+    public static final String EMAIL_ALREADY_REGISTERED = "Email already registered";
 
 
 	public void sendOtpMail(String toEmail, String otp) {
@@ -60,7 +61,7 @@ public class EmailService {
 	// OTP Generation function
 	public void generateAndSendOtp(JobSeeker jobSeeker) {
 		// Generate 6-digit OTP
-		String otp = String.valueOf(100000 + new Random().nextInt(900000));
+		String otp = String.valueOf(100000 + new Random().nextInt(999999));
 
 		// Set OTP and generation time
 		jobSeeker.setOtp(otp);
@@ -162,12 +163,14 @@ public class EmailService {
 
     public String verifyRecruiterOtp(String email, String otp) {
         Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
+
         if (optionalRecruiter.isEmpty()) {
             return EMAIL_NOT_FOUND;
         }
 
         Recruiter recruiter = optionalRecruiter.get();
 
+        // Check if OTP is expired (older than 5 minutes)
         if (recruiter.getOtpGeneratedTime() == null ||
             Duration.between(recruiter.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
             return OTP_EXPIRED;
@@ -183,6 +186,7 @@ public class EmailService {
             return OTP_INVALID;
         }
     }
+
 
     public String resendRecruiterOtp(String email) {
         Optional<Recruiter> recruiterOpt = recruiterRepository.findByEmail(email);

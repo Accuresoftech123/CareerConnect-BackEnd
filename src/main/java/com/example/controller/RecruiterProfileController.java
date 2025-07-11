@@ -3,12 +3,16 @@ package com.example.controller;
 import com.example.dto.*;
 import com.example.service.RecruiterProfileService;
 import com.example.service.RecruiterService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
@@ -25,13 +29,19 @@ public class RecruiterProfileController {
         this.recruiterProfileService = recruiterProfileService;
     }
 
-    @PostMapping("/create/{recruiterId}")
+    @PostMapping(value = "/create/{recruiterId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Map<String, Object>> createProfile(
             @PathVariable int recruiterId,
-            @RequestBody RecruiterProfileDto profileDto) {
+            @RequestPart("profileDto") String profileDtoJson,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) throws JsonProcessingException {
 
-        return recruiterProfileService.createProfile(recruiterId, profileDto);
+        ObjectMapper objectMapper = new ObjectMapper();
+        RecruiterProfileDto profileDto = objectMapper.readValue(profileDtoJson, RecruiterProfileDto.class);
+
+        return recruiterProfileService.createProfile(recruiterId, profileDto, imageFile);
     }
+
 
     
 

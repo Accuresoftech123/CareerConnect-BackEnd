@@ -1,6 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.JobSeekerLoginDto;
+import org.springframework.http.MediaType;
 import com.example.dto.JobSeekerProfileDto;
 import com.example.dto.JobSeekerRegistrationDto;
 import com.example.entity.JobSeeker;
@@ -8,6 +9,8 @@ import com.example.repository.JobSeekerRepository;
 import com.example.service.EmailService;
 import com.example.service.JobSeekerService;
 import com.example.service.mobileOtpService;
+
+import com.itextpdf.io.exceptions.IOException;
 
 import java.util.Map;
 import java.util.Optional;
@@ -18,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * REST Controller for Job Seeker operations like registration, login, and
@@ -109,12 +113,19 @@ public class JobSeekerController {
 	 * @param id         Job seeker ID
 	 * @param profileDto Profile data
 	 * @return Success message
+	 * @throws java.io.IOException 
 	 */
 	@PutMapping("/{id}/profile")
-	public ResponseEntity<?> updateJobSeekerProfile(@PathVariable Integer id,
-	                                                @RequestBody JobSeekerProfileDto profileDto) {
-	    return jobSeekerService.updateJobSeekerProfile(id, profileDto);
+	public ResponseEntity<?> updateJobSeekerProfile(
+	        @PathVariable Integer id,
+	        @RequestPart("dto") JobSeekerProfileDto profileDto,
+	        @RequestPart(value = "resumeFile", required = false) MultipartFile resumeFile,
+	        @RequestPart(value = "videoFile", required = false) MultipartFile videoFile,
+	        @RequestPart(value = "imageFile", required = false) MultipartFile imageFile
+	) throws IOException, java.io.IOException {
+	    return jobSeekerService.updateJobSeekerProfile(id, profileDto, resumeFile, videoFile, imageFile);
 	}
+
 	
 	//Send mobile phone verification code
 	

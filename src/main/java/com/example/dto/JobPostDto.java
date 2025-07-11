@@ -1,258 +1,218 @@
 package com.example.dto;
-
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.time.LocalDate;
 import java.util.List;
 
+import com.example.enums.JobPostStatus;
+
 public class JobPostDto {
 
-    private Integer id;
+    private int id;
 
-    
     private String title;
 
-   
     private String description;
 
-    
     private String location;
 
-    
-    private double minSalary;
-    private double maxSalary;
-
-   
     private String employmentType;
 
-   
     private String minExperience;
     private String maxExperience;
 
-    
-    
-
-	private LocalDate lastDateToApply;
+    private LocalDate lastDateToApply;
 
     private LocalDate postedDate;
 
-    
-    private String jobCategory;
+    private int recruiterId; // Only ID to avoid recursive object nesting
 
-   
     private int numberOfOpenings;
 
-    
-    private String companyName;
-
-   
-    private String jobType;
-
-    
-    private String workLocation;
-
-    
-    private String gender;
-
-    
-    
     private List<String> skills;
 
-    
-    private String jobShift;
+    private double minSalary;
 
-    
-    private String education;
+    private double maxSalary;
 
-    private List<Integer> applicants;
-    
-    private boolean closed; 
-    
     private List<String> benefits;
-    
+
+    private JobPostStatus status;
+
+    private boolean prefillRequest;
+
     private Integer prefillFromJobId;
 
-    public boolean isClosed() {
-		return closed;
-	}
-
-	public void setClosed(boolean closed) {
-		this.closed = closed;
-	}
-
-	public JobPostDto() {
-        super();
+    // Constructors
+    public JobPostDto() {
     }
 
-    public JobPostDto(Integer id, String title, String description, String location, double minSalary,double maxSalary, String employmentType,
-                      String minExperience,String maxExperience, LocalDate lastDateToApply, LocalDate postedDate, String jobCategory,
-                      int numberOfOpenings, String companyName, String jobType, String workLocation, String gender,
-                      List<String> skills, String jobShift, String education, List<Integer> applicants, boolean closed, List<String> benefits,boolean prefillFromExisting) {
+    public JobPostDto(int id, String title, String description, String location, String employmentType,
+                      String minExperience, String maxExperience, LocalDate lastDateToApply,
+                      LocalDate postedDate, int recruiterId, int numberOfOpenings, List<String> skills,
+                      double minSalary, double maxSalary, List<String> benefits,
+                      JobPostStatus status, boolean prefillRequest, Integer prefillFromJobId) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.location = location;
-        this.minSalary = minSalary;
-        this.maxSalary=maxSalary;
         this.employmentType = employmentType;
         this.minExperience = minExperience;
-        this.maxExperience=maxExperience;
+        this.maxExperience = maxExperience;
         this.lastDateToApply = lastDateToApply;
         this.postedDate = postedDate;
-        this.jobCategory = jobCategory;
+        this.recruiterId = recruiterId;
         this.numberOfOpenings = numberOfOpenings;
-        this.companyName = companyName;
-        this.jobType = jobType;
-        this.workLocation = workLocation;
-        this.gender = gender;
         this.skills = skills;
-        this.jobShift = jobShift;
-        this.benefits=benefits;
-        this.education = education;
-        this.applicants=applicants;
-        this.closed=closed;
-        this.prefillFromExisting=prefillFromExisting;
-        
+        this.minSalary = minSalary;
+        this.maxSalary = maxSalary;
+        this.benefits = benefits;
+        this.status = status;
+        this.prefillRequest = prefillRequest;
+        this.prefillFromJobId = prefillFromJobId;
     }
 
     // Getters and Setters
 
-    // ID
-    public Integer getId() { return id; }
-    public void setId(Integer id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    // Title
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    // Description
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public String getTitle() {
+        return title;
+    }
 
-    // Location
-    public String getLocation() { return location; }
-    public void setLocation(String location) { this.location = location; }
+    public void setTitle(String title) {
+        this.title = title;
+    }
 
-    
-    // Employment Type
-    public String getEmploymentType() { return employmentType; }
-    public void setEmploymentType(String employmentType) { this.employmentType = employmentType; }
+    public String getDescription() {
+        return description;
+    }
 
-   
+    public void setDescription(String description) {
+        this.description = description;
+    }
 
-    // Last Date To Apply
-    public LocalDate getLastDateToApply() { return lastDateToApply; }
-    public void setLastDateToApply(LocalDate lastDateToApply) { this.lastDateToApply = lastDateToApply; }
+    public String getLocation() {
+        return location;
+    }
 
-    // Posted Date
-    public LocalDate getPostedDate() { return postedDate; }
-    public void setPostedDate(LocalDate postedDate) { this.postedDate = postedDate; }
+    public void setLocation(String location) {
+        this.location = location;
+    }
 
-    // Job Category
-    public String getJobCategory() { return jobCategory; }
-    public void setJobCategory(String jobCategory) { this.jobCategory = jobCategory; }
+    public String getEmploymentType() {
+        return employmentType;
+    }
 
-    // Number Of Openings
-    public int getNumberOfOpenings() { return numberOfOpenings; }
-    public void setNumberOfOpenings(int numberOfOpenings) { this.numberOfOpenings = numberOfOpenings; }
+    public void setEmploymentType(String employmentType) {
+        this.employmentType = employmentType;
+    }
 
-    // Company Name
-    public String getCompanyName() { return companyName; }
-    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getMinExperience() {
+        return minExperience;
+    }
 
-    // Job Type
-    public String getJobType() { return jobType; }
-    public void setJobType(String jobType) { this.jobType = jobType; }
+    public void setMinExperience(String minExperience) {
+        this.minExperience = minExperience;
+    }
 
-    // Work Location
-    public String getWorkLocation() { return workLocation; }
-    public void setWorkLocation(String workLocation) { this.workLocation = workLocation; }
+    public String getMaxExperience() {
+        return maxExperience;
+    }
 
-    // Gender
-    public String getGender() { return gender; }
-    public void setGender(String gender) { this.gender = gender; }
+    public void setMaxExperience(String maxExperience) {
+        this.maxExperience = maxExperience;
+    }
 
-    
-    // Skills
-    public void setSkills(List<String> skills) {
-		this.skills = skills;
-	}
+    public LocalDate getLastDateToApply() {
+        return lastDateToApply;
+    }
+
+    public void setLastDateToApply(LocalDate lastDateToApply) {
+        this.lastDateToApply = lastDateToApply;
+    }
+
+    public LocalDate getPostedDate() {
+        return postedDate;
+    }
+
+    public void setPostedDate(LocalDate postedDate) {
+        this.postedDate = postedDate;
+    }
+
+    public int getRecruiterId() {
+        return recruiterId;
+    }
+
+    public void setRecruiterId(int recruiterId) {
+        this.recruiterId = recruiterId;
+    }
+
+    public int getNumberOfOpenings() {
+        return numberOfOpenings;
+    }
+
+    public void setNumberOfOpenings(int numberOfOpenings) {
+        this.numberOfOpenings = numberOfOpenings;
+    }
+
     public List<String> getSkills() {
-		return skills;
-	}
-
-    
-    // Job Shift
-    public String getJobShift() { return jobShift; }
-    
-	public void setJobShift(String jobShift) { this.jobShift = jobShift; }
-
-    // Education
-    public String getEducation() { return education; }
-    public void setEducation(String education) { this.education = education; }
-
-    // Applicants
-    public List<Integer> getApplicants() {
-        return applicants;
+        return skills;
     }
 
-    public void setApplicants(List<Integer> applicants) {
-        this.applicants = applicants;
+    public void setSkills(List<String> skills) {
+        this.skills = skills;
     }
 
-	public double getMinSalary() {
-		return minSalary;
-	}
+    public double getMinSalary() {
+        return minSalary;
+    }
 
-	public void setMinSalary(double minSalary) {
-		this.minSalary = minSalary;
-	}
+    public void setMinSalary(double minSalary) {
+        this.minSalary = minSalary;
+    }
 
-	public double getMaxSalary() {
-		return maxSalary;
-	}
+    public double getMaxSalary() {
+        return maxSalary;
+    }
 
-	public void setMaxSalary(double maxSalary) {
-		this.maxSalary = maxSalary;
-	}
+    public void setMaxSalary(double maxSalary) {
+        this.maxSalary = maxSalary;
+    }
 
-	public List<String> getBenefits() {
-		return benefits;
-	}
+    public List<String> getBenefits() {
+        return benefits;
+    }
 
-	public void setBenefits(List<String> benefits) {
-		this.benefits = benefits;
-	}
-    
-	public String getMinExperience() {
-		return minExperience;
-	}
+    public void setBenefits(List<String> benefits) {
+        this.benefits = benefits;
+    }
 
-	public void setMinExperience(String minExperience) {
-		this.minExperience = minExperience;
-	}
+    public JobPostStatus getStatus() {
+        return status;
+    }
 
-	public String getMaxExperience() {
-		return maxExperience;
-	}
+    public void setStatus(JobPostStatus status) {
+        this.status = status;
+    }
 
-	public void setMaxExperience(String maxExperience) {
-		this.maxExperience = maxExperience;
-	}
-	
-	// Add prefill option flag
-	private boolean prefillFromExisting;
-	public boolean isPrefillFromExisting() { return prefillFromExisting; }
-	public void setPrefillFromExisting(boolean prefill) { this.prefillFromExisting = prefill; }
-	
-	public Integer getPrefillFromJobId() {
+    public boolean isPrefillRequest() {
+        return prefillRequest;
+    }
+
+    public void setPrefillRequest(boolean prefillRequest) {
+        this.prefillRequest = prefillRequest;
+    }
+
+    public Integer getPrefillFromJobId() {
         return prefillFromJobId;
     }
-    
+
     public void setPrefillFromJobId(Integer prefillFromJobId) {
         this.prefillFromJobId = prefillFromJobId;
     }
-    
-
 }

@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dto.LoginWithGoogleToken;
-import com.example.entity.LoginWithGoogle;
-import com.example.repository.LoginWithGoogleRepo;
+import com.example.entity.JobSeeker;
+import com.example.repository.JobSeekerRepository;
 import com.example.service.GoogleVerificationService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
@@ -26,44 +26,47 @@ public class loginwithGoogleController {
 	 @Autowired
 	    private GoogleVerificationService googleVerificationService;
 
-	    @Autowired
-	    private LoginWithGoogleRepo loginRepo;
-	    @PostMapping("/google-login")
-	    public ResponseEntity<?> loginUser(@RequestBody LoginWithGoogleToken tokenRequest) {
-	        String token = tokenRequest.getToken();
-	        if (token == null || token.isEmpty()) {
-	            return ResponseEntity.badRequest().body("Token is missing");
-	        }
+	 @Autowired
+	 private JobSeekerRepository jobSeekerRepo;
 
-	        GoogleIdToken.Payload payload = googleVerificationService.verifyToken(token);
+	 @PostMapping("/google-login")
+	 public ResponseEntity<?> loginUser(@RequestBody LoginWithGoogleToken tokenRequest) {
+	     String token = tokenRequest.getToken();
+	     if (token == null || token.isEmpty()) {
+	         return ResponseEntity.badRequest().body("Token is missing");
+	     }
 
-	        if (payload == null) {
-	            return ResponseEntity.badRequest().body("Invalid token");
-	        }
+	     GoogleIdToken.Payload payload = googleVerificationService.verifyToken(token);
 
-	        String email = payload.getEmail();
-	        String name = (String) payload.get("name");
-	        String picture = (String) payload.get("picture");
-	        String googleId = payload.getSubject();
+	     if (payload == null) {
+	         return ResponseEntity.badRequest().body("Invalid token");
+	     }
 
-	        Optional<LoginWithGoogle> existingUser = loginRepo.findByEmail(email);
-	        LoginWithGoogle user;
+	     String email = payload.getEmail();
+	     String name = (String) payload.get("name");
+	     String picture = (String) payload.get("picture");
+	     String googleId = payload.getSubject();
 
-	        if (existingUser.isPresent()) {
-	            user = existingUser.get();
-	            user.setName(name);
-	            user.setPicture(picture);
-	        } else {
-	            user = new LoginWithGoogle();
-	            user.setEmail(email);
-	            user.setName(name);
-	            user.setPicture(picture);
-	            user.setGoogleId(googleId);
-	        }
+	     Optional<JobSeeker> existingUser = jobSeekerRepo.findByEmail(email);
+	     JobSeeker user;
 
-	        loginRepo.save(user);
+	     if (existingUser.isPresent()) {
+	         user = existingUser.get();
+	         user.setFullName(name);
+	         user.setPicture(picture);
+	         user.setGoogleId(googleId);
+	     } else {
+	         user = new JobSeeker();
+	         user.setEmail(email);
+	         user.setFullName(name);
+	         user.setPicture(picture);
+	         user.setGoogleId(googleId);
+	         user.setVerified(true);  // mark email verified if logging in via Google
+	     }
 
-	        return ResponseEntity.ok(user);
-	    }
+	     jobSeekerRepo.save(user);
+
+	     return ResponseEntity.ok(user);
+	 }
 
 }

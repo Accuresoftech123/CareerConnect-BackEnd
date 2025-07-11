@@ -33,11 +33,14 @@ public class SavedJobController {
 	/**
      * Get all saved jobs for a job seeker.
      */
-	@GetMapping("/list/{jobSeekerId}")
-    public ResponseEntity<List<SavedJobPostReportDto>> getSavedJobs(@PathVariable int jobSeekerId) {
-        List<SavedJobPostReportDto> jobPosts = savedJobService.getSavedJobPostDtos(jobSeekerId);
-        return ResponseEntity.ok(jobPosts);
-    }
+	
+//	@GetMapping("/list/{jobSeekerId}")
+//    public ResponseEntity<List<SavedJobPostReportDto>> getSavedJobs(@PathVariable int jobSeekerId) {
+//        List<SavedJobPostReportDto> jobPosts = savedJobService.getSavedJobPostDtos(jobSeekerId);
+//        return ResponseEntity.ok(jobPosts);
+//    }
+
+
 	
 	 /**
      * Remove a saved job.

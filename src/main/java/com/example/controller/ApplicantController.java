@@ -77,11 +77,11 @@ public class ApplicantController {
     
     
     // get appied job by jobseeker
-    @GetMapping("/jobseeker/{jobSeekerId}/applied-jobs")
-    public ResponseEntity<List<SavedJobPostReportDto>> getAppliedJobs(@PathVariable int jobSeekerId) {
-        List<SavedJobPostReportDto> jobs = applicantService.getAppliedJobsByJobSeeker(jobSeekerId);
-        return ResponseEntity.ok(jobs);
-    }
+//    @GetMapping("/jobseeker/{jobSeekerId}/applied-jobs")
+//    public ResponseEntity<List<SavedJobPostReportDto>> getAppliedJobs(@PathVariable int jobSeekerId) {
+//        List<SavedJobPostReportDto> jobs = applicantService.getAppliedJobsByJobSeeker(jobSeekerId);
+//        return ResponseEntity.ok(jobs);
+//    }
     
     // count of applied jobes  by jobseeker
     @GetMapping("/jobseeker/{jobSeekerId}/applied-jobs/count")

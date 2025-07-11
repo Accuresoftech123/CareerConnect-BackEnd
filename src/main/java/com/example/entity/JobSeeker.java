@@ -74,6 +74,9 @@ public class JobSeeker {
 	private String mobileOtp;	
 	private LocalDateTime mobileOtpGeneratedTime;	
 	private boolean isMobileVerified;
+//For Google authentication
+	private String googleId;
+    private String picture;
 
 
 	// personalInfo
@@ -123,8 +126,7 @@ public class JobSeeker {
 			String confirmPassword, JobSeekerPersonalInfo personalInfo, List<Education> educationList,
 			List<Experience> experienceList, List<String> skills, SocialProfile socialProfile,
 			JobPreferences jobPrefeences, boolean isVerified, String otp, LocalDateTime otpGeneratedTime,String mobileOtp,
-			LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified , List<SavedJob> savedJobs
-			, Role role) {
+				LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified ,Role role, List<SavedJob> savedJobs,String googleId,String picture) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -141,6 +143,8 @@ public class JobSeeker {
 		this.isVerified = isVerified;
 		this.otp = otp;
 		this.savedJobs=savedJobs;
+		this.googleId=googleId;
+		this.picture=picture;
 		this.role=role;
 	}
 
@@ -294,6 +298,22 @@ public class JobSeeker {
 
 	public void setSavedJobs(List<SavedJob> savedJobs) {
 		this.savedJobs = savedJobs;
+	}
+
+	public String getGoogleId() {
+		return googleId;
+	}
+
+	public void setGoogleId(String googleId) {
+		this.googleId = googleId;
+	}
+
+	public String getPicture() {
+		return picture;
+	}
+
+	public void setPicture(String picture) {
+		this.picture = picture;
 	}
 
 	public Role getRole() {
