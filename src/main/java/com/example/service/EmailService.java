@@ -161,11 +161,12 @@ public class EmailService {
         sendRecruiterOtpMail(recruiter.getEmail(), otp);
     }
 
-    public String verifyRecruiterOtp(String email, String otp) {
+    public Map<String, Object> verifyRecruiterOtp(String email, String otp) {
         Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
 
         if (optionalRecruiter.isEmpty()) {
-            return EMAIL_NOT_FOUND;
+        	return Map.of("success", false, "message", "Email not found");
+
         }
 
         Recruiter recruiter = optionalRecruiter.get();
@@ -173,7 +174,7 @@ public class EmailService {
         // Check if OTP is expired (older than 5 minutes)
         if (recruiter.getOtpGeneratedTime() == null ||
             Duration.between(recruiter.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
-            return OTP_EXPIRED;
+        	 return Map.of("success", false, "message", "OTP expired");
         }
 
         if (otp.equals(recruiter.getOtp())) {
@@ -181,9 +182,21 @@ public class EmailService {
             recruiter.setOtp(null);
             recruiter.setOtpGeneratedTime(null);
             recruiterRepository.save(recruiter);
-            return OTP_SUCCESS;
+            
+            //call the generate token function 
+            String token = generateToken(email);
+            
+            return Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully",
+                    "token", token,
+                    "role", recruiter.getRole().name(),
+                    "id", recruiter.getId()
+                );
+            
+            
         } else {
-            return OTP_INVALID;
+        	return Map.of("success", false, "message", "Invalid OTP");
         }
     }
 

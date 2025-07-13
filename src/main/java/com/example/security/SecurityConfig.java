@@ -56,6 +56,7 @@ public class SecurityConfig {
         	                
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
+        	                "/api/recruiters/verify-otp",
         	                
         	               
         	                

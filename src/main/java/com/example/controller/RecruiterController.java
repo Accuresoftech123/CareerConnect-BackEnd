@@ -84,18 +84,12 @@ private EmailService emailService;
 	        ));
 	    }
 
-	    String result = emailService.verifyRecruiterOtp(email, otp);
-
-	    if (EmailService.OTP_SUCCESS.equals(result)) {
-	        return ResponseEntity.ok(Map.of(
-	            "success", true,
-	            "message", "OTP verified successfully!"
-	        ));
+	    Map<String, Object> result = emailService.verifyRecruiterOtp(email, otp);
+	    
+	    if (Boolean.TRUE.equals(result.get("success"))) {
+	        return ResponseEntity.ok(result);
 	    } else {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-	            "success", false,
-	            "message", result
-	        ));
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
 	    }
 	}
 
