@@ -10,6 +10,7 @@ import com.example.dto.SavedJobPostReportDto;
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
 import com.example.entity.jobposting.SavedJob;
+import com.example.exception.JobAlreadySavedException;
 import com.example.repository.JobPostRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.SavedJobRepository;
@@ -30,21 +31,22 @@ public class SavedJobService {
 
 	// function for saved job
 	public void saveJob(int jobSeekerId, int jobPostId) {
-		JobSeeker jobSeeker = jobSeekerReposiotry.findById(jobSeekerId)
-				.orElseThrow(() -> new RuntimeException("JobSeeker not found"));
+	    JobSeeker jobSeeker = jobSeekerReposiotry.findById(jobSeekerId)
+	            .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
 
-		JobPost jobPost = jobPostRepository.findById(jobPostId)
-				.orElseThrow(() -> new RuntimeException("JobPost not found"));
+	    JobPost jobPost = jobPostRepository.findById(jobPostId)
+	            .orElseThrow(() -> new RuntimeException("JobPost not found"));
 
-		savedJobRepo.findByJobSeekerAndJobPost(jobSeeker, jobPost).ifPresent(saved -> {
-			throw new RuntimeException("Job already saved");
-		});
+	    savedJobRepo.findByJobSeekerAndJobPost(jobSeeker, jobPost).ifPresent(saved -> {
+	        throw new JobAlreadySavedException("Job already saved");
+	    });
 
-		SavedJob savedJob = new SavedJob();
-		savedJob.setJobSeeker(jobSeeker);
-		savedJob.setJobPost(jobPost);
-		savedJobRepo.save(savedJob);
+	    SavedJob savedJob = new SavedJob();
+	    savedJob.setJobSeeker(jobSeeker);
+	    savedJob.setJobPost(jobPost);
+	    savedJobRepo.save(savedJob);
 	}
+
 
 	// function for get all saved jobs
 
