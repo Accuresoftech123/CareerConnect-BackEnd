@@ -81,13 +81,14 @@ public class JobPostController {
         return ResponseEntity.ok().build();
     }
 
-    
+    //get all active jobpost
     @GetMapping("/jobposts/active")
     public ResponseEntity<List<JobPostDto>> getAllActiveJobPostsForApplicants() {
         List<JobPostDto> activePosts = jobPostService.getAllActiveJobPostsForApplicants();
         return ResponseEntity.ok(activePosts);
     }
     
+    //Active job post as per recruiter id
     @GetMapping("/jobposts/{id}")
     public ResponseEntity<JobPostDto> getActiveJobPostById(@PathVariable Integer id) {
         JobPostDto jobPostDto = jobPostService.getActiveJobPostById(id);

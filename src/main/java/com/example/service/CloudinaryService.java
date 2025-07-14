@@ -27,6 +27,8 @@ public class CloudinaryService {
                 "api_secret", apiSecret
         ));
     }
+	
+	
 	public String uploadFile(MultipartFile file, String folder) throws IOException
 {
         Map<String, Object> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
