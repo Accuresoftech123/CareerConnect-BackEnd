@@ -2,11 +2,15 @@ package com.example.entity;
 
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
+import com.example.entity.profile.Education;
+import com.example.entity.profile.Experience;
 import com.example.enums.ApplicationStatus;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "applicants")
@@ -35,16 +39,56 @@ public class Applicant {
     
     private String resumeFilePath;
     
-    // Additional fields recruiter might need
-    private String expectedSalary;
-    private String availability;
-    private String notes; // For recruiter's internal use
+    
+  
+  
+   
     private String jobPostTitle;
     private String jobPostLocation;
     
+    // JobSeeker info
+    private String fullName;
+    private String email;
+    private String mobileNumber;
+    private List<String> skills;
+    
+   
+    
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    private List<ApplicantEducation> educationList = new ArrayList<>();
+
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    private List<ApplicantExperience> experienceList = new ArrayList<>();
+
+    
+    
+    
+    
     
 
-    public String getJobPostTitle() {
+    
+
+	public Applicant(int id,String fullName, String email, String mobileNumber, List<String> skills, List<Education> educationList, JobPost jobPost,List<Experience> experienceList, JobSeeker jobSeeker, String coverLetter, ApplicationStatus status,
+			LocalDateTime applicationDate, String resumeFilePath,
+			String jobPostTitle, String jobPostLocation) {
+		super();
+		this.id = id;
+		this.jobPost = jobPost;
+		this.jobSeeker = jobSeeker;
+		this.coverLetter = coverLetter;
+		this.status = status;
+		this.applicationDate = applicationDate;
+		this.resumeFilePath = resumeFilePath;
+		
+		this.jobPostTitle = jobPostTitle;
+		this.jobPostLocation = jobPostLocation;
+	}
+
+	public Applicant() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public String getJobPostTitle() {
 		return jobPostTitle;
 	}
 
@@ -58,29 +102,6 @@ public class Applicant {
 
 	public void setJobPostLocation(String jobPostLocation) {
 		this.jobPostLocation = jobPostLocation;
-	}
-
-	public Applicant(int id, JobPost jobPost, JobSeeker jobSeeker, String coverLetter, ApplicationStatus status,
-			LocalDateTime applicationDate, String resumeFilePath, String expectedSalary, String availability,
-			String notes, String jobPostTitle, String jobPostLocation) {
-		super();
-		this.id = id;
-		this.jobPost = jobPost;
-		this.jobSeeker = jobSeeker;
-		this.coverLetter = coverLetter;
-		this.status = status;
-		this.applicationDate = applicationDate;
-		this.resumeFilePath = resumeFilePath;
-		this.expectedSalary = expectedSalary;
-		this.availability = availability;
-		this.notes = notes;
-		this.jobPostTitle = jobPostTitle;
-		this.jobPostLocation = jobPostLocation;
-	}
-
-	public Applicant() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 
 	
@@ -133,29 +154,9 @@ public class Applicant {
 		this.resumeFilePath = resumeFilePath;
 	}
 
-	public String getExpectedSalary() {
-		return expectedSalary;
-	}
+	
 
-	public void setExpectedSalary(String expectedSalary) {
-		this.expectedSalary = expectedSalary;
-	}
-
-	public String getAvailability() {
-		return availability;
-	}
-
-	public void setAvailability(String availability) {
-		this.availability = availability;
-	}
-
-	public String getNotes() {
-		return notes;
-	}
-
-	public void setNotes(String notes) {
-		this.notes = notes;
-	}
+	
 
 	@PrePersist
     protected void onCreate() {
@@ -166,6 +167,56 @@ public class Applicant {
     
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
+
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getMobileNumber() {
+		return mobileNumber;
+	}
+
+	public void setMobileNumber(String mobileNumber) {
+		this.mobileNumber = mobileNumber;
+	}
+
+	public List<String> getSkills() {
+		return skills;
+	}
+
+	public void setSkills(List<String> skills) {
+		this.skills = skills;
+	}
+
+	public List<ApplicantEducation> getEducationList() {
+		return educationList;
+	}
+
+	public void setEducationList(List<ApplicantEducation> educationList) {
+		this.educationList = educationList;
+	}
+
+	public List<ApplicantExperience> getExperienceList() {
+		return experienceList;
+	}
+
+	public void setExperienceList(List<ApplicantExperience> experienceList) {
+		this.experienceList = experienceList;
+	}
+
+	
     
 }
 

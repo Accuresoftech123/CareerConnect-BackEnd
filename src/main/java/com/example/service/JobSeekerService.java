@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.dto.JobSeekerEducationDto;
 import com.example.dto.JobSeekerExperienceDto;
@@ -29,6 +30,7 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.repository.JobSeekerRepository;
+import com.itextpdf.io.exceptions.IOException;
 
 /**
  * Service class to manage Job Seeker registration, login, and profile updates.
@@ -41,6 +43,9 @@ public class JobSeekerService {
 	@Autowired
 	private EmailService emailService;
 
+	@Autowired
+	private CloudinaryService cloudinaryService;
+
 	/**
 	 * Registers a new job seeker if the email is not already taken.
 	 *
@@ -49,32 +54,47 @@ public class JobSeekerService {
 	 */
 
 	public ResponseEntity<?> register(JobSeekerRegistrationDto newJobSeeker) {
-		// Check if a JobSeeker with the given email already exists
-		Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
+	    // Check if JobSeeker already exists
+	    Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
 
-		if (existing.isPresent()) {
-			 return ResponseEntity.status(HttpStatus.CONFLICT)
-                     .body("Email already registered!");
-		}
+	    if (existing.isPresent()) {
+	        JobSeeker existingJobSeeker = existing.get();
 
-		// Create a new JobSeeker entity from DTO
-		JobSeeker jobSeeker = new JobSeeker();
-		jobSeeker.setFullName(newJobSeeker.getFullName());
-		jobSeeker.setEmail(newJobSeeker.getEmail());
-		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-		jobSeeker.setPassword(newJobSeeker.getPassword());
-		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+	        if (!existingJobSeeker.isVerified()) {
+	            // Resend OTP to unverified JobSeeker
+	            emailService.generateAndSendOtp(existingJobSeeker);
 
-		// calling OTP generation method from email service.......
-		emailService.generateAndSendOtp(jobSeeker);
+	            return ResponseEntity.ok(Map.of(
+	                "success", true,
+	                "message", "Email already registered but not verified. OTP re-sent.",
+	                "jobSeekerId", existingJobSeeker.getId()
+	            ));
+	        }
 
-		// pass the id to fronted
-		Map<String, Object> response = new HashMap<>();
-	    response.put("message", "OTP sent. Please verify your account.");
-	    response.put("jobSeekerId", jobSeeker.getId());
+	        // Already verified
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+	            "success", false,
+	            "message", "Email already registered and verified. Please login."
+	        ));
+	    }
 
-	    
-	    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	    // New registration
+	    JobSeeker jobSeeker = new JobSeeker();
+	    jobSeeker.setFullName(newJobSeeker.getFullName());
+	    jobSeeker.setEmail(newJobSeeker.getEmail());
+	    jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
+	    jobSeeker.setPassword(newJobSeeker.getPassword());
+	    jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+	    jobSeeker.setVerified(false); // Add this field to your entity
+
+	    JobSeeker saved = repo.save(jobSeeker);
+	    emailService.generateAndSendOtp(saved);
+
+	    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+	        "success", true,
+	        "message", "OTP sent. Please verify your account.",
+	        "jobSeekerId", saved.getId()
+	    ));
 	}
 
 	/**
@@ -97,14 +117,19 @@ public class JobSeekerService {
 
 	// update jobseeker profile
 
-	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto) {
+	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto,
+            MultipartFile resumeFile,
+            MultipartFile videoFile,
+            MultipartFile imageFile) throws java.io.IOException{
+
 
 		JobSeeker jobSeeker = repo.findById(id).orElse(null);
 
 		if (jobSeeker == null) {
 
-			 return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                     .body("Job Seeker not found with ID: ");
+			return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Job Seeker not found with ID: " + id);
+
 		}
 
 		// update registration data
@@ -135,14 +160,28 @@ public class JobSeekerService {
 				personalInfo.setState(personalInfoDto.getState());
 			if (personalInfoDto.getCountry() != null)
 				personalInfo.setCountry(personalInfoDto.getCountry());
-			if (personalInfoDto.getResumeUrl() != null)
-				personalInfo.setResumeUrl(personalInfoDto.getResumeUrl());
-			if (personalInfoDto.getIntroVideoUrl() != null)
-				personalInfo.setIntroVideoUrl(personalInfoDto.getIntroVideoUrl());
-			if (personalInfoDto.getProfileImageUrl() != null)
-				personalInfo.setProfileImageUrl(personalInfoDto.getProfileImageUrl());
-			personalInfo.setJobSeeker(jobSeeker);
+			try {
+			    if (resumeFile != null && !resumeFile.isEmpty()) {
+			        String resumeUrl = cloudinaryService.uploadFile(resumeFile, "jobseeker/resumes");
+			        personalInfo.setResumeUrl(resumeUrl);
+			    }
 
+			    if (videoFile != null && !videoFile.isEmpty()) {
+			        String videoUrl = cloudinaryService.uploadFile(videoFile, "jobseeker/videos");
+			        personalInfo.setIntroVideoUrl(videoUrl);
+			    }
+
+			    if (imageFile != null && !imageFile.isEmpty()) {
+			        String imageUrl = cloudinaryService.uploadFile(imageFile, "jobseeker/images");
+			        personalInfo.setProfileImageUrl(imageUrl);
+			    }
+			} catch (IOException e) {
+			    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+			                         .body("File upload failed: " + e.getMessage());
+			}
+
+
+			personalInfo.setJobSeeker(jobSeeker);
 			jobSeeker.setPersonalInfo(personalInfo);
 
 		}
@@ -295,68 +334,78 @@ public class JobSeekerService {
 		return ResponseEntity.ok("Profile updated successfully");
 	}
 
-
-
-	
-	
-	//track profile
+	// track profile
 	public Map<String, Object> getProfileCompletionStatus(JobSeeker jobSeeker) {
-	    int totalFields = 9;
-	    int filledFields = 0;
-	    List<String> emptyFields = new ArrayList<>();
+		int totalFields = 9;
+		int filledFields = 0;
+		List<String> emptyFields = new ArrayList<>();
 
-	    if (jobSeeker.getFullName() != null && !jobSeeker.getFullName().isBlank()) filledFields++;
-	    else emptyFields.add("Full Name");
+		if (jobSeeker.getFullName() != null && !jobSeeker.getFullName().isBlank())
+			filledFields++;
+		else
+			emptyFields.add("Full Name");
 
-	    if (jobSeeker.getMobileNumber() != null && !jobSeeker.getMobileNumber().isBlank()) filledFields++;
-	    else emptyFields.add("Mobile Number");
+		if (jobSeeker.getMobileNumber() != null && !jobSeeker.getMobileNumber().isBlank())
+			filledFields++;
+		else
+			emptyFields.add("Mobile Number");
 
-	    if (jobSeeker.getPersonalInfo() != null &&
-	        jobSeeker.getPersonalInfo().getCity() != null &&
-	        !jobSeeker.getPersonalInfo().getCity().isBlank()) filledFields++;
-	    else emptyFields.add("Personal Info");
+		if (jobSeeker.getPersonalInfo() != null && jobSeeker.getPersonalInfo().getCity() != null
+				&& !jobSeeker.getPersonalInfo().getCity().isBlank())
+			filledFields++;
+		else
+			emptyFields.add("Personal Info");
 
-	    if (jobSeeker.getEducationList() != null && !jobSeeker.getEducationList().isEmpty()) filledFields++;
-	    else emptyFields.add("Education");
+		if (jobSeeker.getEducationList() != null && !jobSeeker.getEducationList().isEmpty())
+			filledFields++;
+		else
+			emptyFields.add("Education");
 
-	    if (jobSeeker.getExperienceList() != null && !jobSeeker.getExperienceList().isEmpty()) filledFields++;
-	    else emptyFields.add("Experience");
+		if (jobSeeker.getExperienceList() != null && !jobSeeker.getExperienceList().isEmpty())
+			filledFields++;
+		else
+			emptyFields.add("Experience");
 
-	    if (jobSeeker.getSkills() != null && !jobSeeker.getSkills().isEmpty()) filledFields++;
-	    else emptyFields.add("Skills");
+		if (jobSeeker.getSkills() != null && !jobSeeker.getSkills().isEmpty())
+			filledFields++;
+		else
+			emptyFields.add("Skills");
 
-	    if (jobSeeker.getSocialProfile() != null &&
-	        jobSeeker.getSocialProfile().getLinkedinUrl() != null &&
-	        !jobSeeker.getSocialProfile().getLinkedinUrl().isBlank()) filledFields++;
-	    else emptyFields.add("Social Profile");
+		if (jobSeeker.getSocialProfile() != null && jobSeeker.getSocialProfile().getLinkedinUrl() != null
+				&& !jobSeeker.getSocialProfile().getLinkedinUrl().isBlank())
+			filledFields++;
+		else
+			emptyFields.add("Social Profile");
 
-	    if (jobSeeker.getJobPrefeences() != null &&
-	        jobSeeker.getJobPrefeences().getDesiredJobTitle() != null &&
-	        !jobSeeker.getJobPrefeences().getDesiredJobTitle().isBlank()) filledFields++;
-	    else emptyFields.add("Job Preferences");
+		if (jobSeeker.getJobPrefeences() != null && jobSeeker.getJobPrefeences().getDesiredJobTitle() != null
+				&& !jobSeeker.getJobPrefeences().getDesiredJobTitle().isBlank())
+			filledFields++;
+		else
+			emptyFields.add("Job Preferences");
 
-	    if (jobSeeker.isVerified()) filledFields++;
-	    else emptyFields.add("Email Verification");
+		if (jobSeeker.isVerified())
+			filledFields++;
+		else
+			emptyFields.add("Email Verification");
 
-	    int percentage = (filledFields * 100) / totalFields;
+		int percentage = (filledFields * 100) / totalFields;
 
-	    Map<String, Object> response = new HashMap<>();
-	    response.put("completionPercentage", percentage);
-	    response.put("missingFields", emptyFields);
+		Map<String, Object> response = new HashMap<>();
+		response.put("completionPercentage", percentage);
+		response.put("missingFields", emptyFields);
 
-	    return response;
+		return response;
 	}
-	//Forgate password
-	//Validate Otp and reset password
-	
-	
-	public boolean validateOtpAndResetPassword(String email, String inputOtp, String newPassword ) {
+	// Forgate password
+	// Validate Otp and reset password
+
+	public boolean validateOtpAndResetPassword(String email, String inputOtp, String newPassword) {
 		JobSeeker seeker = repo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-		if(seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
+		if (seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
 			return false;
 		}
-		
-		if(seeker.getOtp().equals(inputOtp)) {
+
+		if (seeker.getOtp().equals(inputOtp)) {
 			seeker.setPassword(newPassword);
 			seeker.setOtp(null);
 			seeker.setOtpGeneratedTime(null);
@@ -364,10 +413,32 @@ public class JobSeekerService {
 			return true;
 		}
 		return false;
+	
+		
 	}
 	
 	
-	
-	
-	
+	//jobseeker get by id personal info
+	public ResponseEntity<?> getJobSeekerImageAndName(int id) {
+	    Optional<JobSeeker> optionalJobSeeker = repo.findById(id);
+
+	    if (optionalJobSeeker.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job Seeker not found with ID: " + id);
+	    }
+
+	    JobSeeker jobSeeker = optionalJobSeeker.get();
+
+	    // Get Personal Info
+	    if (jobSeeker.getPersonalInfo() == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Personal Info not found for Job Seeker ID: " + id);
+	    }
+
+	    JobSeekerPersonalInfoDto infoDto = new JobSeekerPersonalInfoDto();
+	    infoDto.setFullName(jobSeeker.getFullName());
+	    infoDto.setProfileImageUrl(jobSeeker.getPersonalInfo().getProfileImageUrl());
+
+	    return ResponseEntity.ok(infoDto);
+	}
+
+
 }
