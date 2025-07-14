@@ -449,7 +449,7 @@ public class JobSeekerService {
 		int percentage = (filledFields * 100) / totalFields;
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("completionPercentage", percentage);
+		response.put("profileCompletion", percentage);
 		response.put("missingFields", emptyFields);
 
 		return response;

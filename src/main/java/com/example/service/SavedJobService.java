@@ -77,8 +77,10 @@ public class SavedJobService {
 		savedJobRepo.deleteByJobSeekerIdAndJobPostId(jobSeekerId, jobPostId);
 	}
 
-	public Long countOfSavedJobes() {
-		return savedJobRepo.count();
+	
+	
+	public Long countOfSavedJobes(Long JobseekerId) {
+		return savedJobRepo.countByJobSeekerId(JobseekerId);
 	}
 
 }

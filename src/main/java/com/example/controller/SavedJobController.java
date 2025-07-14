@@ -68,9 +68,10 @@ public class SavedJobController {
 	 * Count of saved jobs
 	 */
 	
-	@GetMapping("/count")
-	public Long countOfSavedJobes() {
-		return savedJobService.countOfSavedJobes();
+	@GetMapping("/count/{jobSeekerId}")
+	public ResponseEntity<Long> countSavedJobs(@PathVariable Long jobSeekerId) {
+	    Long count = savedJobService.countOfSavedJobes(jobSeekerId);
+	    return ResponseEntity.ok(count);
 	}
 	
 	
