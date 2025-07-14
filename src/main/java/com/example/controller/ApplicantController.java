@@ -3,6 +3,7 @@ package com.example.controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import com.example.enums.ApplicationStatus;
 import com.example.service.ApplicantService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/applications")
 public class ApplicantController {
 
@@ -23,15 +25,16 @@ public class ApplicantController {
         this.applicantService = applicantService;
     }
 
-    @PostMapping("/job-seeker/{jobSeekerId}/job-post/{jobPostId}")
-    public ResponseEntity<Applicant> applyForJob(
-            @RequestBody ApplicantDTO applicantDTO,
-            @PathVariable("jobSeekerId") int jobSeekerId,
-            @PathVariable("jobPostId") int jobPostId) {
-        Applicant application = applicantService.applyForJob(applicantDTO, jobSeekerId, jobPostId);
-        return ResponseEntity.ok(application);
+    @PostMapping("/applyjob/{jobSeekerId}/job-post/{jobPostId}")
+    public ResponseEntity<ApplicantDTO> applyForJob(
+            @PathVariable int jobSeekerId,
+            @PathVariable int jobPostId) {
+        
+        ApplicantDTO dto = applicantService.applyForJob(jobSeekerId, jobPostId);
+        return new ResponseEntity<>(dto, HttpStatus.CREATED);
     }
 
+    //get alll application applied job
     @GetMapping("/job-post/{jobPostId}")
     public ResponseEntity<List<Applicant>> getApplicationsForJob(
             @PathVariable("jobPostId") int jobPostId) {
@@ -61,6 +64,7 @@ public class ApplicantController {
         return ResponseEntity.noContent().build();
     }
 
+    //get appllications how many jobs appllied by recruiter
     @GetMapping("/{applicationId}")
     public ResponseEntity<Applicant> getApplicationById(
             @PathVariable("applicationId") int applicationId) {
@@ -68,6 +72,7 @@ public class ApplicantController {
         return ResponseEntity.ok(application);
     }
 
+    //withdrw application
     @DeleteMapping("/{applicationId}")
     public ResponseEntity<Void> withdrawApplication(
             @PathVariable("applicationId") int applicationId) {

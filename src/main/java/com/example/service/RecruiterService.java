@@ -51,12 +51,27 @@ public class RecruiterService {
         Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 
         if (existing.isPresent()) {
+            Recruiter existingRecruiter = existing.get();
+            
+            if (!existingRecruiter.isVerified()) {
+                // Re-send OTP to the unverified recruiter
+                emailService.generateAndSendOtp(existingRecruiter);
+
+                return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                    "success", true,
+                    "message", "Email already registered but not verified. OTP re-sent.",
+                    "recruiterId", existingRecruiter.getId()
+                ));
+            }
+
+            // Already registered and verified
             return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
                 "success", false,
                 "message", "Email already registered"
             ));
         }
 
+        // Create new recruiter
         Recruiter recruiter = new Recruiter();
         recruiter.setFullName(newRecruiter.getFullName());
         recruiter.setEmail(newRecruiter.getEmail());
@@ -64,9 +79,9 @@ public class RecruiterService {
         recruiter.setPassword(newRecruiter.getPassword());
         recruiter.setConfirmPassword(newRecruiter.getConfirmPassword());
         recruiter.setStatus(Status.APPROVED);
+        recruiter.setVerified(false);
 
         Recruiter savedRecruiter = recruiterRepository.save(recruiter);
-
         emailService.generateAndSendOtp(savedRecruiter);
 
         Map<String, Object> response = new HashMap<>();

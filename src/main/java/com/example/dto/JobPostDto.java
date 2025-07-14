@@ -9,6 +9,7 @@ public class JobPostDto {
     private int id;
 
     private String title;
+    private String companyName;
 
     private String description;
 
@@ -40,6 +41,7 @@ public class JobPostDto {
     private boolean prefillRequest;
 
     private Integer prefillFromJobId;
+    private String companyImageUrl;
 
     // Constructors
     public JobPostDto() {
@@ -215,4 +217,23 @@ public class JobPostDto {
     public void setPrefillFromJobId(Integer prefillFromJobId) {
         this.prefillFromJobId = prefillFromJobId;
     }
+
+	public String getCompanyImageUrl() {
+		return companyImageUrl;
+	}
+
+	public void setCompanyImageUrl(String companyImageUrl) {
+		this.companyImageUrl = companyImageUrl;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+	
+	
+    
 }

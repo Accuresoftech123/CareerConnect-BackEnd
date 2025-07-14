@@ -54,30 +54,47 @@ public class JobSeekerService {
 	 */
 
 	public ResponseEntity<?> register(JobSeekerRegistrationDto newJobSeeker) {
-		// Check if a JobSeeker with the given email already exists
-		Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
+	    // Check if JobSeeker already exists
+	    Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
 
-		if (existing.isPresent()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered!");
-		}
+	    if (existing.isPresent()) {
+	        JobSeeker existingJobSeeker = existing.get();
 
-		// Create a new JobSeeker entity from DTO
-		JobSeeker jobSeeker = new JobSeeker();
-		jobSeeker.setFullName(newJobSeeker.getFullName());
-		jobSeeker.setEmail(newJobSeeker.getEmail());
-		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-		jobSeeker.setPassword(newJobSeeker.getPassword());
-		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+	        if (!existingJobSeeker.isVerified()) {
+	            // Resend OTP to unverified JobSeeker
+	            emailService.generateAndSendOtp(existingJobSeeker);
 
-		// calling OTP generation method from email service.......
-		emailService.generateAndSendOtp(jobSeeker);
+	            return ResponseEntity.ok(Map.of(
+	                "success", true,
+	                "message", "Email already registered but not verified. OTP re-sent.",
+	                "jobSeekerId", existingJobSeeker.getId()
+	            ));
+	        }
 
-		// pass the id to fronted
-		Map<String, Object> response = new HashMap<>();
-		response.put("message", "OTP sent. Please verify your account.");
-		response.put("jobSeekerId", jobSeeker.getId());
+	        // Already verified
+	        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+	            "success", false,
+	            "message", "Email already registered and verified. Please login."
+	        ));
+	    }
 
-		return ResponseEntity.status(HttpStatus.CREATED).body(response);
+	    // New registration
+	    JobSeeker jobSeeker = new JobSeeker();
+	    jobSeeker.setFullName(newJobSeeker.getFullName());
+	    jobSeeker.setEmail(newJobSeeker.getEmail());
+	    jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
+	    jobSeeker.setPassword(newJobSeeker.getPassword());
+	    jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+	    jobSeeker.setVerified(false); // Add this field to your entity
+
+	    JobSeeker saved = repo.save(jobSeeker);
+	    emailService.generateAndSendOtp(saved);
+
+	    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+	        "success", true,
+	        "message", "OTP sent. Please verify your account.",
+	        "jobSeekerId", saved.getId()
+	    ));
 	}
 
 	/**
@@ -396,6 +413,32 @@ public class JobSeekerService {
 			return true;
 		}
 		return false;
+	
+		
 	}
+	
+	
+	//jobseeker get by id personal info
+	public ResponseEntity<?> getJobSeekerImageAndName(int id) {
+	    Optional<JobSeeker> optionalJobSeeker = repo.findById(id);
+
+	    if (optionalJobSeeker.isEmpty()) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job Seeker not found with ID: " + id);
+	    }
+
+	    JobSeeker jobSeeker = optionalJobSeeker.get();
+
+	    // Get Personal Info
+	    if (jobSeeker.getPersonalInfo() == null) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Personal Info not found for Job Seeker ID: " + id);
+	    }
+
+	    JobSeekerPersonalInfoDto infoDto = new JobSeekerPersonalInfoDto();
+	    infoDto.setFullName(jobSeeker.getFullName());
+	    infoDto.setProfileImageUrl(jobSeeker.getPersonalInfo().getProfileImageUrl());
+
+	    return ResponseEntity.ok(infoDto);
+	}
+
 
 }

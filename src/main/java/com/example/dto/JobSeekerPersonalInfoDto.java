@@ -3,12 +3,14 @@ package com.example.dto;
 public class JobSeekerPersonalInfoDto {
 
 	private String profileImageUrl;
+	private String fullName;
 	private String city;
 	private String state;
 	private String country;
 	
 	private String resumeUrl;
 	private String introVideoUrl;
+	
 	public JobSeekerPersonalInfoDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -22,6 +24,7 @@ public class JobSeekerPersonalInfoDto {
 		this.country = country;
 		this.resumeUrl = resumeUrl;
 		this.introVideoUrl = introVideoUrl;
+		this.fullName=fullName;
 	}
 	public String getProfileImageUrl() {
 		return profileImageUrl;
@@ -59,6 +62,13 @@ public class JobSeekerPersonalInfoDto {
 	public void setIntroVideoUrl(String introVideoUrl) {
 		this.introVideoUrl = introVideoUrl;
 	}
+	public String getFullName() {
+		return fullName;
+	}
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
+	}
+	
 	
 	
 }
