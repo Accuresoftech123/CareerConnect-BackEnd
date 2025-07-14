@@ -86,10 +86,11 @@ public class SecurityConfig {
                      "/api/payments/confirm-payment",
                      "/api/payments/total-amount",
                      
-                     
+                     "/api/applications/applyjob/**",
                      "/api/applications/job-seeker/**",             // apply + my applications
-                     "/api/applications/jobseeker/**",              // applied jobs + count
-                     "/api/applications/**" 
+                     "/api/applications/jobseeker/**",
+                     "/api/applications/{applicationId}"// applied jobs + count
+                    
                      
                      ).hasRole("JOBSEEKER")
              

@@ -21,6 +21,7 @@ import com.example.entity.ApplicantExperience;
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
 import com.example.entity.profile.Education;
+import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.enums.ApplicationStatus;
 import com.example.exception.NotFoundException;
 import com.example.exception.ResourceNotFoundException;
@@ -51,6 +52,12 @@ public class ApplicantService {
             .orElseThrow(() -> new RuntimeException("Job seeker not found"));
         JobPost jobPost = jobPostRepository.findById(jobPostId)
             .orElseThrow(() -> new RuntimeException("Job post not found"));
+        
+        // ✅ Check if profile and resume are present
+        JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
+        if (personalInfo == null || personalInfo.getResumeUrl() == null || personalInfo.getResumeUrl().isEmpty()) {
+            throw new RuntimeException("Please complete your profile and upload resume before applying.");
+        }
 
         Applicant applicant = new Applicant();
         applicant.setJobSeeker(jobSeeker);
