@@ -179,4 +179,11 @@ public class JobSeekerController {
 	        }
 	        return ResponseEntity.ok("Password reset successfully.");
 	    }
+	    
+	    //get jobseeker image and name of jobseeker for dashboard
+	    
+	    @GetMapping("/get-image-name/{id}")
+	    public ResponseEntity<?> getJobSeekerImageAndName(@PathVariable int id) {
+	        return jobSeekerService.getJobSeekerImageAndName(id);
+	    }
 }

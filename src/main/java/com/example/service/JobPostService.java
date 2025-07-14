@@ -190,6 +190,8 @@ public class JobPostService {
         jobPost.setMaxExperience(jobPostDto.getMaxExperience());        
         jobPost.setSkills(jobPostDto.getSkills());
         jobPost.setBenefits(jobPostDto.getBenefits());
+        
+        
        
 
         return jobPost;
@@ -213,7 +215,20 @@ public class JobPostService {
         dto.setNumberOfOpenings(jobPost.getNumberOfOpenings());
   
         dto.setSkills(jobPost.getSkills());
-        dto.setBenefits(jobPost.getBenefits());     
+        dto.setBenefits(jobPost.getBenefits());   
+        
+        if (jobPost.getRecruiter() != null 
+                && jobPost.getRecruiter().getCompanyProfile() != null 
+                && jobPost.getRecruiter().getCompanyProfile().getImg() != null) {
+            dto.setCompanyImageUrl(jobPost.getRecruiter().getCompanyProfile().getImg());
+        }
+        
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getCompanyName()!=null){
+        	dto.setCompanyName(jobPost.getRecruiter().getCompanyProfile().getCompanyName());
+        }
+        		
         return dto;
     }
     

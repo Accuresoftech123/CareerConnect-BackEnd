@@ -67,12 +67,29 @@ public class RecruiterService {
      * @param newRecruiter the recruiter to be registered
      * @return registration status message
      */
-     public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
+    public ResponseEntity<?> register(RecruiterRegistrationDto newRecruiter) {
+        Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
 
-		Optional<Recruiter> existing = recruiterRepository.findByEmail(newRecruiter.getEmail());
-		if (existing.isPresent()) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already registered");
-		}
+        if (existing.isPresent()) {
+            Recruiter existingRecruiter = existing.get();
+            
+            if (!existingRecruiter.isVerified()) {
+                // Re-send OTP to the unverified recruiter
+                emailService.generateAndSendOtp(existingRecruiter);
+
+                return ResponseEntity.status(HttpStatus.OK).body(Map.of(
+                    "success", true,
+                    "message", "Email already registered but not verified. OTP re-sent.",
+                    "recruiterId", existingRecruiter.getId()
+                ));
+            }
+
+            // Already registered and verified
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                "success", false,
+                "message", "Email already registered"
+            ));
+        }
 
        Recruiter recruiter = new Recruiter();
 		recruiter.setFullName(newRecruiter.getFullName());
@@ -83,13 +100,14 @@ public class RecruiterService {
 		recruiter.setPassword(encodedPassword);
 		recruiter.setConfirmPassword(encodedPassword);
 		recruiter.setStatus(Status.APPROVED);
+         recruiter.setVerified(false);
 		recruiter.setRole(Role.ROLE_RECRUITER);
 
 
-		recruiterRepository.save(recruiter);
+	//	recruiterRepository.save(recruiter);
 
-	
-        emailService.generateAndSendOtp(recruiter);
+        Recruiter savedRecruiter = recruiterRepository.save(recruiter);
+        emailService.generateAndSendOtp(savedRecruiter);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "OTP sent. Please verify your account.");

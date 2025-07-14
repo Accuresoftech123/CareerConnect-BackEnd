@@ -135,15 +135,15 @@ public class RecruiterDashboardService {
         ApplicantDTO dto = new ApplicantDTO();
         dto.setApplicationId((long) applicant.getId());
         dto.setJobPostId(applicant.getJobPost().getId());
-        dto.setCoverLetter(applicant.getCoverLetter());
-        dto.setExpectedSalary(applicant.getExpectedSalary());
-        dto.setAvailability(applicant.getAvailability());
+       // dto.setCoverLetter(applicant.getCoverLetter());
+       // dto.setExpectedSalary(applicant.getExpectedSalary());
+        //dto.setAvailability(applicant.getAvailability());
         dto.setResumeFileName(extractFileName(applicant.getResumeFilePath()));
         dto.setJobSeekerName(jobSeeker.getFullName());
         dto.setEmail(jobSeeker.getEmail());
-        dto.setTotalExperience(totalExperience);
+        //dto.setTotalExperience(totalExperience);
         dto.setSkills(jobSeeker.getSkills());
-        dto.setHighestQualification(highestQualification);
+        //dto.setHighestQualification(highestQualification);
         dto.setAppliedDate(applicant.getApplicationDate().toLocalDate());
         dto.setStatus(applicant.getStatus().name());
         

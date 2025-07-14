@@ -1,6 +1,10 @@
 package com.example.service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,8 +12,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.dto.ApplicantDTO;
+import com.example.dto.JobSeekerEducationDto;
+import com.example.dto.JobSeekerExperienceDto;
 import com.example.dto.SavedJobPostReportDto;
 import com.example.entity.Applicant;
+import com.example.entity.ApplicantEducation;
+import com.example.entity.ApplicantExperience;
 import com.example.entity.JobSeeker;
 import com.example.entity.jobposting.JobPost;
 import com.example.entity.profile.Education;
@@ -36,31 +44,71 @@ public class ApplicantService {
         this.jobPostRepository = jobPostRepository;
         this.jobSeekerRepository = jobSeekerRepository;
     }
-
+    
     @Transactional
-    public Applicant applyForJob(ApplicantDTO applicantDTO, int jobSeekerId, int jobPostId) {
-        JobPost jobPost = jobPostRepository.findById(jobPostId)
-                .orElseThrow(() -> new NotFoundException("Job post not found with ID: " + jobPostId));
-
+    public ApplicantDTO applyForJob(int jobSeekerId, int jobPostId) {
         JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
-                .orElseThrow(() -> new NotFoundException("Job seeker not found with ID: " + jobSeekerId));
-
-        if (applicantRepository.existsByJobPostAndJobSeeker(jobPost, jobSeeker)) {
-            throw new DuplicateApplicationException("You have already applied for this job");
-        }
+            .orElseThrow(() -> new RuntimeException("Job seeker not found"));
+        JobPost jobPost = jobPostRepository.findById(jobPostId)
+            .orElseThrow(() -> new RuntimeException("Job post not found"));
 
         Applicant applicant = new Applicant();
-        applicant.setJobPost(jobPost);
         applicant.setJobSeeker(jobSeeker);
+        applicant.setJobPost(jobPost);
+        applicant.setResumeFilePath(jobSeeker.getPersonalInfo().getResumeUrl());
         applicant.setStatus(ApplicationStatus.SUBMITTED);
-        applicant.setCoverLetter(applicantDTO.getCoverLetter());
-        applicant.setExpectedSalary(applicantDTO.getExpectedSalary());
-        applicant.setAvailability(applicantDTO.getAvailability());
-        applicant.setResumeFilePath(applicantDTO.getResumeFileName());
+        applicant.setApplicationDate(LocalDateTime.now());
+        applicant.setFullName(jobSeeker.getFullName());
+        applicant.setEmail(jobSeeker.getEmail());
+        applicant.setMobileNumber(jobSeeker.getMobileNumber());
+        applicant.setSkills(jobSeeker.getSkills());
+        applicant.setJobPostTitle(jobPost.getTitle());
+        applicant.setJobPostLocation(jobPost.getLocation());
+        
+        List<Applicant> existing = applicantRepository.findByJobSeekerIdAndJobPostId(jobSeekerId, jobPostId);
+        if (!existing.isEmpty()) {
+            throw new RuntimeException("You have already applied for this job.");
+        }
 
-        return applicantRepository.save(applicant);
+        // Avoid lambda error with effectively final
+        final Applicant finalApplicant = applicant;
+
+        List<ApplicantEducation> applicantEducationList = jobSeeker.getEducationList().stream()
+        	    .filter(edu -> edu.getDegree() != null || edu.getInstitution() != null || edu.getFieldOfStudy() != null || edu.getPassingYear() != null)
+        	    .map(edu -> {
+        	        ApplicantEducation ae = new ApplicantEducation();
+        	        ae.setDegree(edu.getDegree());
+        	        ae.setInstitute(edu.getInstitution());
+        	        ae.setFieldOfStudy(edu.getFieldOfStudy());
+
+        	        // ✅ Null-safe set
+        	        ae.setPassingYear(edu.getPassingYear() != null ? edu.getPassingYear() : 0L);
+
+        	        ae.setApplicant(finalApplicant);
+        	        return ae;
+        	    }).collect(Collectors.toList());
+
+        List<ApplicantExperience> applicantExperienceList = jobSeeker.getExperienceList().stream()
+            .map(exp -> {
+                ApplicantExperience ax = new ApplicantExperience();
+                ax.setCompany(exp.getCompanyName());
+                ax.setEndDate(exp.getEndDate());
+                ax.setStartDate(exp.getStartDate());
+                ax.setJobTitle(exp.getJobTitle());
+                ax.setKeyResponsibilities(exp.getKeyResponsibilities());
+                ax.setApplicant(finalApplicant);
+                return ax;
+            }).collect(Collectors.toList());
+
+        applicant.setEducationList(applicantEducationList);
+        applicant.setExperienceList(applicantExperienceList);
+
+        applicant = applicantRepository.save(applicant);
+        return mapToDTO(applicant);
     }
 
+    
+    //get applications for jobpost 
     public List<Applicant> getApplicationsForJob(int jobPostId) {
         if (!jobPostRepository.existsById(jobPostId)) {
             throw new NotFoundException("Job post not found with ID: " + jobPostId);
@@ -68,6 +116,7 @@ public class ApplicantService {
         return applicantRepository.findByJobPostId(jobPostId);
     }
 
+    //get applications for jobseeker 
     public List<Applicant> getApplicationsByJobSeeker(int jobSeekerId) {
         if (!jobSeekerRepository.existsById(jobSeekerId)) {
             throw new NotFoundException("Job seeker not found with ID: " + jobSeekerId);
@@ -75,6 +124,7 @@ public class ApplicantService {
         return applicantRepository.findByJobSeekerId(jobSeekerId);
     }
 
+    
     @Transactional
     public Applicant updateApplicationStatus(int applicationId, ApplicationStatus status) {
         Applicant applicant = applicantRepository.findById(applicationId)
@@ -107,31 +157,39 @@ public class ApplicantService {
     public ApplicantDTO mapToDTO(Applicant applicant) {
         JobSeeker jobSeeker = applicant.getJobSeeker();
 
-        String highestQualification = jobSeeker.getEducationList().stream()
-                .sorted((e1, e2) -> e2.getPassingYear().compareTo(e1.getPassingYear()))
-                .map(Education::getDegree)
-                .findFirst()
-                .orElse("N/A");
-
-        int totalExperience = jobSeeker.getExperienceList() != null ? jobSeeker.getExperienceList().size() : 0;
+        // Calculate days since application
+        LocalDate appliedDate = applicant.getApplicationDate().toLocalDate();
+        long daysSinceApplication = ChronoUnit.DAYS.between(appliedDate, LocalDate.now());
 
         ApplicantDTO dto = new ApplicantDTO();
         dto.setApplicationId((long) applicant.getId());
         dto.setJobPostId(applicant.getJobPost().getId());
-        dto.setCoverLetter(applicant.getCoverLetter());
-        dto.setExpectedSalary(applicant.getExpectedSalary());
-        dto.setAvailability(applicant.getAvailability());
         dto.setResumeFileName(applicant.getResumeFilePath());
         dto.setJobSeekerName(jobSeeker.getFullName());
         dto.setEmail(jobSeeker.getEmail());
-        dto.setTotalExperience(totalExperience);
+        dto.setMobileNumber(jobSeeker.getMobileNumber());
+
+        dto.setEducationList(jobSeeker.getEducationList().stream().map(edu -> new JobSeekerEducationDto(edu.getDegree(),edu.getFieldOfStudy(), 
+        		edu.getInstitution(), edu.getPassingYear())).collect(Collectors.toList())
+        );
+
+        dto.setExperienceList(
+            jobSeeker.getExperienceList().stream()
+                .map(exp -> new JobSeekerExperienceDto(
+                    exp.getJobTitle(), exp.getCompanyName(), exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities()))
+                .collect(Collectors.toList())
+        );
+
         dto.setSkills(jobSeeker.getSkills());
-        dto.setHighestQualification(highestQualification);
-        dto.setAppliedDate(applicant.getApplicationDate().toLocalDate());
+        dto.setAppliedDate(appliedDate);
         dto.setStatus(applicant.getStatus().name());
-        
+        dto.setDaysSinceApplication(daysSinceApplication);
+        dto.setJobPostTitle(applicant.getJobPost().getTitle());
+        dto.setJobPostLocation(applicant.getJobPost().getLocation());
+
         return dto;
     }
+
 
     public List<ApplicantDTO> getApplicantsForRecruiter(int recruiterId) {
         if (!applicantRepository.existsByJobPost_Recruiter_Id(recruiterId)) {

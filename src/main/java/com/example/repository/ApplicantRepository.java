@@ -71,5 +71,9 @@ public interface ApplicantRepository extends JpaRepository<Applicant, Integer> {
     List<Applicant> findTop9ByJobPost_RecruiterOrderByApplicationDateDesc(Recruiter recruiter);
     List<Applicant> findTop9ByJobPostInAndStatusNotOrderByApplicationDateDesc(
             List<JobPost> jobPosts, ApplicationStatus status);
+    
+    
+    List<Applicant> findByJobSeekerIdAndJobPostId(int jobSeekerId, int jobPostId);
+
   
 }
