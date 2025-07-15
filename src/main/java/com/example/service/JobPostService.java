@@ -226,6 +226,32 @@ public class JobPostService {
 				&& jobPost.getRecruiter().getCompanyProfile().getCompanyName() != null) {
 			dto.setCompanyName(jobPost.getRecruiter().getCompanyProfile().getCompanyName());
 		}
+		
+		
+        
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getHrContactEmail()!=null){
+        	dto.setCompanyMail(jobPost.getRecruiter().getCompanyProfile().getHrContactEmail());
+        }
+        
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getHrContactMobileNumber()!=null){
+        	dto.setCompanyHr(jobPost.getRecruiter().getCompanyProfile().getHrContactMobileNumber());
+        }
+        
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getIndustryType()!=null){
+        	dto.setCompanyIndustry(jobPost.getRecruiter().getCompanyProfile().getIndustryType());
+        }
+        
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getWebsite()!=null){
+        	dto.setCompanyWebsite(jobPost.getRecruiter().getCompanyProfile().getWebsite());
+        }
 
 		return dto;
 	}
@@ -378,7 +404,7 @@ public class JobPostService {
 			}
 
 			// limit to 5 jobs
-			if (recommendedJobs.size() >= 5) {
+			if (recommendedJobs.size() >= 8) {
 				break;
 			}
 		}
