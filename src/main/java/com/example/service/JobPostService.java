@@ -115,22 +115,22 @@ public class JobPostService {
 		return jobPosts.stream().map(this::mapToDto).collect(Collectors.toList());
 	}
 
-//    // Read (Get by ID)
-//    public JobPostDto getJobPostById(Integer id) {
-//        JobPost jobPost = jobPostRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("JobPost not found with id: " + id));
-//
-//        JobPostDto dto = mapToDto(jobPost);
-//
-//        // Determine if the job post is closed based on lastDateToApply
-//        if (jobPost.getLastDateToApply() != null && jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
-//            dto.setStatus(null);
-//        } else {
-//            dto.setStatus(Status);
-//        }
-//
-//        return dto;
-//    }
+    // Read (Get by ID)
+    public JobPostDto getJobPostById(Integer id) {
+        JobPost jobPost = jobPostRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("JobPost not found with id: " + id));
+
+        JobPostDto dto = mapToDto(jobPost);
+
+        // Determine if the job post is closed based on lastDateToApply
+        if (jobPost.getLastDateToApply() != null && jobPost.getLastDateToApply().isBefore(LocalDate.now())) {
+            dto.setStatus(null);
+        } else {
+            dto.setStatus(jobPost.getStatus());
+        }
+
+        return dto;
+    }
 
 	// Update
 	public JobPostDto updateJobPost(Integer id, JobPostDto jobPostDto) {

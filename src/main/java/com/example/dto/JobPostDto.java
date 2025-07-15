@@ -42,6 +42,13 @@ public class JobPostDto {
 
     private Integer prefillFromJobId;
     private String companyImageUrl;
+    
+    private String companyIndustry;
+    
+    private String companyWebsite;
+    private String CompanyHr;
+    private String CompanyMail;
+    
 
     // Constructors
     public JobPostDto() {
@@ -233,6 +240,40 @@ public class JobPostDto {
 	public void setCompanyName(String companyName) {
 		this.companyName = companyName;
 	}
+
+	public String getCompanyIndustry() {
+		return companyIndustry;
+	}
+
+	public void setCompanyIndustry(String companyIndustry) {
+		this.companyIndustry = companyIndustry;
+	}
+
+	public String getCompanyWebsite() {
+		return companyWebsite;
+	}
+
+	public void setCompanyWebsite(String companyWebsite) {
+		this.companyWebsite = companyWebsite;
+	}
+
+	public String getCompanyHr() {
+		return CompanyHr;
+	}
+
+	public void setCompanyHr(String companyHr) {
+		CompanyHr = companyHr;
+	}
+
+	public String getCompanyMail() {
+		return CompanyMail;
+	}
+
+	public void setCompanyMail(String companyMail) {
+		CompanyMail = companyMail;
+	}
+	
+	
 	
 	
     
