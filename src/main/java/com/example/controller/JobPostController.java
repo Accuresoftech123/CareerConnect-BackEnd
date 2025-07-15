@@ -43,11 +43,12 @@ public class JobPostController {
     }
 
     // fetch job post according to specific id 
-//    @GetMapping("/recruiters/{id}/jobposts")
-//    public ResponseEntity<JobPostDto> getJobPostById(@PathVariable Integer id) {
-//        JobPostDto jobPost = jobPostService.getJobPostById(id);
-//        return ResponseEntity.ok(jobPost);
-//    }
+    @GetMapping("/jobposts/{id}")
+    public ResponseEntity<JobPostDto> getJobPostById(@PathVariable Integer id) {
+        JobPostDto jobPost = jobPostService.getJobPostById(id);
+        return ResponseEntity.ok(jobPost);
+    }
+    
 
     // update existing job post by recruiter
     @PutMapping("/recruiters/{id}/update-jobpost")
@@ -89,7 +90,7 @@ public class JobPostController {
     }
     
     //Active job post as per recruiter id
-    @GetMapping("/jobposts/{id}")
+    @GetMapping("/Activejobposts/{id}")
     public ResponseEntity<JobPostDto> getActiveJobPostById(@PathVariable Integer id) {
         JobPostDto jobPostDto = jobPostService.getActiveJobPostById(id);
         return ResponseEntity.ok(jobPostDto);
