@@ -204,6 +204,16 @@ public class JobPostController {
     public ResponseEntity<Long> GetcloseJobPost() {
         return ResponseEntity.ok(jobPostService.getCloseJobPost());
     }
-
-
+//Get List of matching JobPost
+    @GetMapping("/today-matches/{jobSeekerId}")
+    public ResponseEntity<List<JobPost>> getTodayMatches(@PathVariable int jobSeekerId) {
+        List<JobPost> jobs = jobPostService.getTodayJobMatchesListForSeeker(jobSeekerId);
+        return ResponseEntity.ok(jobs);
+    }
+// Get Count of Matching JobPost Count
+    @GetMapping("/today-matches-count/{jobSeekerId}")
+    public ResponseEntity<Long> getTodayMatchesCount(@PathVariable int jobSeekerId) {
+        Long count = jobPostService.getTodayJobMatchesCountForSeeker(jobSeekerId);
+        return ResponseEntity.ok(count);
+    }
 }
