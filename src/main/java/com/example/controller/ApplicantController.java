@@ -14,8 +14,8 @@ import com.example.enums.ApplicationStatus;
 import com.example.service.ApplicantService;
 
 @RestController
+@RequestMapping("/api/applications")
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/applications")
 public class ApplicantController {
 
     private final ApplicantService applicantService;

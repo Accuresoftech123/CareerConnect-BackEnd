@@ -18,7 +18,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 @CrossOrigin(origins = "http://localhost:3000")
 public class loginwithGoogleController {
 

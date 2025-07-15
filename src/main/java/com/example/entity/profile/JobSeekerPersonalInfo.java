@@ -3,11 +3,13 @@ package com.example.entity.profile;
 import com.example.entity.JobSeeker;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.OneToOne;
 
 @Entity
@@ -22,7 +24,12 @@ public class JobSeekerPersonalInfo {
 	private String state;
 	private String country;
 	
+	@Lob
+	@Column(name = "resume_url", columnDefinition = "LONGTEXT")
 	private String resumeUrl;
+	
+	@Lob
+	@Column(name = "intro_video_url", columnDefinition = "LONGTEXT")
 	private String introVideoUrl;
 	
 	@OneToOne

@@ -29,11 +29,8 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 
-@RequestMapping("/jobseekers")  // Use plural naming for RESTful endpoints
+@RequestMapping("/api/jobseekers")  // Use plural naming for RESTful endpoints
 @CrossOrigin(origins = "http://localhost:3000")
-
-
-
 public class JobSeekerController {
 
 	@Autowired
@@ -63,7 +60,7 @@ public class JobSeekerController {
 
 	    
 
-	@PostMapping("/verifyOtp")
+	@PostMapping("/verify-otp")
 	public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
 	    String email = request.get("email");
 	    String otp = request.get("otp");
@@ -75,18 +72,12 @@ public class JobSeekerController {
 	        ));
 	    }
 
-	    String result = emailService.verifyOtp(email, otp);
+	    Map<String, Object> result = emailService.verifyOtp(email, otp);
 
-	    if (EmailService.OTP_SUCCESS.equals(result)) { // this will now match properly
-	        return ResponseEntity.ok(Map.of(
-	            "success", true,
-	            "message", "OTP verified successfully!"
-	        ));
+	    if (Boolean.TRUE.equals(result.get("success"))) {
+	        return ResponseEntity.ok(result);
 	    } else {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-	            "success", false,
-	            "message", result
-	        ));
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
 	    }
 
 	}
@@ -94,7 +85,7 @@ public class JobSeekerController {
 	
 
 	// Resend otp controller
-	@PostMapping("/resendOTP")
+	@PostMapping("/resend-otp")
 	public ResponseEntity<String> resendotp(@RequestParam String email) {
 		String result = emailService.resendOtp(email);
 		if (result.equals("New OTP sent successfully!")) {
@@ -113,12 +104,7 @@ public class JobSeekerController {
 	 */
 	@PostMapping("/login")
 	public ResponseEntity<?> loginJobSeeker(@RequestBody JobSeekerLoginDto loginDto) {
-		JobSeeker jobSeeker = jobSeekerService.login(loginDto.getEmail(), loginDto.getPassword());
-
-		if (jobSeeker != null) {
-			return ResponseEntity.ok(jobSeeker);
-		}
-		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+	    return jobSeekerService.login(loginDto.getEmail(), loginDto.getPassword());
 	}
 
 	/**
@@ -143,7 +129,7 @@ public class JobSeekerController {
 	
 	//Send mobile phone verification code
 	
-	    @PostMapping("/sendOtp")
+	    @PostMapping("/send-mobile-otp")
 	    public ResponseEntity<String> sendMobileOtp(@RequestParam String mobileNumber) {
 	        Optional<JobSeeker> seekerOpt = repo.findByMobileNumber(mobileNumber);
 

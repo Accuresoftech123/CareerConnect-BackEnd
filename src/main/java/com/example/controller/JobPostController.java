@@ -21,14 +21,17 @@ import com.example.service.ApplicantService;
 import com.example.service.JobPostService;
 
 @RestController
+@RequestMapping("/api/jobposts")
 @CrossOrigin(origins = "http://localhost:3000")
-@RequestMapping("/jobposts")
+
 public class JobPostController {
 
     @Autowired
     private JobPostService jobPostService;
 
-    @PostMapping("/recruiter/{recruiterId}/jobposts")
+
+    // create a job post by recruiter
+    @PostMapping("/recruiter/{recruiterId}")
     public ResponseEntity<JobPostDto> createJobPost(@RequestBody JobPostDto jobPostDto, @PathVariable Integer recruiterId) {
         JobPostDto createdJobPost = jobPostService.createJobPost(jobPostDto, recruiterId); // Pass recruiterId separately
         return ResponseEntity.ok(createdJobPost);
@@ -36,7 +39,7 @@ public class JobPostController {
 
 
     // fetch all job post by recruiter
-    @GetMapping("/recruiters/jobposts")
+    @GetMapping("/recruiter")
     public ResponseEntity<List<JobPostDto>> getAllJobPosts() {
         List<JobPostDto> jobPosts = jobPostService.getAllJobPosts();
         return ResponseEntity.ok(jobPosts);
@@ -51,19 +54,19 @@ public class JobPostController {
     
 
     // update existing job post by recruiter
-    @PutMapping("/recruiters/{id}/update-jobpost")
+    @PutMapping("/recruiters/{id}")
     public ResponseEntity<JobPostDto> updateJobPost(@PathVariable Integer id, @RequestBody JobPostDto jobPostDto) {
         JobPostDto updatedJobPost = jobPostService.updateJobPost(id, jobPostDto);
         return ResponseEntity.ok(updatedJobPost);
     }
 
     // delete the existing job post created by recruiter
-    @DeleteMapping("/recruiters/{id}/delete-jobpost")
+    @DeleteMapping("/recruiters/{id}")
     public ResponseEntity<String> deleteJobPost(@PathVariable Integer id) {
         jobPostService.deleteJobPost(id);
         return ResponseEntity.ok("JobPost deleted successfully with ID: " + id);
     }
-    //search job by job seeker according to title,location,experience
+    // ✅ 6. Search jobs
     @GetMapping("/search")
     public ResponseEntity<List<JobPost>> searchJobs(
             @RequestParam(required = false) String title,
@@ -75,22 +78,21 @@ public class JobPostController {
     }
 
     
-    //jobpost close  
+    // ✅ Close job post
     @PutMapping("/{jobId}/close")
     public ResponseEntity<Void> closeJobPost(@PathVariable Long jobId, @RequestParam Integer recruiterId) {
         jobPostService.closeJobPost(jobId, recruiterId);
         return ResponseEntity.ok().build();
     }
 
-    //get all active jobpost
-    @GetMapping("/jobposts/active")
+    
+    @GetMapping("/active")
     public ResponseEntity<List<JobPostDto>> getAllActiveJobPostsForApplicants() {
         List<JobPostDto> activePosts = jobPostService.getAllActiveJobPostsForApplicants();
         return ResponseEntity.ok(activePosts);
     }
     
-    //Active job post as per recruiter id
-    @GetMapping("/Activejobposts/{id}")
+    @GetMapping("/{id}/active")
     public ResponseEntity<JobPostDto> getActiveJobPostById(@PathVariable Integer id) {
         JobPostDto jobPostDto = jobPostService.getActiveJobPostById(id);
         return ResponseEntity.ok(jobPostDto);
@@ -144,7 +146,7 @@ public class JobPostController {
     }
 
    //get a latest job post added by recruiter 
-    @GetMapping("/recruiters/{recruiterId}/last-post")
+    @GetMapping("/recruiter/{recruiterId}/last")
     public ResponseEntity<JobPostDto> getLastAddedJobPost(
             @PathVariable Integer recruiterId) {
         Optional<JobPostDto> lastPost = jobPostService.getLastAddedJobPost(recruiterId);
@@ -170,7 +172,7 @@ public class JobPostController {
 
     
     //shoertlist applicants
-    @PutMapping("/{applicantId}/shortlist")
+    @PutMapping("/applicants/{applicantId}/shortlist")
     public ResponseEntity<String> shortlistApplicant(@PathVariable Integer applicantId) {
         jobPostService.shortlistApplicant(applicantId);
         return ResponseEntity.ok("Applicant with ID " + applicantId + " has been shortlisted.");
@@ -200,7 +202,7 @@ public class JobPostController {
     }
 
 
-    @GetMapping("/Close/count")
+    @GetMapping("/close/count")
     public ResponseEntity<Long> GetcloseJobPost() {
         return ResponseEntity.ok(jobPostService.getCloseJobPost());
     }

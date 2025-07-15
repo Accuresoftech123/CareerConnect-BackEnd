@@ -2,18 +2,27 @@ package com.example.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
+import com.example.security.CustomUserDetails;
+import com.example.security.CustomUserDetailsService;
+import com.example.security.JwtUtil;
 
 @Service
 public class EmailService {
@@ -23,6 +32,14 @@ public class EmailService {
 	private JobSeekerRepository repo;
 	@Autowired
 	private RecruiterRepository recruiterRepository;
+	
+	    @Autowired
+	    private JwtUtil jwtUtil;
+
+	    @Autowired
+	    private CustomUserDetailsService userDetailsService;
+	    
+	  
 	
 	public static final String OTP_SUCCESS = "OTP Success"; // 🔍 Fixed spelling, proper format
 
@@ -55,23 +72,37 @@ public class EmailService {
 
 		// Send email
 		sendOtpMail(jobSeeker.getEmail(), otp);
+		
+		
 	}
+	
+	
+	// generate token function
+		public String generateToken(String email) {
+			 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+			 CustomUserDetails customUser = (CustomUserDetails) userDetails;
+		    return jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+		}
+	
+	
 
 	// Email verification method..
 
 	
-	public String verifyOtp(String email, String otp) {
+	public Map<String, Object> verifyOtp(String email, String otp) {
+
         Optional<JobSeeker> optionalJobSeeker = repo.findByEmail(email);
 
         if (optionalJobSeeker.isEmpty()) {
-            return EMAIL_NOT_FOUND;
+        	return Map.of("success", false, "message", "Email not found");
+
         }
 
         JobSeeker jobSeeker = optionalJobSeeker.get();
 
         if (jobSeeker.getOtpGeneratedTime() == null ||
             Duration.between(jobSeeker.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
-            return OTP_EXPIRED;
+        	 return Map.of("success", false, "message", "OTP expired");
         }
 
         if (otp.equals(jobSeeker.getOtp())) {
@@ -79,9 +110,21 @@ public class EmailService {
             jobSeeker.setOtp(null);
             jobSeeker.setOtpGeneratedTime(null);
             repo.save(jobSeeker);
-            return OTP_SUCCESS;
+            
+            //call the generate token function 
+            String token = generateToken(email);
+            
+            return Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully",
+                    "token", token,
+                    "role", jobSeeker.getRole().name(),
+                    "id", jobSeeker.getId()
+                );
+            
+            
         } else {
-            return OTP_INVALID;
+        	return Map.of("success", false, "message", "Invalid OTP");
         }
 	}
 
@@ -118,11 +161,12 @@ public class EmailService {
         sendRecruiterOtpMail(recruiter.getEmail(), otp);
     }
 
-    public String verifyRecruiterOtp(String email, String otp) {
+    public Map<String, Object> verifyRecruiterOtp(String email, String otp) {
         Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
 
         if (optionalRecruiter.isEmpty()) {
-            return EMAIL_NOT_FOUND;
+        	return Map.of("success", false, "message", "Email not found");
+
         }
 
         Recruiter recruiter = optionalRecruiter.get();
@@ -130,7 +174,7 @@ public class EmailService {
         // Check if OTP is expired (older than 5 minutes)
         if (recruiter.getOtpGeneratedTime() == null ||
             Duration.between(recruiter.getOtpGeneratedTime(), LocalDateTime.now()).toMinutes() > 5) {
-            return OTP_EXPIRED;
+        	 return Map.of("success", false, "message", "OTP expired");
         }
 
         if (otp.equals(recruiter.getOtp())) {
@@ -138,9 +182,21 @@ public class EmailService {
             recruiter.setOtp(null);
             recruiter.setOtpGeneratedTime(null);
             recruiterRepository.save(recruiter);
-            return OTP_SUCCESS;
+            
+            //call the generate token function 
+            String token = generateToken(email);
+            
+            return Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully",
+                    "token", token,
+                    "role", recruiter.getRole().name(),
+                    "id", recruiter.getId()
+                );
+            
+            
         } else {
-            return OTP_INVALID;
+        	return Map.of("success", false, "message", "Invalid OTP");
         }
     }
 

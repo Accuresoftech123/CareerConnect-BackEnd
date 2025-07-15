@@ -2,6 +2,10 @@ package com.example.dto;
 
 
 
+import com.example.enums.Role;
+
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Transient;
 
 /**
@@ -17,6 +21,11 @@ public class JobSeekerRegistrationDto {
 	private String mobileNumber; // Job seeker's contact mobile number
 	private String password; // Password for the account
 	private String otp;
+	
+	@Enumerated(EnumType.STRING)
+	private Role role;
+	
+	
 	public String getOtp() {
 		return otp;
 	}
@@ -42,7 +51,7 @@ public class JobSeekerRegistrationDto {
 	 * Parameterized constructor to initialize all fields of the DTO.
 	 */
 	public JobSeekerRegistrationDto(int id, String fullName, String email, String mobileNumber, String password,
-			String confirmPassword,String otp) {
+			String confirmPassword,String otp,Role role) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -51,6 +60,7 @@ public class JobSeekerRegistrationDto {
 		this.password = password;
 		this.confirmPassword = confirmPassword;
 		this.otp=otp;
+		this.role = role;
 	}
 
 	// Getter and Setter methods for all fields below
@@ -104,5 +114,15 @@ public class JobSeekerRegistrationDto {
 	public void setConfirmPassword(String confirmPassword) {
 		this.confirmPassword = confirmPassword;
 	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+	
+	
 
 }

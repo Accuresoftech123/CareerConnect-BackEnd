@@ -13,6 +13,8 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,14 +31,30 @@ import com.example.entity.profile.Experience;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.example.enums.Role;
 import com.example.repository.JobSeekerRepository;
 import com.itextpdf.io.exceptions.IOException;
+import com.example.security.CustomUserDetails;
+import com.example.security.CustomUserDetailsService;
+import com.example.security.JwtUtil;
 
 /**
  * Service class to manage Job Seeker registration, login, and profile updates.
  */
 @Service
 public class JobSeekerService {
+	
+	
+	    @Autowired
+	    private JwtUtil jwtUtil;
+
+	    @Autowired
+	    private CustomUserDetailsService userDetailsService;
+	    
+	    @Autowired
+	    private PasswordEncoder passwordEncoder;
+	
+	
 
 	@Autowired
 	private JobSeekerRepository repo;
@@ -45,6 +63,9 @@ public class JobSeekerService {
 
 	@Autowired
 	private CloudinaryService cloudinaryService;
+	
+	
+	
 
 	/**
 	 * Registers a new job seeker if the email is not already taken.
@@ -78,23 +99,35 @@ public class JobSeekerService {
 	        ));
 	    }
 
-	    // New registration
-	    JobSeeker jobSeeker = new JobSeeker();
-	    jobSeeker.setFullName(newJobSeeker.getFullName());
-	    jobSeeker.setEmail(newJobSeeker.getEmail());
-	    jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-	    jobSeeker.setPassword(newJobSeeker.getPassword());
-	    jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
-	    jobSeeker.setVerified(false); // Add this field to your entity
+		// Create a new JobSeeker entity from DTO
+		JobSeeker jobSeeker = new JobSeeker();
+		jobSeeker.setFullName(newJobSeeker.getFullName());
+		jobSeeker.setEmail(newJobSeeker.getEmail());
+		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
+		
+		 // ✅ Encrypt password before saving
+	    String encodedPassword = passwordEncoder.encode(newJobSeeker.getPassword());
+	    jobSeeker.setPassword(encodedPassword);
+	    
+	    // (Optional) You don't need to store confirm password, but if you must:
+	   // jobSeeker.setConfirmPassword(encodedPassword);
+	    
+		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
+		jobSeeker.setRole(Role.ROLE_JOBSEEKER);
+		
+		 // ✅ Save job seeker first so it has an ID before sending OTP
+	   // repo.save(jobSeeker);
+	     JobSeeker saved = repo.save(jobSeeker);
 
-	    JobSeeker saved = repo.save(jobSeeker);
-	    emailService.generateAndSendOtp(saved);
+		// calling OTP generation method from email service.......
+		emailService.generateAndSendOtp(saved);
 
-	    return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
-	        "success", true,
-	        "message", "OTP sent. Please verify your account.",
-	        "jobSeekerId", saved.getId()
-	    ));
+		// pass the id to fronted
+		Map<String, Object> response = new HashMap<>();
+		response.put("message", "OTP sent. Please verify your account.");
+		response.put("jobSeekerId", jobSeeker.getId());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 
 	/**
@@ -104,15 +137,40 @@ public class JobSeekerService {
 	 * @param password the password
 	 * @return JobSeeker object if login is successful, otherwise null
 	 */
-	public JobSeeker login(String email, String password) {
-		// Find JobSeeker by email
-		JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
-
-		// Verify password match
-		if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
-			return existingJobSeeker;
+//	public JobSeeker login(String email, String password) {
+//		// Find JobSeeker by email
+//		JobSeeker existingJobSeeker = repo.findByEmail(email).orElse(null);
+//
+//		// Verify password match
+//		if (existingJobSeeker != null && existingJobSeeker.getPassword().equals(password)) {
+//			return existingJobSeeker;
+//		}
+//		return null;
+//	}
+	
+	public ResponseEntity<?> login(String email, String password) {
+	
+		JobSeeker jobSeeker = repo.findByEmail(email).orElse(null);
+		
+		if (jobSeeker == null || !passwordEncoder.matches(password, jobSeeker.getPassword())) {
+		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
 		}
-		return null;
+		
+		 // ✅ Load user details for JWT
+		
+		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+		 CustomUserDetails customUser = (CustomUserDetails) userDetails;
+		 
+		  // Generate JWT token with role
+	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+	      
+	      // ✅ Return token and role
+	      Map<String, Object> response = new HashMap<>();
+	      response.put("token", token);
+	      response.put("role", jobSeeker.getRole().name());
+	      response.put("id", jobSeeker.getId());
+	      
+	      return ResponseEntity.ok(response);
 	}
 
 	// update jobseeker profile
@@ -391,7 +449,7 @@ public class JobSeekerService {
 		int percentage = (filledFields * 100) / totalFields;
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("completionPercentage", percentage);
+		response.put("profileCompletion", percentage);
 		response.put("missingFields", emptyFields);
 
 		return response;
@@ -404,9 +462,8 @@ public class JobSeekerService {
 		if (seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
 			return false;
 		}
-
-		if (seeker.getOtp().equals(inputOtp)) {
-			seeker.setPassword(newPassword);
+	if(seeker.getOtp().equals(inputOtp)) {
+			seeker.setPassword(passwordEncoder.encode(newPassword));
 			seeker.setOtp(null);
 			seeker.setOtpGeneratedTime(null);
 			repo.save(seeker);

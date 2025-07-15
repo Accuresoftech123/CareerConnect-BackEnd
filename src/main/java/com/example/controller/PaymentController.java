@@ -28,7 +28,7 @@ import com.example.service.ReceiptService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/payment")
+@RequestMapping("/api/payments")
 @CrossOrigin(origins = "http://localhost:3000" )
 public class PaymentController {
 	

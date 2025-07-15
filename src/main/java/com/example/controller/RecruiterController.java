@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * registration, login, and profile update.
  */
 @RestController
-@RequestMapping("/recruiters") // Plural for RESTful consistency
+@RequestMapping("/api/recruiters") // Plural for RESTful consistency
 @CrossOrigin(origins = "http://localhost:3000")
 public class RecruiterController {
 
@@ -35,12 +35,10 @@ private EmailService emailService;
 	 * @param recruiter Recruiter data from request body
 	 * @return Success or failure message
 	 */
-	@PostMapping("/register")
-	public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
-		
-			return recruiterService.register(recruiterDto);
-		
-	}
+	 @PostMapping("/register")
+	    public ResponseEntity<?> registerRecruiter(@RequestBody RecruiterRegistrationDto recruiterDto) {
+	        return recruiterService.register(recruiterDto);
+	    }
 
 	/**
 	 * Authenticates a recruiter login.
@@ -86,18 +84,12 @@ private EmailService emailService;
 	        ));
 	    }
 
-	    String result = emailService.verifyRecruiterOtp(email, otp);
-
-	    if (EmailService.OTP_SUCCESS.equals(result)) {
-	        return ResponseEntity.ok(Map.of(
-	            "success", true,
-	            "message", "OTP verified successfully!"
-	        ));
+	    Map<String, Object> result = emailService.verifyRecruiterOtp(email, otp);
+	    
+	    if (Boolean.TRUE.equals(result.get("success"))) {
+	        return ResponseEntity.ok(result);
 	    } else {
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
-	            "success", false,
-	            "message", result
-	        ));
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
 	    }
 	} 
 

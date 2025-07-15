@@ -31,7 +31,7 @@ import com.example.service.RecruiterDashboardService;
 
 
 @RestController
-@RequestMapping("/recruiter")
+@RequestMapping("/api/recruiters/dashboard")
 public class RecruiterDashboardController {
 	
 	
@@ -43,8 +43,8 @@ public class RecruiterDashboardController {
     @Autowired
     RecruiterRepository RecRepo;
     
-    @GetMapping("/dashboard/summary/{recruiterId}")
-    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(@PathVariable Integer recruiterId) {
+    // ✅ Dashboard Summary
+    @GetMapping("/summary/{recruiterId}")    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(@PathVariable Integer recruiterId) {
         Recruiter recruiter = RecRepo.findById(recruiterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found with id: " + recruiterId));
         
@@ -53,7 +53,8 @@ public class RecruiterDashboardController {
 
     
  
-    @GetMapping("/recent-applicants")
+ // ✅ Recent Applicants
+    @GetMapping("/recent-applicants")   
     public ResponseEntity<List<ApplicantDTO>> getRecentApplicants(
             @RequestParam("recruiterId") int recruiterId) {
         try {
@@ -71,8 +72,9 @@ public class RecruiterDashboardController {
         }
     }
     
-// 
-    @GetMapping("/job-posts/active")
+ 
+    // ✅ Active Job Posts
+    @GetMapping("/job-posts/active")    
     public ResponseEntity<List<JobPost>> getActiveJobPosts(
              Recruiter recruiter) {
         return ResponseEntity.ok(dashboardService.getActiveJobPosts(recruiter));

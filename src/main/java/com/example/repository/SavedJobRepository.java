@@ -17,4 +17,5 @@ public interface SavedJobRepository extends JpaRepository<SavedJob, Long>{
 	    Optional<SavedJob> findByJobSeekerAndJobPost(JobSeeker jobSeeker, JobPost jobPost);
 	    void deleteByJobSeekerIdAndJobPostId(int jobSeekerId, int jobPostId);
 
+	    Long countByJobSeekerId(Long jobSeekerId);
 }

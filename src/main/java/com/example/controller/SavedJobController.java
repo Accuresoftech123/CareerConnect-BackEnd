@@ -18,8 +18,9 @@ import com.example.exception.JobAlreadySavedException;
 import com.example.service.SavedJobService;
 
 @RestController
-@RequestMapping("/jobseekers/saved-jobs")
+@RequestMapping("/api/jobseekers/saved-jobs")
 @CrossOrigin(origins = "http://localhost:3000")
+
 public class SavedJobController {
 	
 	@Autowired
@@ -44,11 +45,14 @@ public class SavedJobController {
 	/**
      * Get all saved jobs for a job seeker.
      */
-//	@GetMapping("/saved-jobs/{jobSeekerId}")
+	
+//	@GetMapping("/list/{jobSeekerId}")
 //    public ResponseEntity<List<SavedJobPostReportDto>> getSavedJobs(@PathVariable int jobSeekerId) {
 //        List<SavedJobPostReportDto> jobPosts = savedJobService.getSavedJobPostDtos(jobSeekerId);
 //        return ResponseEntity.ok(jobPosts);
 //    }
+
+
 	
 	 /**
      * Remove a saved job.
@@ -64,9 +68,10 @@ public class SavedJobController {
 	 * Count of saved jobs
 	 */
 	
-	@GetMapping("/count")
-	public Long countOfSavedJobes() {
-		return savedJobService.countOfSavedJobes();
+	@GetMapping("/count/{jobSeekerId}")
+	public ResponseEntity<Long> countSavedJobs(@PathVariable Long jobSeekerId) {
+	    Long count = savedJobService.countOfSavedJobes(jobSeekerId);
+	    return ResponseEntity.ok(count);
 	}
 	
 	
