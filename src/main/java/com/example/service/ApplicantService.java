@@ -25,6 +25,8 @@ import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.enums.ApplicationStatus;
 import com.example.exception.NotFoundException;
 import com.example.exception.ResourceNotFoundException;
+import com.example.exception.AlreadyAppliedException;
+import com.example.exception.BadRequestException;
 import com.example.exception.DuplicateApplicationException;
 import com.example.repository.ApplicantRepository;
 import com.example.repository.JobPostRepository;
@@ -36,6 +38,9 @@ public class ApplicantService {
     private final ApplicantRepository applicantRepository;
     private final JobPostRepository jobPostRepository;
     private final JobSeekerRepository jobSeekerRepository;
+   // private final AlreadyAppliedException AlreadyAppliedException;
+    
+   
 
     @Autowired
     public ApplicantService(ApplicantRepository applicantRepository,
@@ -56,7 +61,7 @@ public class ApplicantService {
         // ✅ Check if profile and resume are present
         JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
         if (personalInfo == null || personalInfo.getResumeUrl() == null || personalInfo.getResumeUrl().isEmpty()) {
-            throw new RuntimeException("Please complete your profile and upload resume before applying.");
+        	throw new BadRequestException("Please complete your profile and upload resume before applying.");
         }
 
         Applicant applicant = new Applicant();
@@ -74,7 +79,7 @@ public class ApplicantService {
         
         List<Applicant> existing = applicantRepository.findByJobSeekerIdAndJobPostId(jobSeekerId, jobPostId);
         if (!existing.isEmpty()) {
-            throw new RuntimeException("You have already applied for this job.");
+        	throw new AlreadyAppliedException("You have already applied for this job.");
         }
 
         // Avoid lambda error with effectively final

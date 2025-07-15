@@ -68,7 +68,7 @@ public class SecurityConfig {
         	                "/api/jobposts/closed",
         	                "/api/jobposts/closed/filtered",
         	                "/api/jobposts/closed/before-date",
-        	                "/api/jobposts/{id}",
+        	              //  "/api/jobposts/{id}",
         	                "/api/jobposts/close/count",
         	                
         	                "/api/payments/create-order",
@@ -77,6 +77,9 @@ public class SecurityConfig {
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
              .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+             
+             // === NEW: Secure this endpoint === for both jobseeker and recruiter
+             .requestMatchers("/api/jobposts/{id}").authenticated()
              
           // === JOBSEEKER-ONLY PROTECTED ENDPOINTS ===
              .requestMatchers("/api/jobseekers/**",
@@ -110,8 +113,19 @@ public class SecurityConfig {
          .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // ✅ Disable session for JWT
          .exceptionHandling(exception -> exception
                  .authenticationEntryPoint((request, response, authException) -> {
-                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-                 }))
+//                     response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+//                 })
+                	 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                     response.setContentType("application/json");
+                     response.getWriter().write("{\"message\": \"Unauthorized or expired token\"}");
+                 })
+                 .accessDeniedHandler((request, response, accessDeniedException) -> {
+                     response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                     response.setContentType("application/json");
+                     response.getWriter().write("{\"message\": \"Access denied\"}");
+                 })
+                 
+        		 )
          .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class) // ✅ ADD JWT Filter in chain
          .httpBasic(Customizer.withDefaults())
          .logout(logout -> logout.permitAll());
