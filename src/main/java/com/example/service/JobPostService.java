@@ -227,6 +227,10 @@ public class JobPostService {
 			dto.setCompanyName(jobPost.getRecruiter().getCompanyProfile().getCompanyName());
 		}
 		
+		if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
+				&& jobPost.getRecruiter().getCompanyProfile().getImg() != null) {
+			dto.setHrName(jobPost.getRecruiter().getFullName());
+		}
 		
         
         if(jobPost.getRecruiter()!= null
@@ -252,6 +256,12 @@ public class JobPostService {
         		&& jobPost.getRecruiter().getCompanyProfile().getWebsite()!=null){
         	dto.setCompanyWebsite(jobPost.getRecruiter().getCompanyProfile().getWebsite());
         }
+        if(jobPost.getRecruiter()!= null
+        		&& jobPost.getRecruiter().getCompanyProfile()!=null
+        		&& jobPost.getRecruiter().getCompanyProfile().getWebsite()!=null){
+        	dto.setCompanyAbout(jobPost.getRecruiter().getCompanyProfile().getAbout());
+        }
+
 
 		return dto;
 	}
