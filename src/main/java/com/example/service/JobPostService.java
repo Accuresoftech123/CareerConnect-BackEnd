@@ -3,8 +3,10 @@ package com.example.service;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -112,15 +114,14 @@ public class JobPostService {
 
 		return dto;
 	}
-
 	public List<JobPostDto> getAllJobPostsWithBookmarks(int jobSeekerId) {
-	    List<JobPost> jobPosts = jobPostRepository.findAll();
+	    List<JobPost> jobPosts = jobPostRepository.findAllByOrderByPostedDateDesc();
 
-	    List<Long> savedJobIds = savedJobRepo.findSavedJobIdsByJobSeekerId(jobSeekerId);
+	    Set<Long> savedJobIds = new HashSet<>(savedJobRepo.findSavedJobIdsByJobSeekerId(jobSeekerId));
 
 	    return jobPosts.stream().map(job -> {
 	        JobPostDto dto = mapToDto(job);
-	        dto.setBookmarked(savedJobIds.contains((long) dto.getId()));  // cast dto.getId() to long if needed
+	        dto.setBookmarked(savedJobIds.contains((long) dto.getId()));
 	        return dto;
 	    }).collect(Collectors.toList());
 	}
