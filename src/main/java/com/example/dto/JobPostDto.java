@@ -49,6 +49,8 @@ public class JobPostDto {
     private String CompanyHr;
     private String CompanyMail;
     
+    private boolean bookmarked;
+    
 
     // Constructors
     public JobPostDto() {
@@ -58,7 +60,8 @@ public class JobPostDto {
                       String minExperience, String maxExperience, LocalDate lastDateToApply,
                       LocalDate postedDate, int recruiterId, int numberOfOpenings, List<String> skills,
                       double minSalary, double maxSalary, List<String> benefits,
-                      JobPostStatus status, boolean prefillRequest, Integer prefillFromJobId) {
+                      JobPostStatus status, boolean prefillRequest, Integer prefillFromJobId
+                      ,boolean bookmarked ) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -77,6 +80,7 @@ public class JobPostDto {
         this.status = status;
         this.prefillRequest = prefillRequest;
         this.prefillFromJobId = prefillFromJobId;
+        this.bookmarked = bookmarked;
     }
 
     // Getters and Setters
@@ -272,6 +276,15 @@ public class JobPostDto {
 	public void setCompanyMail(String companyMail) {
 		CompanyMail = companyMail;
 	}
+
+	public boolean isBookmarked() {
+		return bookmarked;
+	}
+
+	public void setBookmarked(boolean bookmarked) {
+		this.bookmarked = bookmarked;
+	}
+	
 	
 	
 	

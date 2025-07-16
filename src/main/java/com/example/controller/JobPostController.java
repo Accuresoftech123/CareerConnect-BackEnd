@@ -39,10 +39,10 @@ public class JobPostController {
 
 
     // fetch all job post by recruiter
-    @GetMapping("/recruiter")
-    public ResponseEntity<List<JobPostDto>> getAllJobPosts() {
-        List<JobPostDto> jobPosts = jobPostService.getAllJobPosts();
-        return ResponseEntity.ok(jobPosts);
+    @GetMapping("/all-jobs/{jobSeekerId}")
+    public ResponseEntity<List<JobPostDto>> getAllJobPostsWithBookmarks(@PathVariable int jobSeekerId) {
+        List<JobPostDto> jobs = jobPostService.getAllJobPostsWithBookmarks(jobSeekerId);
+        return ResponseEntity.ok(jobs);
     }
 
     // fetch job post according to specific id 
