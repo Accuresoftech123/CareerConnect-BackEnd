@@ -31,6 +31,7 @@ import com.example.repository.JobSeekerExperienceRepository;
 import com.example.repository.JobSeekerPersonalInfoRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
+import com.example.repository.SavedJobRepository;
 
 import jakarta.transaction.Transactional;
 
@@ -53,6 +54,9 @@ public class JobPostService {
 
 	@Autowired
 	private JobSeekerExperienceRepository experienceRepository;
+	
+	@Autowired
+	private SavedJobRepository savedJobRepo;
 
 	// Create
 	// CREATE JobPost
@@ -109,10 +113,16 @@ public class JobPostService {
 		return dto;
 	}
 
-	// Read (Get All)
-	public List<JobPostDto> getAllJobPosts() {
-		List<JobPost> jobPosts = jobPostRepository.findAll();
-		return jobPosts.stream().map(this::mapToDto).collect(Collectors.toList());
+	public List<JobPostDto> getAllJobPostsWithBookmarks(int jobSeekerId) {
+	    List<JobPost> jobPosts = jobPostRepository.findAll();
+
+	    List<Long> savedJobIds = savedJobRepo.findSavedJobIdsByJobSeekerId(jobSeekerId);
+
+	    return jobPosts.stream().map(job -> {
+	        JobPostDto dto = mapToDto(job);
+	        dto.setBookmarked(savedJobIds.contains((long) dto.getId()));  // cast dto.getId() to long if needed
+	        return dto;
+	    }).collect(Collectors.toList());
 	}
 
     // Read (Get by ID)
