@@ -390,6 +390,8 @@ public class JobPostService {
 
 		// Step 3: get all jobes
 		List<JobPostDto> allJobs = getAllActiveJobPostsForApplicants();
+		
+		  List<Long> savedJobIds = savedJobRepo.findSavedJobIdsByJobSeekerId(jobSeekerId); // ✅
 
 		// Step 4: filter matching jobs
 
@@ -417,10 +419,13 @@ public class JobPostService {
 			System.out.println(matchesSkill);
 			System.out.println(matchesLocation);
 			System.out.println("Seeker Skills: " + jobSeekersSkills);
+			
+			
+			
 
 			System.out.println("Job Skills: " + job.getSkills());
 			if (matchesSkill || matchesLocation) {
-				recommendedJobs.add(convertRecommendedJobPostDto(job));
+				recommendedJobs.add(convertRecommendedJobPostDto(job,savedJobIds));
 			}
 
 			// limit to 5 jobs
@@ -433,7 +438,7 @@ public class JobPostService {
 	}
 
 	// convert jobpost object to recommendejob post object
-	private RecommendedJobPostDto convertRecommendedJobPostDto(JobPostDto job) {
+	private RecommendedJobPostDto convertRecommendedJobPostDto(JobPostDto job ,List<Long> savedJobIds) {
 
 		RecommendedJobPostDto dto = new RecommendedJobPostDto();
 		dto.setId(job.getId());
@@ -444,6 +449,10 @@ public class JobPostService {
 		dto.setMinSalary(job.getMinSalary());
 		dto.setMaxSalary(job.getMaxSalary());
 		dto.setSkills(job.getSkills());
+		
+		dto.setBookmarked(savedJobIds.contains((long) job.getId()));
+
+
 
 		return dto;
 	}
