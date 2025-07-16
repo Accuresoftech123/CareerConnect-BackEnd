@@ -8,10 +8,11 @@ public class RecommendedJobPostDto {
 	 private String title;
 	 private String companyName;
 	 private String location;
-	 private String jobType;
+	 private String employmentType;;
 	 private double minSalary; 
 	 private double maxSalary;
 	 private List<String> skills;
+	 private boolean bookmarked;
 	 
 	 
 	public RecommendedJobPostDto() {
@@ -20,17 +21,18 @@ public class RecommendedJobPostDto {
 	}
 
 
-	public RecommendedJobPostDto(int id, String title, String companyName, String location, String jobType,
-			double minSalary, double maxSalary, List<String> skills) {
+	public RecommendedJobPostDto(int id, String title, String companyName, String location, String employmentType,
+			double minSalary, double maxSalary, List<String> skills ,boolean bookmarked) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.companyName = companyName;
 		this.location = location;
-		this.jobType = jobType;
+		this.employmentType = employmentType;
 		this.minSalary = minSalary;
 		this.maxSalary = maxSalary;
 		this.skills = skills;
+		this.bookmarked = bookmarked;
 	}
 
 
@@ -74,13 +76,16 @@ public class RecommendedJobPostDto {
 	}
 
 
-	public String getJobType() {
-		return jobType;
+	
+
+
+	public String getEmploymentType() {
+		return employmentType;
 	}
 
 
-	public void setJobType(String jobType) {
-		this.jobType = jobType;
+	public void setEmploymentType(String employmentType) {
+		this.employmentType = employmentType;
 	}
 
 
@@ -112,6 +117,18 @@ public class RecommendedJobPostDto {
 	public void setSkills(List<String> skills) {
 		this.skills = skills;
 	}
+
+
+	public boolean isBookmarked() {
+		return bookmarked;
+	}
+
+
+	public void setBookmarked(boolean bookmarked) {
+		this.bookmarked = bookmarked;
+	}
+	
+	
 	
 
 	 
