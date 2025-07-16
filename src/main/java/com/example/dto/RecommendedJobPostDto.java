@@ -8,7 +8,7 @@ public class RecommendedJobPostDto {
 	 private String title;
 	 private String companyName;
 	 private String location;
-	 private String jobType;
+	 private String employmentType;;
 	 private double minSalary; 
 	 private double maxSalary;
 	 private List<String> skills;
@@ -20,14 +20,14 @@ public class RecommendedJobPostDto {
 	}
 
 
-	public RecommendedJobPostDto(int id, String title, String companyName, String location, String jobType,
+	public RecommendedJobPostDto(int id, String title, String companyName, String location, String employmentType,
 			double minSalary, double maxSalary, List<String> skills) {
 		super();
 		this.id = id;
 		this.title = title;
 		this.companyName = companyName;
 		this.location = location;
-		this.jobType = jobType;
+		this.employmentType = employmentType;
 		this.minSalary = minSalary;
 		this.maxSalary = maxSalary;
 		this.skills = skills;
@@ -74,13 +74,16 @@ public class RecommendedJobPostDto {
 	}
 
 
-	public String getJobType() {
-		return jobType;
+	
+
+
+	public String getEmploymentType() {
+		return employmentType;
 	}
 
 
-	public void setJobType(String jobType) {
-		this.jobType = jobType;
+	public void setEmploymentType(String employmentType) {
+		this.employmentType = employmentType;
 	}
 
 

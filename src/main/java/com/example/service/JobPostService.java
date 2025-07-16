@@ -419,7 +419,7 @@ public class JobPostService {
 			System.out.println("Seeker Skills: " + jobSeekersSkills);
 
 			System.out.println("Job Skills: " + job.getSkills());
-			if (matchesSkill && matchesLocation) {
+			if (matchesSkill || matchesLocation) {
 				recommendedJobs.add(convertRecommendedJobPostDto(job));
 			}
 
@@ -438,9 +438,9 @@ public class JobPostService {
 		RecommendedJobPostDto dto = new RecommendedJobPostDto();
 		dto.setId(job.getId());
 		dto.setTitle(job.getTitle());
-		// dto.setCompanyName(job.getCompanyName());
+		dto.setCompanyName(job.getCompanyName());
 		dto.setLocation(job.getLocation());
-		// dto.setJobType(job.getJobType());
+		dto.setEmploymentType(job.getEmploymentType());
 		dto.setMinSalary(job.getMinSalary());
 		dto.setMaxSalary(job.getMaxSalary());
 		dto.setSkills(job.getSkills());
