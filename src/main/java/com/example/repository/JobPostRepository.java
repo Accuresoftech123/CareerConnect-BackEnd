@@ -107,5 +107,9 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     	    @Param("location") String location,
     	    @Param("skills") List<String> skills,
     	    @Param("experience") Integer experience);
+    
+    //For Fetch Job Post by posted date
+    List<JobPost> findAllByOrderByPostedDateDesc();
+
 
 }
