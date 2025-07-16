@@ -49,6 +49,10 @@ public class JobPostDto {
     private String CompanyHr;
     private String CompanyMail;
     
+    private String hrName;
+    
+    private String companyAbout;
+    
     private boolean bookmarked;
     
 
@@ -276,6 +280,23 @@ public class JobPostDto {
 	public void setCompanyMail(String companyMail) {
 		CompanyMail = companyMail;
 	}
+
+	public String getHrName() {
+		return hrName;
+	}
+
+	public void setHrName(String hrName) {
+		this.hrName = hrName;
+	}
+
+	public String getCompanyAbout() {
+		return companyAbout;
+	}
+
+	public void setCompanyAbout(String companyAbout) {
+		this.companyAbout = companyAbout;
+	}
+	
 
 	public boolean isBookmarked() {
 		return bookmarked;
