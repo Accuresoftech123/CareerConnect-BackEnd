@@ -22,6 +22,7 @@ public class JobPost {
 
 	private String title;
 
+	@Column(length = 5000)
 	private String description;
 
 	private String location;

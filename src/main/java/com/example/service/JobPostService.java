@@ -452,6 +452,7 @@ public class JobPostService {
 		dto.setSkills(job.getSkills());
 		
 		dto.setBookmarked(savedJobIds.contains((long) job.getId()));
+		dto.setCompanyImageUrl(job.getCompanyImageUrl());;
 
 
 
