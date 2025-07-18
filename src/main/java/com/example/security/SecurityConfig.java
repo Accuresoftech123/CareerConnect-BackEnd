@@ -78,8 +78,10 @@ public class SecurityConfig {
         	                "/api/jobposts/close/count",
         	                
         	                "/api/payments/create-order",
-        	                "/api/payments/webhook"
+        	                "/api/payments/webhook",
         	                
+        	                "/api/jobseekers/{id}/upload-resume",//for testing 
+        	                "/api/jobseekers/getprofile/{id}"//for testing 
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
              .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

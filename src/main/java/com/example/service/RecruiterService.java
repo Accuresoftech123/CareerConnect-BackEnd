@@ -93,7 +93,7 @@ public class RecruiterService {
         }
 
        Recruiter recruiter = new Recruiter();
-		recruiter.setFullName(newRecruiter.getFullName());
+		recruiter.setCompanyName(newRecruiter.getCompanyName());
 		recruiter.setEmail(newRecruiter.getEmail());
 		recruiter.setMobileNumber(newRecruiter.getMobileNumber());
 		// Encrypt password before saving
@@ -157,7 +157,7 @@ public class RecruiterService {
         // Map entity to DTO
         RecruiterDTO dto = new RecruiterDTO();
         dto.setId(existing.getId());
-        dto.setFullName(existing.getFullName());
+        dto.setCompanyName(existing.getCompanyName());
         dto.setEmail(existing.getEmail());
 
        // return ResponseEntity.ok(dto);
@@ -178,8 +178,8 @@ public class RecruiterService {
             .orElseThrow(() -> new RecruiterNotFoundException("Recruiter not found"));
         
         // Update basic info
-        if (profileDto.getFullName() != null) {
-            recruiter.setFullName(profileDto.getFullName());
+        if (profileDto.getCompanyName() != null) {
+            recruiter.setCompanyName(profileDto.getCompanyName());
         }
         
         if (profileDto.getMobileNumber() != 0) {

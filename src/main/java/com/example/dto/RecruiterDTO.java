@@ -11,7 +11,7 @@ import com.example.enums.Status;
 public class RecruiterDTO {
 	private Integer id;
 
-	private String fullName;
+	private String companyName;
 
 	private String email;
 
@@ -50,14 +50,14 @@ public class RecruiterDTO {
 		// TODO Auto-generated constructor stub
 	}
 
-	public RecruiterDTO(Integer id, String fullName, String email, long mobileNumber, String password,
+	public RecruiterDTO(Integer id, String companyName, String email, long mobileNumber, String password,
 			String confirmPassword, Boolean isVerified, String otp, LocalDateTime otpGeneratedTime, String mobileOtp,
 			LocalDateTime mobileOtpGeneratedTime, Boolean isMobileVerified, Status status,
 			CompanyProfileDTO companyProfile, List<CompanyLocationDTO> companyLocations, List<String> industries,
 			RecruiterPersonalInfoDTO personalInfo, RecruiterSocialProfileDTO socialProfile, String website) {
 		super();
 		this.id = id;
-		this.fullName = fullName;
+		this.companyName = companyName;
 		this.email = email;
 		this.mobileNumber = mobileNumber;
 		this.password = password;
@@ -85,12 +85,14 @@ public class RecruiterDTO {
 		this.id = id;
 	}
 
-	public String getFullName() {
-		return fullName;
+	
+
+	public String getCompanyName() {
+		return companyName;
 	}
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public String getEmail() {
