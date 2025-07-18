@@ -61,12 +61,12 @@ public class RecruiterProfileService {
         // 2. Proceed with profile creation since email is registered
         Recruiter recruiter = existingRecruiter.get();
      // Update recruiter details
-        recruiter.setFullName(dto.getFullName());
+      //  recruiter.setCompanyName(dto.getCompanyName());
         // Handle company profile
         CompanyProfile companyProfile = recruiter.getCompanyProfile() != null ? 
             recruiter.getCompanyProfile() : new CompanyProfile();
         
-        companyProfile.setCompanyName(dto.getCompanyProfile().getCompanyName());
+        companyProfile.setHrName(dto.getCompanyProfile().getHrName());
         companyProfile.setWebsite(dto.getCompanyProfile().getWebsite());
         companyProfile.setIndustryType(dto.getCompanyProfile().getIndustryType());
         companyProfile.setAbout(dto.getCompanyProfile().getAbout());
@@ -126,8 +126,8 @@ public class RecruiterProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found with id: " + recruiterId));
 
         // Update basic info
-        if (recruiterDTO.getFullName() != null) {
-            recruiter.setFullName(recruiterDTO.getFullName());
+        if (recruiterDTO.getCompanyName() != null) {
+            recruiter.setCompanyName(recruiterDTO.getCompanyName());
         }
         if (recruiterDTO.getMobileNumber() != 0) {
             recruiter.setMobileNumber(recruiterDTO.getMobileNumber());
@@ -190,7 +190,7 @@ public class RecruiterProfileService {
     // Helper methods for saving related entities
     private void saveCompanyProfile(Recruiter recruiter, CompanyProfileDTO companyProfileDTO) {
         CompanyProfile companyProfile = new CompanyProfile();
-        companyProfile.setCompanyName(companyProfileDTO.getCompanyName());
+        companyProfile.setHrName(companyProfileDTO.getHrName());
         companyProfile.setWebsite(companyProfileDTO.getWebsite());
         companyProfile.setAbout(companyProfileDTO.getAbout());
         companyProfile.setFoundingYear(companyProfileDTO.getFoundingYear());
@@ -250,8 +250,8 @@ public class RecruiterProfileService {
             return;
         }
 
-        if (companyProfileDTO.getCompanyName() != null) {
-            companyProfile.setCompanyName(companyProfileDTO.getCompanyName());
+        if (companyProfileDTO.getHrName() != null) {
+            companyProfile.setHrName(companyProfileDTO.getHrName());
         }
         if (companyProfileDTO.getWebsite() != null) {
             companyProfile.setWebsite(companyProfileDTO.getWebsite());
@@ -370,7 +370,7 @@ public class RecruiterProfileService {
     private RecruiterDTO convertToDTO(Recruiter recruiter) {
         RecruiterDTO dto = new RecruiterDTO();
         dto.setId(recruiter.getId());
-        dto.setFullName(recruiter.getFullName());
+        dto.setCompanyName(recruiter.getCompanyName());
         dto.setEmail(recruiter.getEmail());
         dto.setMobileNumber(recruiter.getMobileNumber());
         dto.setIsVerified(recruiter.isVerified());
@@ -405,7 +405,7 @@ public class RecruiterProfileService {
     private CompanyProfileDTO convertToDTO(CompanyProfile companyProfile) {
         CompanyProfileDTO dto = new CompanyProfileDTO();
         dto.setId(companyProfile.getId());
-        dto.setCompanyName(companyProfile.getCompanyName());
+        dto.setHrName(companyProfile.getHrName());
         dto.setWebsite(companyProfile.getWebsite());
         dto.setAbout(companyProfile.getAbout());
         dto.setFoundingYear(companyProfile.getFoundingYear());

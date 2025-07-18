@@ -13,7 +13,7 @@ import jakarta.persistence.Enumerated;
 public class RecruiterRegistrationDto {
 
 	// Recruiter's personal details
-	private String fullName; // First name of the recruiter
+	private String companyName; // First name of the recruiter
 	
 	private String email; // Email address of the recruiter
 	private long mobileNumber; // Contact number of the recruiter
@@ -55,10 +55,10 @@ public class RecruiterRegistrationDto {
 	 * @param password        Password entered by the recruiter
 	 * @param confirmPassword Confirmation of the password
 	 */
-	public RecruiterRegistrationDto(String fullName,  String email, long phoneNumber, String password,
+	public RecruiterRegistrationDto(String companyName,  String email, long phoneNumber, String password,
 			String confirmPassword, Status status) {
 		super();
-		this.fullName = fullName;
+		this.companyName = companyName;
 		
 		this.email = email;
 		this.mobileNumber = phoneNumber;
@@ -69,18 +69,28 @@ public class RecruiterRegistrationDto {
 
 	// Getters and Setters
 
-	public String getFullName() {
-		return fullName;
-	}
-
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+	
 
 	
 
 	public String getEmail() {
 		return email;
+	}
+
+	public String getCompanyName() {
+		return companyName;
+	}
+
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
+	}
+
+	public Role getRole() {
+		return role;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
 	}
 
 	public void setEmail(String email) {
