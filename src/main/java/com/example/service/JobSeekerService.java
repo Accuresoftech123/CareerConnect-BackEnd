@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -496,6 +497,83 @@ public class JobSeekerService {
 
 	    return ResponseEntity.ok(infoDto);
 	}
+	
+	
+	
+	    public JobSeekerProfileDto getJobSeekerProfile(int id) {
+	        JobSeeker jobSeeker = repo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("JobSeeker not found with id: " + id));
+
+	        JobSeekerProfileDto dto = new JobSeekerProfileDto();
+	        dto.setFullName(jobSeeker.getFullName());
+	        dto.setMobileNumber(jobSeeker.getMobileNumber());
+	        dto.setSkills(jobSeeker.getSkills());
+
+	        // Personal Info
+	        JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
+	        if (personalInfo != null) {
+	            JobSeekerPersonalInfoDto personalInfoDto = new JobSeekerPersonalInfoDto();
+	            personalInfoDto.setCity(personalInfo.getCity());
+	            personalInfoDto.setState(personalInfo.getState());
+	            personalInfoDto.setCountry(personalInfo.getCountry());
+	            personalInfoDto.setResumeUrl(personalInfo.getResumeUrl());
+	            personalInfoDto.setIntroVideoUrl(personalInfo.getIntroVideoUrl());
+	            personalInfoDto.setProfileImageUrl(personalInfo.getProfileImageUrl());
+	            dto.setPersonalInfo(personalInfoDto);
+	        }
+
+	        // Education
+	        if (jobSeeker.getEducationList() != null) {
+	            List<JobSeekerEducationDto> educationDtos = jobSeeker.getEducationList().stream()
+	                .map(edu -> {
+	                    JobSeekerEducationDto edto = new JobSeekerEducationDto();
+	                    edto.setDegree(edu.getDegree());
+	                    edto.setFieldOfStudy(edu.getFieldOfStudy());
+	                    edto.setInstitution(edu.getInstitution());
+	                    edto.setPassingYear(edu.getPassingYear());
+	                    return edto;
+	                }).collect(Collectors.toList());
+	            dto.setEducationList(educationDtos);
+	        }
+
+	        // Experience
+	        if (jobSeeker.getExperienceList() != null) {
+	            List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
+	                .map(exp -> {
+	                    JobSeekerExperienceDto exdto = new JobSeekerExperienceDto();
+	                    exdto.setJobTitle(exp.getJobTitle());
+	                    exdto.setCompanyName(exp.getCompanyName());
+	                    exdto.setStartDate(exp.getStartDate());
+	                    exdto.setEndDate(exp.getEndDate());
+	                    exdto.setKeyResponsibilities(exp.getKeyResponsibilities());
+	                    return exdto;
+	                }).collect(Collectors.toList());
+	            dto.setExperienceList(experienceDtos);
+	        }
+
+	        // Social Profile
+	        SocialProfile social = jobSeeker.getSocialProfile();
+	        if (social != null) {
+	            JobSeekerSocialProfileDto socialDto = new JobSeekerSocialProfileDto();
+	            socialDto.setLinkedinUrl(social.getLinkedinUrl());
+	            socialDto.setGithubUrl(social.getGithubUrl());
+	            socialDto.setPortfolioWebsite(social.getPortfolioWebsite());
+	            dto.setScoicalProfile(socialDto);
+	        }
+
+	        // Job Preferences
+	        JobPreferences prefs = jobSeeker.getJobPrefeences();
+	        if (prefs != null) {
+	            JobSeekerJonPreferencesDto prefDto = new JobSeekerJonPreferencesDto();
+	            prefDto.setDesiredJobTitle(prefs.getDesiredJobTitle());
+	            prefDto.setExpectedSalary(prefs.getExpectedSalary());
+	            prefDto.setJobType(prefs.getJobType());
+	            prefDto.setPreferredLocation(prefs.getPreferredLocation());
+	            dto.setJobPreferences(prefDto);
+	        }
+
+	        return dto;
+	    }
 
 
 }
