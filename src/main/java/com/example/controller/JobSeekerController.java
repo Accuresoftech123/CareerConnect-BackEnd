@@ -8,6 +8,7 @@ import com.example.entity.JobSeeker;
 import com.example.repository.JobSeekerRepository;
 import com.example.service.EmailService;
 import com.example.service.JobSeekerService;
+import com.example.service.ResumeParsingService;
 import com.example.service.mobileOtpService;
 
 import com.itextpdf.io.exceptions.IOException;
@@ -42,6 +43,8 @@ public class JobSeekerController {
 	private mobileOtpService MobileOtpService;
 	@Autowired
 	private JobSeekerRepository repo;
+	@Autowired
+	ResumeParsingService resumeParsingService;
 
 	/**
 	 * Registers a new job seeker.
@@ -186,4 +189,41 @@ public class JobSeekerController {
 	    public ResponseEntity<?> getJobSeekerImageAndName(@PathVariable int id) {
 	        return jobSeekerService.getJobSeekerImageAndName(id);
 	    }
+	    
+	    @PostMapping("/{id}/upload-resume")
+	    public ResponseEntity<Map<String, Object>> uploadResumeForJobSeeker(
+	            @PathVariable("id") int jobSeekerId,
+	            @RequestParam("file") MultipartFile file) {
+	        try {
+	            JobSeeker updatedJobSeeker = resumeParsingService.parseAndSaveResume(file, jobSeekerId);
+
+	            // ✅ Use your own mapping method instead of jobSeekerMapper
+	            JobSeekerProfileDto dto = resumeParsingService.mapToDto(updatedJobSeeker);
+
+	            return ResponseEntity.ok(Map.of(
+	                    "message", "✅ Resume parsed and saved successfully!",
+	                    "jobSeekerData", dto
+	            ));
+	        } catch (IllegalArgumentException e) {
+	            return ResponseEntity.badRequest().body(Map.of("error", "⚠️ Invalid file: " + e.getMessage()));
+	        } catch (Exception e) {
+	            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                    .body(Map.of("error", "❌ Resume parsing failed: " + e.getMessage()));
+	        }
+	    }
+	    
+	    @GetMapping("/getprofile/{id}")
+	    public ResponseEntity<?> getJobSeekerProfile(@PathVariable int id) {
+	        try {
+	            JobSeekerProfileDto profile = jobSeekerService.getJobSeekerProfile(id);
+	            return ResponseEntity.ok(profile);
+	        } catch (RuntimeException e) {
+	            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+	        }
+	    }
+
+
+
+
+
 }
