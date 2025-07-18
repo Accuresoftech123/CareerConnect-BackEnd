@@ -16,7 +16,7 @@ public class CompanyProfile {
     private String img;
     private String companyEmail;
     
-	private String companyName;
+	private String hrName;
     private String website;
     private String about;
     private int foundingYear;
@@ -37,12 +37,12 @@ public class CompanyProfile {
 		// TODO Auto-generated constructor stub
 	}
 
-	public CompanyProfile(int id, String companyName, String website, String about, int foundingYear,
+	public CompanyProfile(int id, String hrName, String website, String about, int foundingYear,
 			String companySize, Recruiter recruiter,String img, String companyEmail, String hrContactEmail, String hrContactMobileNumber) {
 		super();
 		this.id = id;
 		this.companyEmail=companyEmail;
-		this.companyName = companyName;
+		this.hrName = hrName;
 		this.website = website;
 		this.about = about;
 		this.foundingYear = foundingYear;
@@ -61,12 +61,14 @@ public class CompanyProfile {
 		this.id = id;
 	}
 
-	public String getCompanyName() {
-		return companyName;
+	
+
+	public String getHrName() {
+		return hrName;
 	}
 
-	public void setCompanyName(String companyName) {
-		this.companyName = companyName;
+	public void setHrName(String hrName) {
+		this.hrName = hrName;
 	}
 
 	public String getWebsite() {

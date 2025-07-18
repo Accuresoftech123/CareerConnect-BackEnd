@@ -233,14 +233,14 @@ public class JobPostService {
 			dto.setCompanyImageUrl(jobPost.getRecruiter().getCompanyProfile().getImg());
 		}
 
-		if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
-				&& jobPost.getRecruiter().getCompanyProfile().getCompanyName() != null) {
-			dto.setCompanyName(jobPost.getRecruiter().getCompanyProfile().getCompanyName());
+	if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
+				&& jobPost.getRecruiter().getCompanyName() != null) {
+			dto.setCompanyName(jobPost.getRecruiter().getCompanyName());
 		}
 		
 		if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
-				&& jobPost.getRecruiter().getCompanyProfile().getImg() != null) {
-			dto.setHrName(jobPost.getRecruiter().getFullName());
+				&& jobPost.getRecruiter().getCompanyProfile().getHrName() != null) {
+			dto.setHrName(jobPost.getRecruiter().getCompanyProfile().getHrName());
 		}
 		
         

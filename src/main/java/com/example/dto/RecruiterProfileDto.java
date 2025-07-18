@@ -8,9 +8,11 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.validation.constraints.*;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class RecruiterProfileDto {
 	
-	private String fullName;
+	private String companyName;
 	private long mobileNumber;
 	private String recruiterEmail;
 	private int recruiterId;
@@ -25,22 +27,24 @@ public class RecruiterProfileDto {
 		// TODO Auto-generated constructor stub
 	}
 
-	public RecruiterProfileDto(String fullName, long mobileNumber, CompanyProfileDTO companyProfile,
+	public RecruiterProfileDto(String companyName, long mobileNumber, CompanyProfileDTO companyProfile,
 			List<CompanyLocationDTO> companyLocation, String recruiterEmail) {
 		super();
-		this.fullName = fullName;
+		this.companyName = companyName;
 		this.mobileNumber = mobileNumber;
 		this.CompanyProfile = companyProfile;
 		this.companyLocation = companyLocation;
 		this.recruiterEmail = recruiterEmail;
 	}
 
-	public String getFullName() {
-		return fullName;
+	
+
+	public String getCompanyName() {
+		return companyName;
 	}
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public long getMobileNumber() {

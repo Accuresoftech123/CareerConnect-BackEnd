@@ -143,7 +143,7 @@ public class AdminService {
 	public Map<String, Object> getRecruitersReportWithCount() {
 		List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream().map(r -> {
 			RecruiterProfileDto dto = new RecruiterProfileDto();
-			dto.setFullName(r.getFullName());
+			//dto.setFName(r.getFullName());
 			dto.setMobileNumber(r.getMobileNumber());
 			dto.setRecruiterEmail(r.getEmail());
 
@@ -152,7 +152,7 @@ public class AdminService {
 				CompanyProfile cp = r.getCompanyProfile();
 
 				CompanyProfileDTO companyDTO = new CompanyProfileDTO();
-				companyDTO.setCompanyName(cp.getCompanyName());
+			//	companyDTO.setCompanyName(cp.getCompanyName());
 				companyDTO.setWebsite(cp.getWebsite());
 				companyDTO.setAbout(cp.getAbout());
 				companyDTO.setCompanySize(cp.getCompanySize());
