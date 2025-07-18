@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -23,6 +24,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -69,7 +71,13 @@ public class JobSeeker {
 	// To store date&time for Otp expire
 	private LocalDateTime otpGeneratedTime;
 	
-	
+	 @Column(name = "created_at")
+	    private LocalDateTime createdAt;
+
+	    @PrePersist
+	    public void onCreate() {
+	        this.createdAt = LocalDateTime.now();
+	    }
 	//MObile number varification!..
 	private String mobileOtp;	
 	private LocalDateTime mobileOtpGeneratedTime;	
@@ -126,7 +134,7 @@ public class JobSeeker {
 			String confirmPassword, JobSeekerPersonalInfo personalInfo, List<Education> educationList,
 			List<Experience> experienceList, List<String> skills, SocialProfile socialProfile,
 			JobPreferences jobPrefeences, boolean isVerified, String otp, LocalDateTime otpGeneratedTime,String mobileOtp,
-				LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified ,Role role, List<SavedJob> savedJobs,String googleId,String picture) {
+				LocalDateTime mobileOtpGeneratedTime,boolean isMobileVerified ,Role role, List<SavedJob> savedJobs,String googleId,String picture,LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -146,6 +154,7 @@ public class JobSeeker {
 		this.googleId=googleId;
 		this.picture=picture;
 		this.role=role;
+		this. createdAt= createdAt;
 	}
 
 	public int getId() {
@@ -322,6 +331,14 @@ public class JobSeeker {
 
 	public void setRole(Role role) {
 		this.role = role;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 	
 	

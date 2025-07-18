@@ -218,4 +218,11 @@ public class JobPostController {
         Long count = jobPostService.getTodayJobMatchesCountForSeeker(jobSeekerId);
         return ResponseEntity.ok(count);
     }
+    
+    @GetMapping("/jobposts/recent/count")
+    public ResponseEntity<Long> countRecentJobPosts() {
+        return ResponseEntity.ok(jobPostService.countRecentJobPosts());
+    }
+
+
 }

@@ -27,7 +27,13 @@ public class Recruiter {
 
 	private long mobileNumber;
 
-	
+	@Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 	private String password;
 
 	@Transient

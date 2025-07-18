@@ -1,5 +1,6 @@
 package com.example.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -196,7 +197,10 @@ public class RecruiterService {
     }
     
    
-
+    public long countRecruitersFromLast30Days() {
+        LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+        return recruiterRepository.countRecruitersRegisteredInLast30Days(startDate);
+    }
    
 
 }
