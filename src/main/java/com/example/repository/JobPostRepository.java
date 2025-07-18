@@ -110,6 +110,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     
     //For Fetch Job Post by posted date
     List<JobPost> findAllByOrderByPostedDateDesc();
+    
+    
+ // Count job posts by recruiter
+    long countByRecruiterId(int recruiterId);
 
 
 }
