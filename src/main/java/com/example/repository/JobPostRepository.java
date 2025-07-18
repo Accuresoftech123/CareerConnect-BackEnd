@@ -1,6 +1,7 @@
 package com.example.repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -110,6 +111,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     
     //For Fetch Job Post by posted date
     List<JobPost> findAllByOrderByPostedDateDesc();
+    
+    
+    @Query("SELECT COUNT(jp) FROM JobPost jp WHERE jp.postedDate >= :startDate")
+    long countJobPostsFromLast30Days(@Param("startDate") LocalDate startDate);
 
 
 }

@@ -1,6 +1,10 @@
 package com.example.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.PrePersist;
 
 
 
@@ -19,6 +23,13 @@ public class JobSeekerProfileDto {
 	private List<String> skills;
 	private JobSeekerJonPreferencesDto jobPreferences;
 	private JobSeekerSocialProfileDto scoicalProfile;
+	
+	    private LocalDateTime createdAt;
+
+	    @PrePersist
+	    public void onCreate() {
+	        this.createdAt = LocalDateTime.now();
+	    }
 	public JobSeekerProfileDto() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -29,7 +40,7 @@ public class JobSeekerProfileDto {
 	public JobSeekerProfileDto(int id, String fullName, String email, String mobileNumber,
 			JobSeekerPersonalInfoDto personalInfo, List<JobSeekerEducationDto> educationList,
 			List<JobSeekerExperienceDto> experienceList, List<String> skills, JobSeekerJonPreferencesDto jobPreferences,
-			JobSeekerSocialProfileDto scoicalProfile) {
+			JobSeekerSocialProfileDto scoicalProfile,LocalDateTime createdAt) {
 		super();
 		this.id = id;
 		this.fullName = fullName;
@@ -128,6 +139,12 @@ public class JobSeekerProfileDto {
 
 	public void setMobileNumber(String mobileNumber) {
 		this.mobileNumber = mobileNumber;
+	}
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	

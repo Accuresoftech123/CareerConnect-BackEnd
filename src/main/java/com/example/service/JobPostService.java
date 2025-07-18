@@ -513,7 +513,7 @@ public class JobPostService {
 	               
 	        );
 	    }
-
+        
 	    public Long getTodayJobMatchesCountForSeeker(int jobSeekerId) {
 	        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
 	            .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
@@ -535,4 +535,13 @@ public class JobPostService {
 	                roundedYears
 	        );
 	    }
+	    public long countRecentJobPosts() {
+	        LocalDate startDate = LocalDate.now().minusDays(30);
+	        return jobPostRepository.countJobPostsFromLast30Days(startDate);
+	    }
+
+
+	    
+	    
+	    
 }

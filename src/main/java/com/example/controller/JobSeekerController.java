@@ -13,6 +13,7 @@ import com.example.service.mobileOtpService;
 
 import com.itextpdf.io.exceptions.IOException;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -222,6 +223,18 @@ public class JobSeekerController {
 	        }
 	    }
 
+		    
+//	 //  GET list of job seekers registered in the last 30 days
+//	    @GetMapping("/recent")
+//	    public ResponseEntity<List<JobSeeker>> getRecentJobSeekers() {
+//	        return ResponseEntity.ok(jobSeekerService.getJobSeekersFromLast30Days());
+//	    }
+
+	    // GET count of job seekers registered in the last 30 days
+	    @GetMapping("/recent/count")
+	    public ResponseEntity<Long> getRecentJobSeekerCount() {
+	        return ResponseEntity.ok(jobSeekerService.countJobSeekersFromLast30Days());
+	    }
 
 
 

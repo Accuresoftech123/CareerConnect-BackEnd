@@ -93,6 +93,9 @@ private EmailService emailService;
 	    }
 	} 
 
-
+	 @GetMapping("/recent/count")
+	    public ResponseEntity<Long> countRecentRecruiters() {
+	        return ResponseEntity.ok(recruiterService.countRecruitersFromLast30Days());
+	    }
 
 }
