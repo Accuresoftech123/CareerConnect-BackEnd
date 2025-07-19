@@ -1,6 +1,7 @@
 package com.example.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,12 +16,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.example.dto.ApplicantDTO;
+import com.example.dto.CompanyLocationDTO;
+import com.example.dto.CompanyProfileDTO;
 import com.example.dto.RecruiterDTO;
 import com.example.dto.RecruiterProfileDto;
 import com.example.dto.RecruiterRegistrationDto;
 import com.example.entity.Applicant;
 import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
+import com.example.entity.profile.CompanyLocation;
 import com.example.entity.profile.CompanyProfile;
 import com.example.enums.ApplicationStatus;
 import com.example.enums.Role;
@@ -201,6 +205,36 @@ public class RecruiterService {
         LocalDateTime startDate = LocalDateTime.now().minusDays(30);
         return recruiterRepository.countRecruitersRegisteredInLast30Days(startDate);
     }
+    
+    public List<RecruiterDTO> getRecentRecruiterSummaries() {
+        LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+        List<Recruiter> recruiters = recruiterRepository.findRecruitersRegisteredInLast30Days(startDate);
+
+        List<RecruiterDTO> result = new ArrayList<>();
+
+        for (Recruiter recruiter : recruiters) {
+            RecruiterDTO dto = new RecruiterDTO();
+            dto.setCompanyName(recruiter.getCompanyName());
+
+            List<CompanyLocation> locations = recruiter.getCompanyLocations();
+            if (locations != null && !locations.isEmpty()) {
+                CompanyLocation firstLocation = locations.get(0);
+                CompanyLocationDTO locationDTO = new CompanyLocationDTO();
+                locationDTO.setCity(firstLocation.getCity());
+
+                List<CompanyLocationDTO> locationList = new ArrayList<>();
+                locationList.add(locationDTO);
+                dto.setCompanyLocations(locationList);
+            }
+
+            result.add(dto);
+        }
+
+        return result;
+    }
+
+    
+
    
 
 }

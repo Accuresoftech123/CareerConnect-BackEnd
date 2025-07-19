@@ -559,28 +559,25 @@ public class JobSeekerService {
 	        return dto;
 	    }
 	//
-//	public List<JobSeekerProfileDto> getRecentJobSeekerSummaries() {
-//		    LocalDateTime startDate = LocalDateTime.now().minusDays(30);
-//		    List<JobSeeker> jobSeekers = repo.findJobSeekersRegisteredInLast30Days(startDate);
-//
-//		    List<JobSeekerProfileDto> result = new ArrayList<>();
-//
-//		    for (JobSeeker js : jobSeekers) {
-//		        JobSeekerProfileDto dto = new JobSeekerProfileDto();
-//		        dto.setFullName(js.getFullName());
-//		        dto.setCreatedAt(js.getCreatedAt());
-//
-//		        JobSeekerJonPreferencesDto preferencesDto = new JobSeekerJonPreferencesDto();
-//		        if (js.getJobPrefeences() != null) {
-//		            preferencesDto.setDesiredJobTitle(js.getJobPrefeences().getDesiredJobTitle());
-//		        }
-//
-//		        dto.setJobPreferences(preferencesDto);
-//		        result.add(dto);
-//		    }
-//
-//		    return result;
-//		}
+	public List<JobSeekerProfileDto> getRecentJobSeekerSummaries() {
+		 LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+		 List<JobSeeker> jobSeekers = repo.findJobSeekersRegisteredInLast30Days(startDate);
+
+		 List<JobSeekerProfileDto> result = new ArrayList<>();
+
+		 for (JobSeeker js : jobSeekers) {
+		 JobSeekerProfileDto dto = new JobSeekerProfileDto();
+		 dto.setFullName(js.getFullName());
+		 dto.setCreatedAt(js.getCreatedAt());
+
+		 JobSeekerJonPreferencesDto preferencesDto = new JobSeekerJonPreferencesDto();
+		 if (js.getJobPrefeences() != null) {
+		 preferencesDto.setDesiredJobTitle(js.getJobPrefeences().getDesiredJobTitle());
+		 }
+		 dto.setJobPreferences(preferencesDto);
+		 result.add(dto);
+		 } return result;
+		}
 
 	public long countJobSeekersFromLast30Days() {
 		LocalDateTime startDate = LocalDateTime.now().minusDays(30);

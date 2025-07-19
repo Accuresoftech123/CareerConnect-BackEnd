@@ -46,5 +46,7 @@ public interface RecruiterRepository extends JpaRepository<Recruiter, Integer> {
 
     @Query("SELECT COUNT(r) FROM Recruiter r WHERE r.createdAt >= :startDate")
     long countRecruitersRegisteredInLast30Days(@Param("startDate") LocalDateTime startDate);
+    
+    
 
 }
