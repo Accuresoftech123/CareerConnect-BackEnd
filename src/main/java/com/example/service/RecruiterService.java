@@ -21,6 +21,7 @@ import com.example.dto.CompanyProfileDTO;
 import com.example.dto.RecruiterDTO;
 import com.example.dto.RecruiterProfileDto;
 import com.example.dto.RecruiterRegistrationDto;
+import com.example.dto.recruiterProfileImgDto;
 import com.example.entity.Applicant;
 import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
@@ -236,7 +237,22 @@ public class RecruiterService {
         return result;
     }
 
-    
+    public recruiterProfileImgDto getRecruiterProfileImage(int recruiterId) {
+        Recruiter recruiter = recruiterRepository.findById(recruiterId)
+                .orElseThrow(() -> new RuntimeException("Recruiter not found"));
+
+        CompanyProfile companyProfile = recruiter.getCompanyProfile();
+        if (companyProfile == null) {
+            throw new RuntimeException("Company profile not found for recruiter");
+        }
+
+        recruiterProfileImgDto dto = new recruiterProfileImgDto();
+        dto.setCompanyName(recruiter.getCompanyName()); // from Recruiter class
+        dto.setImage(companyProfile.getImg());          // from CompanyProfile
+
+        return dto;
+    }
+
 
    
 

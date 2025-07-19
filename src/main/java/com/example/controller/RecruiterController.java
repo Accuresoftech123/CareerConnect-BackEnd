@@ -4,6 +4,7 @@ import com.example.dto.RecruiterDTO;
 import com.example.dto.RecruiterLoginDto;
 import com.example.dto.RecruiterProfileDto;
 import com.example.dto.RecruiterRegistrationDto;
+import com.example.dto.recruiterProfileImgDto;
 import com.example.entity.Recruiter;
 import com.example.service.EmailService;
 import com.example.service.RecruiterService;
@@ -105,5 +106,13 @@ private EmailService emailService;
 	        List<RecruiterDTO> recentRecruiters = recruiterService.getRecentRecruiterSummaries();
 	        return new ResponseEntity<>(recentRecruiters, HttpStatus.OK);
 	    }
+	 
+	 //get image and company name
+	 @GetMapping("/profile-image/{id}")
+	 public ResponseEntity<recruiterProfileImgDto> getRecruiterProfileImage(@PathVariable int id) {
+	     recruiterProfileImgDto dto = recruiterService.getRecruiterProfileImage(id);
+	     return new ResponseEntity<>(dto, HttpStatus.OK);
+	 }
+
 
 }
