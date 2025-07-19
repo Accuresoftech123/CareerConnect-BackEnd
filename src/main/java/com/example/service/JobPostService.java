@@ -544,4 +544,10 @@ public class JobPostService {
 	    
 	    
 	    
+	    
+	    
+	    //job post by recruiter
+	    public long getTotalJobPostsByRecruiter(int recruiterId) {
+	        return jobPostRepository.countByRecruiterId(recruiterId);
+	    }
 }

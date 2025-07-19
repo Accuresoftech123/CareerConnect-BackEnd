@@ -225,4 +225,11 @@ public class JobPostController {
     }
 
 
+    
+    // count total jobpost by recruiter
+    @GetMapping("/jobpost-count/{recruiterId}")
+    public ResponseEntity<Long> getJobPostCount(@PathVariable int recruiterId) {
+        long count = jobPostService.getTotalJobPostsByRecruiter(recruiterId);
+        return ResponseEntity.ok(count);
+    }
 }
