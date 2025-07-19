@@ -44,7 +44,8 @@ public class RecruiterDashboardController {
     RecruiterRepository RecRepo;
     
     // ✅ Dashboard Summary
-    @GetMapping("/summary/{recruiterId}")    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(@PathVariable Integer recruiterId) {
+    @GetMapping("/summary/{recruiterId}")  
+    public ResponseEntity<RecruiterDashboardSummaryDto> getDashboardSummary(@PathVariable Integer recruiterId) {
         Recruiter recruiter = RecRepo.findById(recruiterId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recruiter not found with id: " + recruiterId));
         
