@@ -10,6 +10,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
+import java.util.stream.Collectors;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,10 +46,9 @@ import com.example.security.JwtUtil;
  */
 @Service
 public class JobSeekerService {
-	
-	
-	    @Autowired
-	    private JwtUtil jwtUtil;
+
+	@Autowired
+	private JwtUtil jwtUtil;
 
 	    @Autowired
 	    private CustomUserDetailsService userDetailsService;
@@ -67,9 +68,6 @@ public class JobSeekerService {
 
 	@Autowired
 	private CloudinaryService cloudinaryService;
-	
-	
-	
 
 	/**
 	 * Registers a new job seeker if the email is not already taken.
@@ -79,49 +77,45 @@ public class JobSeekerService {
 	 */
 
 	public ResponseEntity<?> register(JobSeekerRegistrationDto newJobSeeker) {
-	    // Check if JobSeeker already exists
-	    Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
+		// Check if JobSeeker already exists
+		Optional<JobSeeker> existing = repo.findByEmail(newJobSeeker.getEmail());
 
-	    if (existing.isPresent()) {
-	        JobSeeker existingJobSeeker = existing.get();
+		if (existing.isPresent()) {
+			JobSeeker existingJobSeeker = existing.get();
 
-	        if (!existingJobSeeker.isVerified()) {
-	            // Resend OTP to unverified JobSeeker
-	            emailService.generateAndSendOtp(existingJobSeeker);
+			if (!existingJobSeeker.isVerified()) {
+				// Resend OTP to unverified JobSeeker
+				emailService.generateAndSendOtp(existingJobSeeker);
 
-	            return ResponseEntity.ok(Map.of(
-	                "success", true,
-	                "message", "Email already registered but not verified. OTP re-sent.",
-	                "jobSeekerId", existingJobSeeker.getId()
-	            ));
-	        }
+				return ResponseEntity.ok(
+						Map.of("success", true, "message", "Email already registered but not verified. OTP re-sent.",
+								"jobSeekerId", existingJobSeeker.getId()));
+			}
 
-	        // Already verified
-	        return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
-	            "success", false,
-	            "message", "Email already registered and verified. Please login."
-	        ));
-	    }
+			// Already verified
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(Map.of("success", false, "message", "Email already registered and verified. Please login."));
+		}
 
 		// Create a new JobSeeker entity from DTO
 		JobSeeker jobSeeker = new JobSeeker();
 		jobSeeker.setFullName(newJobSeeker.getFullName());
 		jobSeeker.setEmail(newJobSeeker.getEmail());
 		jobSeeker.setMobileNumber(newJobSeeker.getMobileNumber());
-		
-		 // ✅ Encrypt password before saving
-	    String encodedPassword = passwordEncoder.encode(newJobSeeker.getPassword());
-	    jobSeeker.setPassword(encodedPassword);
-	    
-	    // (Optional) You don't need to store confirm password, but if you must:
-	   // jobSeeker.setConfirmPassword(encodedPassword);
-	    
+
+		// ✅ Encrypt password before saving
+		String encodedPassword = passwordEncoder.encode(newJobSeeker.getPassword());
+		jobSeeker.setPassword(encodedPassword);
+
+		// (Optional) You don't need to store confirm password, but if you must:
+		// jobSeeker.setConfirmPassword(encodedPassword);
+
 		jobSeeker.setConfirmPassword(newJobSeeker.getConfirmPassword());
 		jobSeeker.setRole(Role.ROLE_JOBSEEKER);
-		
-		 // ✅ Save job seeker first so it has an ID before sending OTP
-	   // repo.save(jobSeeker);
-	     JobSeeker saved = repo.save(jobSeeker);
+
+		// ✅ Save job seeker first so it has an ID before sending OTP
+		// repo.save(jobSeeker);
+		JobSeeker saved = repo.save(jobSeeker);
 
 		// calling OTP generation method from email service.......
 		emailService.generateAndSendOtp(saved);
@@ -151,46 +145,42 @@ public class JobSeekerService {
 //		}
 //		return null;
 //	}
-	
+
 	public ResponseEntity<?> login(String email, String password) {
-	
+
 		JobSeeker jobSeeker = repo.findByEmail(email).orElse(null);
-		
+
 		if (jobSeeker == null || !passwordEncoder.matches(password, jobSeeker.getPassword())) {
-		    return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
 		}
-		
-		 // ✅ Load user details for JWT
-		
-		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-		 CustomUserDetails customUser = (CustomUserDetails) userDetails;
-		 
-		  // Generate JWT token with role
-	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
-	      
-	      // ✅ Return token and role
-	      Map<String, Object> response = new HashMap<>();
-	      response.put("token", token);
-	      response.put("role", jobSeeker.getRole().name());
-	      response.put("id", jobSeeker.getId());
-	      
-	      return ResponseEntity.ok(response);
+
+		// ✅ Load user details for JWT
+
+		UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+		CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+		// Generate JWT token with role
+		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+
+		// ✅ Return token and role
+		Map<String, Object> response = new HashMap<>();
+		response.put("token", token);
+		response.put("role", jobSeeker.getRole().name());
+		response.put("id", jobSeeker.getId());
+
+		return ResponseEntity.ok(response);
 	}
 
 	// update jobseeker profile
 
-	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto,
-            MultipartFile resumeFile,
-            MultipartFile videoFile,
-            MultipartFile imageFile) throws java.io.IOException{
-
+	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto, MultipartFile resumeFile,
+			MultipartFile videoFile, MultipartFile imageFile) throws java.io.IOException {
 
 		JobSeeker jobSeeker = repo.findById(id).orElse(null);
 
 		if (jobSeeker == null) {
 
-			return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Job Seeker not found with ID: " + id);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job Seeker not found with ID: " + id);
 
 		}
 
@@ -232,25 +222,24 @@ public class JobSeekerService {
 			if (personalInfoDto.getCountry() != null && !personalInfoDto.getCountry().isEmpty())
 				personalInfo.setCountry(personalInfoDto.getCountry());
 			try {
-			    if (resumeFile != null && !resumeFile.isEmpty()) {
-			        String resumeUrl = cloudinaryService.uploadFile(resumeFile, "jobseeker/resumes");
-			        personalInfo.setResumeUrl(resumeUrl);
-			    }
+				if (resumeFile != null && !resumeFile.isEmpty()) {
+					String resumeUrl = cloudinaryService.uploadFile(resumeFile, "jobseeker/resumes");
+					personalInfo.setResumeUrl(resumeUrl);
+				}
 
-			    if (videoFile != null && !videoFile.isEmpty()) {
-			        String videoUrl = cloudinaryService.uploadFile(videoFile, "jobseeker/videos");
-			        personalInfo.setIntroVideoUrl(videoUrl);
-			    }
+				if (videoFile != null && !videoFile.isEmpty()) {
+					String videoUrl = cloudinaryService.uploadFile(videoFile, "jobseeker/videos");
+					personalInfo.setIntroVideoUrl(videoUrl);
+				}
 
-			    if (imageFile != null && !imageFile.isEmpty()) {
-			        String imageUrl = cloudinaryService.uploadFile(imageFile, "jobseeker/images");
-			        personalInfo.setProfileImageUrl(imageUrl);
-			    }
+				if (imageFile != null && !imageFile.isEmpty()) {
+					String imageUrl = cloudinaryService.uploadFile(imageFile, "jobseeker/images");
+					personalInfo.setProfileImageUrl(imageUrl);
+				}
 			} catch (IOException e) {
-			    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-			                         .body("File upload failed: " + e.getMessage());
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("File upload failed: " + e.getMessage());
 			}
-
 
 			personalInfo.setJobSeeker(jobSeeker);
 			jobSeeker.setPersonalInfo(personalInfo);
@@ -260,7 +249,7 @@ public class JobSeekerService {
 		// update education
 
 		// seperate the educationdto from profile dto
-		//List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
+		// List<JobSeekerEducationDto> educationDtoList = dto.getEducationList();
 
 		if (dto.getEducationList() != null) {
 
@@ -294,7 +283,7 @@ public class JobSeekerService {
 
 		// update experience
 
-	//	List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
+		// List<JobSeekerExperienceDto> experienceDtoList = dto.getExperienceList();
 
 		if (dto.getExperienceList() != null) {
 
@@ -475,7 +464,7 @@ public class JobSeekerService {
 		if (seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
 			return false;
 		}
-	if(seeker.getOtp().equals(inputOtp)) {
+		if (seeker.getOtp().equals(inputOtp)) {
 			seeker.setPassword(passwordEncoder.encode(newPassword));
 			seeker.setOtp(null);
 			seeker.setOtpGeneratedTime(null);
@@ -483,32 +472,131 @@ public class JobSeekerService {
 			return true;
 		}
 		return false;
-	
-		
+
 	}
-	
-	
-	//jobseeker get by id personal info
+
+	// jobseeker get by id personal info
 	public ResponseEntity<?> getJobSeekerImageAndName(int id) {
-	    Optional<JobSeeker> optionalJobSeeker = repo.findById(id);
+		Optional<JobSeeker> optionalJobSeeker = repo.findById(id);
 
-	    if (optionalJobSeeker.isEmpty()) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job Seeker not found with ID: " + id);
-	    }
+		if (optionalJobSeeker.isEmpty()) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Job Seeker not found with ID: " + id);
+		}
 
-	    JobSeeker jobSeeker = optionalJobSeeker.get();
+		JobSeeker jobSeeker = optionalJobSeeker.get();
 
-	    // Get Personal Info
-	    if (jobSeeker.getPersonalInfo() == null) {
-	        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Personal Info not found for Job Seeker ID: " + id);
-	    }
+		// Get Personal Info
+		if (jobSeeker.getPersonalInfo() == null) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Personal Info not found for Job Seeker ID: " + id);
+		}
 
-	    JobSeekerPersonalInfoDto infoDto = new JobSeekerPersonalInfoDto();
-	    infoDto.setFullName(jobSeeker.getFullName());
-	    infoDto.setProfileImageUrl(jobSeeker.getPersonalInfo().getProfileImageUrl());
+		JobSeekerPersonalInfoDto infoDto = new JobSeekerPersonalInfoDto();
+		infoDto.setFullName(jobSeeker.getFullName());
+		infoDto.setProfileImageUrl(jobSeeker.getPersonalInfo().getProfileImageUrl());
 
 	    return ResponseEntity.ok(infoDto);
 	}
+	
+	
+	
+	    public JobSeekerProfileDto getJobSeekerProfile(int id) {
+	        JobSeeker jobSeeker = repo.findById(id)
+	            .orElseThrow(() -> new RuntimeException("JobSeeker not found with id: " + id));
 
+	        JobSeekerProfileDto dto = new JobSeekerProfileDto();
+	        dto.setFullName(jobSeeker.getFullName());
+	        dto.setMobileNumber(jobSeeker.getMobileNumber());
+	        dto.setSkills(jobSeeker.getSkills());
+
+	        // Personal Info
+	        JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
+	        if (personalInfo != null) {
+	            JobSeekerPersonalInfoDto personalInfoDto = new JobSeekerPersonalInfoDto();
+	            personalInfoDto.setCity(personalInfo.getCity());
+	            personalInfoDto.setState(personalInfo.getState());
+	            personalInfoDto.setCountry(personalInfo.getCountry());
+	            personalInfoDto.setResumeUrl(personalInfo.getResumeUrl());
+	            personalInfoDto.setIntroVideoUrl(personalInfo.getIntroVideoUrl());
+	            personalInfoDto.setProfileImageUrl(personalInfo.getProfileImageUrl());
+	            dto.setPersonalInfo(personalInfoDto);
+	        }
+
+	        // Education
+	        if (jobSeeker.getEducationList() != null) {
+	            List<JobSeekerEducationDto> educationDtos = jobSeeker.getEducationList().stream()
+	                .map(edu -> {
+	                    JobSeekerEducationDto edto = new JobSeekerEducationDto();
+	                    edto.setDegree(edu.getDegree());
+	                    edto.setFieldOfStudy(edu.getFieldOfStudy());
+	                    edto.setInstitution(edu.getInstitution());
+	                    edto.setPassingYear(edu.getPassingYear());
+	                    return edto;
+	                }).collect(Collectors.toList());
+	            dto.setEducationList(educationDtos);
+	        }
+
+	        // Experience
+	        if (jobSeeker.getExperienceList() != null) {
+	            List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
+	                .map(exp -> {
+	                    JobSeekerExperienceDto exdto = new JobSeekerExperienceDto();
+	                    exdto.setJobTitle(exp.getJobTitle());
+	                    exdto.setCompanyName(exp.getCompanyName());
+	                    exdto.setStartDate(exp.getStartDate());
+	                    exdto.setEndDate(exp.getEndDate());
+	                    exdto.setKeyResponsibilities(exp.getKeyResponsibilities());
+	                    return exdto;
+	                }).collect(Collectors.toList());
+	            dto.setExperienceList(experienceDtos);
+	        }
+
+	        // Social Profile
+	        SocialProfile social = jobSeeker.getSocialProfile();
+	        if (social != null) {
+	            JobSeekerSocialProfileDto socialDto = new JobSeekerSocialProfileDto();
+	            socialDto.setLinkedinUrl(social.getLinkedinUrl());
+	            socialDto.setGithubUrl(social.getGithubUrl());
+	            socialDto.setPortfolioWebsite(social.getPortfolioWebsite());
+	            dto.setScoicalProfile(socialDto);
+	        }
+
+	        // Job Preferences
+	        JobPreferences prefs = jobSeeker.getJobPrefeences();
+	        if (prefs != null) {
+	            JobSeekerJonPreferencesDto prefDto = new JobSeekerJonPreferencesDto();
+	            prefDto.setDesiredJobTitle(prefs.getDesiredJobTitle());
+	            prefDto.setExpectedSalary(prefs.getExpectedSalary());
+	            prefDto.setJobType(prefs.getJobType());
+	            prefDto.setPreferredLocation(prefs.getPreferredLocation());
+	            dto.setJobPreferences(prefDto);
+	        }
+
+	        return dto;
+	    }
+	//
+	public List<JobSeekerProfileDto> getRecentJobSeekerSummaries() {
+		 LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+		 List<JobSeeker> jobSeekers = repo.findJobSeekersRegisteredInLast30Days(startDate);
+
+		 List<JobSeekerProfileDto> result = new ArrayList<>();
+
+		 for (JobSeeker js : jobSeekers) {
+		 JobSeekerProfileDto dto = new JobSeekerProfileDto();
+		 dto.setFullName(js.getFullName());
+		 dto.setCreatedAt(js.getCreatedAt());
+
+		 JobSeekerJonPreferencesDto preferencesDto = new JobSeekerJonPreferencesDto();
+		 if (js.getJobPrefeences() != null) {
+		 preferencesDto.setDesiredJobTitle(js.getJobPrefeences().getDesiredJobTitle());
+		 }
+		 dto.setJobPreferences(preferencesDto);
+		 result.add(dto);
+		 } return result;
+		}
+
+	public long countJobSeekersFromLast30Days() {
+		LocalDateTime startDate = LocalDateTime.now().minusDays(30);
+		return repo.countJobSeekersRegisteredInLast30Days(startDate);
+	}
 
 }

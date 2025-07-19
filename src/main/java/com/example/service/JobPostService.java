@@ -233,14 +233,14 @@ public class JobPostService {
 			dto.setCompanyImageUrl(jobPost.getRecruiter().getCompanyProfile().getImg());
 		}
 
-		if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
-				&& jobPost.getRecruiter().getCompanyProfile().getCompanyName() != null) {
-			dto.setCompanyName(jobPost.getRecruiter().getCompanyProfile().getCompanyName());
+	if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
+				&& jobPost.getRecruiter().getCompanyName() != null) {
+			dto.setCompanyName(jobPost.getRecruiter().getCompanyName());
 		}
 		
 		if (jobPost.getRecruiter() != null && jobPost.getRecruiter().getCompanyProfile() != null
-				&& jobPost.getRecruiter().getCompanyProfile().getImg() != null) {
-			dto.setHrName(jobPost.getRecruiter().getFullName());
+				&& jobPost.getRecruiter().getCompanyProfile().getHrName() != null) {
+			dto.setHrName(jobPost.getRecruiter().getCompanyProfile().getHrName());
 		}
 		
         
@@ -513,7 +513,7 @@ public class JobPostService {
 	               
 	        );
 	    }
-
+        
 	    public Long getTodayJobMatchesCountForSeeker(int jobSeekerId) {
 	        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
 	            .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
@@ -535,6 +535,15 @@ public class JobPostService {
 	                roundedYears
 	        );
 	    }
+	    public long countRecentJobPosts() {
+	        LocalDate startDate = LocalDate.now().minusDays(30);
+	        return jobPostRepository.countJobPostsFromLast30Days(startDate);
+	    }
+
+
+	    
+	    
+	    
 	    
 	    
 	    //job post by recruiter

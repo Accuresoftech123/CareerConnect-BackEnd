@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.RecruiterDTO;
 import com.example.dto.RecruiterLoginDto;
 import com.example.dto.RecruiterProfileDto;
 import com.example.dto.RecruiterRegistrationDto;
@@ -7,6 +8,7 @@ import com.example.entity.Recruiter;
 import com.example.service.EmailService;
 import com.example.service.RecruiterService;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +95,15 @@ private EmailService emailService;
 	    }
 	} 
 
-
+	 @GetMapping("/recent/count")
+	    public ResponseEntity<Long> countRecentRecruiters() {
+	        return ResponseEntity.ok(recruiterService.countRecruitersFromLast30Days());
+	    }
+	 
+	 @GetMapping("/recent")
+	    public ResponseEntity<List<RecruiterDTO>> getRecentRecruiterSummaries() {
+	        List<RecruiterDTO> recentRecruiters = recruiterService.getRecentRecruiterSummaries();
+	        return new ResponseEntity<>(recentRecruiters, HttpStatus.OK);
+	    }
 
 }

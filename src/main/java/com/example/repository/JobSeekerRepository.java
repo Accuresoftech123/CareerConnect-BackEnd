@@ -1,9 +1,13 @@
 package com.example.repository;
 
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.entity.JobSeeker;
@@ -26,5 +30,11 @@ public interface JobSeekerRepository extends JpaRepository<JobSeeker, Integer> {
      */
     Optional<JobSeeker> findByEmail(String email);
     Optional<JobSeeker> findByMobileNumber(String mobileNumber);
+    
+    @Query("SELECT js FROM JobSeeker js WHERE js.createdAt >= :startDate ORDER BY js.createdAt DESC")
+    List<JobSeeker> findJobSeekersRegisteredInLast30Days(@Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT COUNT(js) FROM JobSeeker js WHERE js.createdAt >= :startDate")
+    long countJobSeekersRegisteredInLast30Days(@Param("startDate") LocalDateTime startDate);
 
 }

@@ -20,14 +20,20 @@ public class Recruiter {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
-	private String fullName;
+	private String companyName;
 
 	@Column(unique = true)
 	private String email;
 
 	private long mobileNumber;
 
-	
+	@Column(name = "created_at")
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    public void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 	private String password;
 
 	@Transient
@@ -73,7 +79,7 @@ public class Recruiter {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Recruiter(Integer id, String fullName, String email, long mobileNumber, String password,
+	public Recruiter(Integer id, String companyName, String email, long mobileNumber, String password,
 			String confirmPassword, boolean isVerified, String otp, LocalDateTime otpGeneratedTime, String mobileOtp,
 			LocalDateTime mobileOtpGeneratedTime, boolean isMobileVerified, Status status,
 			CompanyProfile companyProfile, List<CompanyLocation> companyLocations, List<String> industries,
@@ -81,7 +87,7 @@ public class Recruiter {
 			Role role) {
 		super();
 		this.id = id;
-		this.fullName = fullName;
+		this.companyName=companyName;
 		this.email = email;
 		this.mobileNumber = mobileNumber;
 		this.password = password;
@@ -109,12 +115,13 @@ public class Recruiter {
 		this.id = id;
 	}
 
-	public String getFullName() {
-		return fullName;
+	
+	public String getCompanyName() {
+		return companyName;
 	}
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
 	public String getEmail() {

@@ -53,15 +53,21 @@ public class SecurityConfig {
         	                "/api/jobseekers/forgot-password",
         	                "/api/jobseekers/reset-password",
         	                "/api/jobseekers/send-mobile-otp",
+        	                "api/jobseekers/recent",
+        	                "api/jobseekers/recent/count",
         	                
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
         	                "/api/recruiters/verify-otp",
         	                
-        	               
+        	                
+        	                "/api/admin/register",
+        	                "/api/admin/login",
+        	                "api/recruiters/recent/count",
+        	                "/api/jobposts/jobposts/recent/count",
         	                
         	                "/api/auth/google-login",
-        	                
+        	                 "api/payments/total-amount",
         	                "/api/jobposts/search",
         	                "/api/jobposts/active",
         	                "/api/jobposts/active/count",
@@ -72,8 +78,12 @@ public class SecurityConfig {
         	                "/api/jobposts/close/count",
         	                
         	                "/api/payments/create-order",
-        	                "/api/payments/webhook"
+        	                "/api/payments/webhook",
         	                
+        	                "/api/jobseekers/{id}/upload-resume",//for testing 
+        	                "/api/jobseekers/getprofile/{id}",//for testing 
+        	                "/api/jobseekers/recent", //testing 
+        	                "/api/recruiters/recent"
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
              .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()

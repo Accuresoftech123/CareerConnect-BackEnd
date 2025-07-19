@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.dto.AdminLogin;
+import com.example.dto.AdminRegisterDto;
 import com.example.dto.CompanyProfileDTO;
 import com.example.dto.JobSeekerEducationDto;
 import com.example.dto.JobSeekerExperienceDto;
@@ -18,6 +20,7 @@ import com.example.dto.JobSeekerPersonalInfoDto;
 import com.example.dto.JobSeekerProfileDto;
 import com.example.dto.JobSeekerSocialProfileDto;
 import com.example.dto.RecruiterProfileDto;
+import com.example.entity.Admin;
 import com.example.entity.JobSeeker;
 import com.example.entity.Recruiter;
 import com.example.entity.profile.CompanyProfile;
@@ -26,6 +29,7 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Status;
+import com.example.repository.AdminRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
 
@@ -42,6 +46,29 @@ public class AdminService {
 	@Autowired
 	private RecruiterRepository recruiterRepository;
 
+	
+	 @Autowired
+	 private AdminRepository adminRepository;
+
+	 
+	 
+
+	    // Register admin
+	    public String register(AdminRegisterDto request) {
+	        if (adminRepository.findByEmail(request.getEmail()).isPresent()) {
+	            return "Email already registered";
+	        }
+	        Admin admin = new Admin(request.getEmail(), request.getPassword());
+	        adminRepository.save(admin);
+	        return "Admin registered successfully";
+	    }
+
+	    // Login admin
+	    public boolean login(AdminLogin request) {
+	        return adminRepository.findByEmail(request.getEmail())
+	                .map(admin -> admin.getPassword().equals(request.getPassword()))
+	                .orElse(false);
+	    }
 	/**
 	 * Returns the total number of job seekers.
 	 *
@@ -143,7 +170,7 @@ public class AdminService {
 	public Map<String, Object> getRecruitersReportWithCount() {
 		List<RecruiterProfileDto> recruiterProfiles = recruiterRepository.findAll().stream().map(r -> {
 			RecruiterProfileDto dto = new RecruiterProfileDto();
-			dto.setFullName(r.getFullName());
+			//dto.setFName(r.getFullName());
 			dto.setMobileNumber(r.getMobileNumber());
 			dto.setRecruiterEmail(r.getEmail());
 
@@ -152,7 +179,7 @@ public class AdminService {
 				CompanyProfile cp = r.getCompanyProfile();
 
 				CompanyProfileDTO companyDTO = new CompanyProfileDTO();
-				companyDTO.setCompanyName(cp.getCompanyName());
+			//	companyDTO.setCompanyName(cp.getCompanyName());
 				companyDTO.setWebsite(cp.getWebsite());
 				companyDTO.setAbout(cp.getAbout());
 				companyDTO.setCompanySize(cp.getCompanySize());

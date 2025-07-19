@@ -1,6 +1,7 @@
 package com.example.repository;
 
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,4 +38,15 @@ public interface RecruiterRepository extends JpaRepository<Recruiter, Integer> {
     
 //    @Query("SELECT a FROM Applicant a WHERE a.jobPost.recruiter.id = :recruiterId")
 //    List<Applicant> findApplicantsByRecruiterId(@Param("recruiterId") int recruiterId);
+    
+ // RecruiterRepository.java
+
+    @Query("SELECT r FROM Recruiter r WHERE r.createdAt >= :startDate ORDER BY r.createdAt DESC")
+    List<Recruiter> findRecruitersRegisteredInLast30Days(@Param("startDate") LocalDateTime startDate);
+
+    @Query("SELECT COUNT(r) FROM Recruiter r WHERE r.createdAt >= :startDate")
+    long countRecruitersRegisteredInLast30Days(@Param("startDate") LocalDateTime startDate);
+    
+    
+
 }
