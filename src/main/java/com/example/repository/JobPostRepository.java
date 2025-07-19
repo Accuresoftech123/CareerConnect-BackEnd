@@ -115,6 +115,10 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     
     @Query("SELECT COUNT(jp) FROM JobPost jp WHERE jp.postedDate >= :startDate")
     long countJobPostsFromLast30Days(@Param("startDate") LocalDate startDate);
+    
+    
+ // Count job posts by recruiter
+    long countByRecruiterId(int recruiterId);
 
 
 }

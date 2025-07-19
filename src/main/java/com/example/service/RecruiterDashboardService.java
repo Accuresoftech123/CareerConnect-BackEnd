@@ -146,6 +146,7 @@ public class RecruiterDashboardService {
         //dto.setHighestQualification(highestQualification);
         dto.setAppliedDate(applicant.getApplicationDate().toLocalDate());
         dto.setStatus(applicant.getStatus().name());
+        dto.setProfileImageUrl(jobSeeker.getPersonalInfo().getProfileImageUrl());
         
         return dto;
     }

@@ -34,6 +34,7 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
+import com.example.repository.JobSeekerPersonalInfoRepository;
 import com.example.repository.JobSeekerRepository;
 import com.itextpdf.io.exceptions.IOException;
 import com.example.security.CustomUserDetails;
@@ -49,11 +50,16 @@ public class JobSeekerService {
 	@Autowired
 	private JwtUtil jwtUtil;
 
-	@Autowired
-	private CustomUserDetailsService userDetailsService;
-
-	@Autowired
-	private PasswordEncoder passwordEncoder;
+	    @Autowired
+	    private CustomUserDetailsService userDetailsService;
+	    
+	    @Autowired
+	    private PasswordEncoder passwordEncoder;
+	    
+	    @Autowired
+	    private JobSeekerPersonalInfoRepository personalInfoRepo;
+	
+	
 
 	@Autowired
 	private JobSeekerRepository repo;
@@ -195,16 +201,25 @@ public class JobSeekerService {
 
 			JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
 
-			// check if the personalInfo is null , then create new object
-			if (personalInfo == null) {
-				personalInfo = new JobSeekerPersonalInfo();
-			}
+			 if (personalInfo == null) {
+			        // ✅ Try to fetch existing personal info from DB (if previously saved)
+			        Optional<JobSeekerPersonalInfo> optionalPersonalInfo = personalInfoRepo.findByJobSeekerId(jobSeeker.getId());
 
-			if (personalInfoDto.getCity() != null)
+			        if (optionalPersonalInfo.isPresent()) {
+			            personalInfo = optionalPersonalInfo.get(); // ✅ use DB record
+			           
+			        } else {
+			            personalInfo = new JobSeekerPersonalInfo(); // ✅ new record if not found
+			            personalInfo.setJobSeeker(jobSeeker);
+			            jobSeeker.setPersonalInfo(personalInfo);
+			        }
+			    }
+
+			if (personalInfoDto.getCity() != null && !personalInfoDto.getCity().isEmpty())
 				personalInfo.setCity(personalInfoDto.getCity());
-			if (personalInfoDto.getState() != null)
+			if (personalInfoDto.getState() != null && !personalInfoDto.getState().isEmpty())
 				personalInfo.setState(personalInfoDto.getState());
-			if (personalInfoDto.getCountry() != null)
+			if (personalInfoDto.getCountry() != null && !personalInfoDto.getCountry().isEmpty())
 				personalInfo.setCountry(personalInfoDto.getCountry());
 			try {
 				if (resumeFile != null && !resumeFile.isEmpty()) {

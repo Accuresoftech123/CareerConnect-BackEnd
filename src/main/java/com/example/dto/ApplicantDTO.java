@@ -7,6 +7,8 @@ public class ApplicantDTO {
     private Long applicationId;
     private int jobPostId;
     
+    private String profileImageUrl;
+    
     private String resumeFileName; // For file upload handling
     
     // Fields for Recruiter View
@@ -45,7 +47,8 @@ public void JobPostLocation(String jobPostLocation) {
 			String mobileNumber,String jobSeekerName,
 		String resumeFileName,  String email,  List<String> skills,
 		  LocalDate appliedDate, String status,
-		long DaysSinceApplication, String jobPostTitle, String jobPostLocation) {
+		long DaysSinceApplication, String jobPostTitle, String jobPostLocation
+		,String profileImageUrl) {
 	super();
 	this.applicationId = applicationId;
 	this.jobPostId = jobPostId;
@@ -62,6 +65,7 @@ public void JobPostLocation(String jobPostLocation) {
 	this.DaysSinceApplication = DaysSinceApplication;
 	this.jobPostTitle = jobPostTitle;
 	this.jobPostLocation = jobPostLocation;
+	this.profileImageUrl=profileImageUrl;
 }
 
 	public long getDaysSinceApplication() {
@@ -176,6 +180,16 @@ public void setDaysSinceApplication(long DaysSinceApplication) {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+	public String getProfileImageUrl() {
+		return profileImageUrl;
+	}
+
+	public void setProfileImageUrl(String profileImageUrl) {
+		this.profileImageUrl = profileImageUrl;
+	}
+	
+	
 
 	
   
