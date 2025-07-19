@@ -60,22 +60,20 @@ public class EmailService {
 
 	// OTP Generation function
 	public void generateAndSendOtp(JobSeeker jobSeeker) {
-		// Generate 6-digit OTP
-		String otp = String.valueOf(100000 + new Random().nextInt(999999));
+	    // Generate 6-digit OTP
+	    String otp = String.valueOf(new Random().nextInt(900000) + 100000);
 
-		// Set OTP and generation time
-		jobSeeker.setOtp(otp);
-		jobSeeker.setOtpGeneratedTime(LocalDateTime.now());
+	    // Set OTP and generation time
+	    jobSeeker.setOtp(otp);
+	    jobSeeker.setOtpGeneratedTime(LocalDateTime.now());
 
-		// Save to database
-		repo.save(jobSeeker);
+	    // Save to database
+	    repo.save(jobSeeker);
 
-		// Send email
-		sendOtpMail(jobSeeker.getEmail(), otp);
-		
-		
+	    // Send email
+	    sendOtpMail(jobSeeker.getEmail(), otp);
 	}
-	
+
 	
 	// generate token function
 		public String generateToken(String email) {
