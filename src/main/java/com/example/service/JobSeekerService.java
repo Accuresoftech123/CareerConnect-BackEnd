@@ -584,12 +584,15 @@ public class JobSeekerService {
 		 JobSeekerProfileDto dto = new JobSeekerProfileDto();
 		 dto.setFullName(js.getFullName());
 		 dto.setCreatedAt(js.getCreatedAt());
+		 dto.setMobileNumber(js.getMobileNumber());
 
 		 JobSeekerJonPreferencesDto preferencesDto = new JobSeekerJonPreferencesDto();
 		 if (js.getJobPrefeences() != null) {
 		 preferencesDto.setDesiredJobTitle(js.getJobPrefeences().getDesiredJobTitle());
+
 		 }
 		 dto.setJobPreferences(preferencesDto);
+		
 		 result.add(dto);
 		 } return result;
 		}
