@@ -44,6 +44,8 @@ public class RecruiterDTO {
 
 	// Additional fields from the PDF form
 	private String website; // Company website
+	
+	private LocalDateTime createdAt;
 
 	public RecruiterDTO() {
 		super();
@@ -229,6 +231,14 @@ public class RecruiterDTO {
 
 	public void setWebsite(String website) {
 		this.website = website;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
 	}
 
 }

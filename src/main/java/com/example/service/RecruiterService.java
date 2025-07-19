@@ -215,6 +215,9 @@ public class RecruiterService {
         for (Recruiter recruiter : recruiters) {
             RecruiterDTO dto = new RecruiterDTO();
             dto.setCompanyName(recruiter.getCompanyName());
+            dto.setMobileNumber(recruiter.getMobileNumber());
+            dto.setCreatedAt(recruiter.getCreatedAt());;
+            
 
             List<CompanyLocation> locations = recruiter.getCompanyLocations();
             if (locations != null && !locations.isEmpty()) {

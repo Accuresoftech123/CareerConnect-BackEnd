@@ -269,6 +269,14 @@ public class Recruiter {
 	public void setRole(Role role) {
 		this.role = role;
 	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
 	
 	
 
