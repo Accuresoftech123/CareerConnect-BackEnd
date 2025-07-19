@@ -83,7 +83,8 @@ public class SecurityConfig {
         	                "/api/jobseekers/{id}/upload-resume",//for testing 
         	                "/api/jobseekers/getprofile/{id}",//for testing 
         	                "/api/jobseekers/recent", //testing 
-        	                "/api/recruiters/recent"
+        	                "/api/recruiters/recent",  //for testing 
+        	               "/api/recruiters/profile-image/{id}"
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
              .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
