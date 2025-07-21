@@ -1,0 +1,37 @@
+# Ignore Maven or Gradle build files
+*.jar
+*.war
+*.ear
+
+# Ignore target/ and build/ directories (where build artifacts are stored)
+target/
+build/
+
+# Ignore IDE specific files
+.idea/
+.vscode/
+*.iml
+
+# Ignore OS specific files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+*.log
+
+# Ignore temporary or backup files
+*.swp
+*.swo
+*~
+*.bak
+
+# Ignore Dockerfile itself and other Docker-related files (if not needed in the image)
+Dockerfile*
+.dockerignore
+
+# Ignore files used for local configuration or caching
+/.mvn/
+/.gradle/
+
+# Ignore Spring Boot's default embedded database files if used (e.g., H2 database files)
+*.h2.db

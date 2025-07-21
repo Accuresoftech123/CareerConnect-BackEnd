@@ -32,7 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 
 @RequestMapping("/api/jobseekers")  // Use plural naming for RESTful endpoints
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 public class JobSeekerController {
 
 	@Autowired
