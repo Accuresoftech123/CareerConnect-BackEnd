@@ -13,6 +13,7 @@ import com.example.repository.JobSeekerEducationRepository;
 import com.example.repository.JobSeekerExperienceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,6 +35,7 @@ public class ResumeParsingService {
     @Autowired
     private JobSeekerExperienceRepository experienceRepository;
 
+    
     public JobSeeker parseAndSaveResume(MultipartFile file, int jobSeekerId) throws IOException {
         JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
                 .orElseThrow(() -> new RuntimeException("Job Seeker not found"));

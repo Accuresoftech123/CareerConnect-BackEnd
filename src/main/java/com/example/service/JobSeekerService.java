@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -172,7 +173,6 @@ public class JobSeekerService {
 	}
 
 	// update jobseeker profile
-
 	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto, MultipartFile resumeFile,
 			MultipartFile videoFile, MultipartFile imageFile) throws java.io.IOException {
 

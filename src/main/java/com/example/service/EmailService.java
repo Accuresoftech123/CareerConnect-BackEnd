@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,7 @@ public class EmailService {
 	}
 
 	// OTP Generation function
+	@Async
 	public void generateAndSendOtp(JobSeeker jobSeeker) {
 	    // Generate 6-digit OTP
 	    String otp = String.valueOf(new Random().nextInt(900000) + 100000);
