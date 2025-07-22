@@ -34,6 +34,8 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
+import com.example.repository.JobSeekerEducationRepository;
+import com.example.repository.JobSeekerExperienceRepository;
 import com.example.repository.JobSeekerPersonalInfoRepository;
 import com.example.repository.JobSeekerRepository;
 import com.itextpdf.io.exceptions.IOException;
@@ -58,6 +60,12 @@ public class JobSeekerService {
 	    
 	    @Autowired
 	    private JobSeekerPersonalInfoRepository personalInfoRepo;
+	    
+	    @Autowired
+	    private JobSeekerEducationRepository educationRepository;
+	    
+	    @Autowired
+	    private JobSeekerExperienceRepository experienceRepository;
 	
 	
 
@@ -186,11 +194,11 @@ public class JobSeekerService {
 
 		// update registration data
 
-		if (dto.getFullName() != null) {
+		if (dto.getFullName() != null && !dto.getFullName().isEmpty()) {
 			jobSeeker.setFullName(dto.getFullName());
 		}
 
-		if (dto.getMobileNumber() != null) {
+		if (dto.getMobileNumber() != null && !dto.getMobileNumber().isEmpty()) {
 			jobSeeker.setMobileNumber(dto.getMobileNumber());
 		}
 
@@ -258,16 +266,31 @@ public class JobSeekerService {
 
 			for (JobSeekerEducationDto num : dto.getEducationList()) {
 
-				Education education = new Education();
+				Education education;
+				
+				 if (num.getId() != 0) {
+			            // Try to fetch existing education record
+			            Optional<Education> existingEdu = educationRepository.findById(num.getId());
+
+			            if (existingEdu.isPresent()) {
+			                education = existingEdu.get();
+			            } else {
+			                // If not found, create new (optional fallback)
+			                education = new Education();
+			            }
+			        } else {
+			            // If no ID is passed, create new
+			            education = new Education();
+			        }
 
 				// create object or save each object of education
-				if (num.getDegree() != null)
+				if (num.getDegree() != null && !num.getDegree().isEmpty())
 					education.setDegree(num.getDegree());
-				if (num.getFieldOfStudy() != null)
+				if (num.getFieldOfStudy() != null && !num.getFieldOfStudy().isEmpty())
 					education.setFieldOfStudy(num.getFieldOfStudy());
-				if (num.getInstitution() != null)
+				if (num.getInstitution() != null && !num.getInstitution().isEmpty())
 					education.setInstitution(num.getInstitution());
-				if (num.getPassingYear() != null && num.getPassingYear() >= 1950) {
+				if (num.getPassingYear() != null && num.getPassingYear() >= 1950 && num.getPassingYear() != 0) {
 					education.setPassingYear(num.getPassingYear());
 				}
 				education.setJobSeeker(jobSeeker);
@@ -293,20 +316,35 @@ public class JobSeekerService {
 			for (JobSeekerExperienceDto num : dto.getExperienceList()) {
 
 				// create object of experience to access the data
-				Experience experience = new Experience();
+				 Experience experience;
 
-				if (num.getJobTitle() != null)
+			        if (num.getId() != 0) {
+			            // Try to fetch existing experience record
+			            Optional<Experience> existingExp = experienceRepository.findById(num.getId());
+
+			            if (existingExp.isPresent()) {
+			                experience = existingExp.get();
+			            } else {
+			                // If not found, create new (optional fallback)
+			                experience = new Experience();
+			            }
+			        } else {
+			            // If no ID is passed, create new
+			            experience = new Experience();
+			        }
+
+				if (num.getJobTitle() != null && !num.getJobTitle().isEmpty())
 					experience.setJobTitle(num.getJobTitle());
-				if (num.getCompanyName() != null)
+				if (num.getCompanyName() != null && !num.getCompanyName().isEmpty())
 					experience.setCompanyName(num.getCompanyName());
-				if (num.getStartDate() != null)
+				if (num.getStartDate() != null )
 					experience.setStartDate(num.getStartDate());
 				if (num.getEndDate() != null) {
 					experience.setEndDate(num.getEndDate());
 				} else {
 					experience.setEndDate(LocalDate.now());
 				}
-				if (num.getKeyResponsibilities() != null)
+				if (num.getKeyResponsibilities() != null && !num.getKeyResponsibilities().isEmpty())
 					experience.setKeyResponsibilities(num.getKeyResponsibilities());
 				experience.setJobSeeker(jobSeeker);
 
@@ -353,11 +391,11 @@ public class JobSeekerService {
 				socialProfile = new SocialProfile();
 			}
 
-			if (socialProfileDto.getLinkedinUrl() != null)
+			if (socialProfileDto.getLinkedinUrl() != null && !socialProfileDto.getLinkedinUrl().isEmpty() )
 				socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
-			if (socialProfileDto.getGithubUrl() != null)
+			if (socialProfileDto.getGithubUrl() != null && !socialProfileDto.getGithubUrl().isEmpty())
 				socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
-			if (socialProfileDto.getPortfolioWebsite() != null)
+			if (socialProfileDto.getPortfolioWebsite() != null && !socialProfileDto.getPortfolioWebsite().isEmpty())
 				socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
 			socialProfile.setJobSeeker(jobSeeker);
 
@@ -376,13 +414,13 @@ public class JobSeekerService {
 				preferences = new JobPreferences();
 			}
 
-			if (preferencesDto.getDesiredJobTitle() != null)
+			if (preferencesDto.getDesiredJobTitle() != null && !preferencesDto.getDesiredJobTitle().isEmpty())
 				preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
-			if (preferencesDto.getJobType() != null)
+			if (preferencesDto.getJobType() != null && !preferencesDto.getJobType().isEmpty())
 				preferences.setJobType(preferencesDto.getJobType());
-			if (preferencesDto.getExpectedSalary() != 0)
+			if (preferencesDto.getExpectedSalary() != 0 )
 				preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
-			if (preferencesDto.getPreferredLocation() != null)
+			if (preferencesDto.getPreferredLocation() != null && !preferencesDto.getPreferredLocation().isEmpty())
 				preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
 			preferences.setJobSeeker(jobSeeker);
 
@@ -504,6 +542,7 @@ public class JobSeekerService {
 	            .orElseThrow(() -> new RuntimeException("JobSeeker not found with id: " + id));
 
 	        JobSeekerProfileDto dto = new JobSeekerProfileDto();
+	        dto.setId(jobSeeker.getId());
 	        dto.setFullName(jobSeeker.getFullName());
 	        dto.setMobileNumber(jobSeeker.getMobileNumber());
 	        dto.setSkills(jobSeeker.getSkills());
@@ -512,6 +551,7 @@ public class JobSeekerService {
 	        JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
 	        if (personalInfo != null) {
 	            JobSeekerPersonalInfoDto personalInfoDto = new JobSeekerPersonalInfoDto();
+	            personalInfoDto.setFullName(jobSeeker.getFullName());
 	            personalInfoDto.setCity(personalInfo.getCity());
 	            personalInfoDto.setState(personalInfo.getState());
 	            personalInfoDto.setCountry(personalInfo.getCountry());
@@ -526,6 +566,7 @@ public class JobSeekerService {
 	            List<JobSeekerEducationDto> educationDtos = jobSeeker.getEducationList().stream()
 	                .map(edu -> {
 	                    JobSeekerEducationDto edto = new JobSeekerEducationDto();
+	                    edto.setId(edu.getId());
 	                    edto.setDegree(edu.getDegree());
 	                    edto.setFieldOfStudy(edu.getFieldOfStudy());
 	                    edto.setInstitution(edu.getInstitution());
@@ -540,6 +581,7 @@ public class JobSeekerService {
 	            List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
 	                .map(exp -> {
 	                    JobSeekerExperienceDto exdto = new JobSeekerExperienceDto();
+	                    exdto.setId(exp.getId());
 	                    exdto.setJobTitle(exp.getJobTitle());
 	                    exdto.setCompanyName(exp.getCompanyName());
 	                    exdto.setStartDate(exp.getStartDate());
