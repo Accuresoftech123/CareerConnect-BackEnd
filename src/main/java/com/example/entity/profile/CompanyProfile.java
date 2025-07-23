@@ -18,6 +18,8 @@ public class CompanyProfile {
     
 	private String hrName;
     private String website;
+    
+    @Column(length = 5000)
     private String about;
     private int foundingYear;
     private String companySize;
