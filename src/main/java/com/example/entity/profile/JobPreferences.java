@@ -23,7 +23,11 @@ public class JobPreferences {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 	
-	private String desiredJobTitle;
+	@ElementCollection
+	@CollectionTable(name = "job_preference_desired_titles", joinColumns = @JoinColumn(name = "job_preference_id"))
+	@Column(name = "desired_job_title")
+	private List<String> desiredJobTitle;
+
 	
 	
 	@ElementCollection
@@ -47,7 +51,7 @@ public class JobPreferences {
 	}
 
 
-	public JobPreferences(long id, String desiredJobTitle, List<String> jobType, Double expectedSalary,
+	public JobPreferences(long id, List<String> desiredJobTitle, List<String> jobType, Double expectedSalary,
 			String preferredLocation, JobSeeker jobSeeker) {
 		super();
 		this.id = id;
@@ -68,13 +72,12 @@ public class JobPreferences {
 		this.id = id;
 	}
 
-
-	public String getDesiredJobTitle() {
+	public List<String> getDesiredJobTitle() {
 		return desiredJobTitle;
 	}
 
 
-	public void setDesiredJobTitle(String desiredJobTitle) {
+	public void setDesiredJobTitle(List<String> desiredJobTitle) {
 		this.desiredJobTitle = desiredJobTitle;
 	}
 

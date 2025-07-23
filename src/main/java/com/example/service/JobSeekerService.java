@@ -456,8 +456,22 @@ public class JobSeekerService {
 				preferences = new JobPreferences();
 			}
 
-			if (preferencesDto.getDesiredJobTitle() != null && !preferencesDto.getDesiredJobTitle().isEmpty())
-				preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
+			if (preferencesDto.getDesiredJobTitle() != null && !preferencesDto.getDesiredJobTitle().isEmpty()) {
+				
+				List<String> existingDesiredJobTitle = preferences.getDesiredJobTitle();
+				
+				if(existingDesiredJobTitle == null) {
+					existingDesiredJobTitle = new ArrayList<>();
+				}
+				
+				for (String newType : preferencesDto.getDesiredJobTitle()) {
+			        if (newType != null && !existingDesiredJobTitle.contains(newType)) {
+			        	existingDesiredJobTitle.add(newType); // ✅ add only if not already present
+			        }
+			    }
+				preferences.setDesiredJobTitle(existingDesiredJobTitle);
+			}
+				
 			
 			
 			if (preferencesDto.getJobTypes() != null && !preferencesDto.getJobTypes().isEmpty()) {
@@ -535,7 +549,7 @@ public class JobSeekerService {
 			emptyFields.add("Social Profile");
 
 		if (jobSeeker.getJobPrefeences() != null && jobSeeker.getJobPrefeences().getDesiredJobTitle() != null
-				&& !jobSeeker.getJobPrefeences().getDesiredJobTitle().isBlank())
+				&& !jobSeeker.getJobPrefeences().getDesiredJobTitle().isEmpty())
 			filledFields++;
 		else
 			emptyFields.add("Job Preferences");
