@@ -47,6 +47,13 @@
 			<type>pom</type>
 		</dependency>
 		
+		<!--  performance speed -->
+		<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+
+		
 		<!-- parse resume-->
 		<dependency>
     <groupId>org.apache.pdfbox</groupId>

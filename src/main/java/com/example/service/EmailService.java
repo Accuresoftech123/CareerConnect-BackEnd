@@ -49,7 +49,7 @@ public class EmailService {
     public static final String EMAIL_NOT_FOUND = "Email not found";
     public static final String EMAIL_ALREADY_REGISTERED = "Email already registered";
 
-
+    @Async
 	public void sendOtpMail(String toEmail, String otp) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(toEmail);
@@ -144,7 +144,7 @@ public class EmailService {
 	}
 
     // ====================== Recruiter Email OTP Methods =====================
-
+	@Async
     public void sendRecruiterOtpMail(String toEmail, String otp) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(toEmail);
@@ -153,6 +153,7 @@ public class EmailService {
         mailSender.send(message);
     }
 
+    @Async
     public void generateAndSendOtp(Recruiter recruiter) {
         String otp = String.valueOf(100000 + new Random().nextInt(900000));
         recruiter.setOtp(otp);
@@ -161,6 +162,7 @@ public class EmailService {
         sendRecruiterOtpMail(recruiter.getEmail(), otp);
     }
 
+    
     public Map<String, Object> verifyRecruiterOtp(String email, String otp) {
         Optional<Recruiter> optionalRecruiter = recruiterRepository.findByEmail(email);
 
