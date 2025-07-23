@@ -145,7 +145,7 @@ public class AdminService {
 			// Job Preferences
 			if (jobSeeker.getJobPrefeences() != null) {
 				JobPreferences pref = jobSeeker.getJobPrefeences();
-				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobType(),
+				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobTypes(),
 						pref.getExpectedSalary(), pref.getPreferredLocation()));
 			}
 
