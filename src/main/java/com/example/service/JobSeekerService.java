@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -204,7 +205,29 @@ public class JobSeekerService {
 
 		// update personal info
 		JobSeekerPersonalInfoDto personalInfoDto = dto.getPersonalInfo();
+		
+		CompletableFuture<String> resumeFuture = null;
+	    CompletableFuture<String> videoFuture = null;
+	    CompletableFuture<String> imageFuture = null;
+	    
+	    if (resumeFile != null && !resumeFile.isEmpty()) {
+	        resumeFuture = cloudinaryService.uploadFileAsync(resumeFile, "jobseeker/resumes");
+	    }
 
+	    if (videoFile != null && !videoFile.isEmpty()) {
+	        videoFuture = cloudinaryService.uploadFileAsync(videoFile, "jobseeker/videos");
+	    }
+
+	    if (imageFile != null && !imageFile.isEmpty()) {
+	        imageFuture = cloudinaryService.uploadFileAsync(imageFile, "jobseeker/images");
+	    }
+
+	    CompletableFuture.allOf(
+	            resumeFuture != null ? resumeFuture : CompletableFuture.completedFuture(""),
+	            videoFuture != null ? videoFuture : CompletableFuture.completedFuture(""),
+	            imageFuture != null ? imageFuture : CompletableFuture.completedFuture("")
+	    ).join(); 
+	    
 		if (personalInfoDto != null) {
 
 			JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
@@ -230,20 +253,39 @@ public class JobSeekerService {
 			if (personalInfoDto.getCountry() != null && !personalInfoDto.getCountry().isEmpty())
 				personalInfo.setCountry(personalInfoDto.getCountry());
 			try {
-				if (resumeFile != null && !resumeFile.isEmpty()) {
-					String resumeUrl = cloudinaryService.uploadFile(resumeFile, "jobseeker/resumes");
-					personalInfo.setResumeUrl(resumeUrl);
-				}
-
-				if (videoFile != null && !videoFile.isEmpty()) {
-					String videoUrl = cloudinaryService.uploadFile(videoFile, "jobseeker/videos");
-					personalInfo.setIntroVideoUrl(videoUrl);
-				}
-
-				if (imageFile != null && !imageFile.isEmpty()) {
-					String imageUrl = cloudinaryService.uploadFile(imageFile, "jobseeker/images");
-					personalInfo.setProfileImageUrl(imageUrl);
-				}
+				if (resumeFuture != null) {
+		            try {
+						personalInfo.setResumeUrl(resumeFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		        if (videoFuture != null) {
+		            try {
+						personalInfo.setIntroVideoUrl(videoFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		        if (imageFuture != null) {
+		            try {
+						personalInfo.setProfileImageUrl(imageFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
 			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body("File upload failed: " + e.getMessage());

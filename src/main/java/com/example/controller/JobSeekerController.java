@@ -13,6 +13,8 @@ import com.example.service.mobileOtpService;
 
 import com.itextpdf.io.exceptions.IOException;
 
+import io.micrometer.core.annotation.Timed;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -119,6 +121,7 @@ public class JobSeekerController {
 	 * @return Success message
 	 * @throws java.io.IOException 
 	 */
+	//@Timed(value = "jobseeker.profile.update", description = "Time to update job seeker profile", histogram = true)
 	@PutMapping("/{id}/profile")
 	public ResponseEntity<?> updateJobSeekerProfile(
 	        @PathVariable Integer id,
