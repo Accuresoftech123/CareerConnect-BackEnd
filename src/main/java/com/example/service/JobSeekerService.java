@@ -416,8 +416,25 @@ public class JobSeekerService {
 
 			if (preferencesDto.getDesiredJobTitle() != null && !preferencesDto.getDesiredJobTitle().isEmpty())
 				preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
-			if (preferencesDto.getJobType() != null && !preferencesDto.getJobType().isEmpty())
-				preferences.setJobType(preferencesDto.getJobType());
+			
+			
+			if (preferencesDto.getJobTypes() != null && !preferencesDto.getJobTypes().isEmpty()) {
+				 List<String> existingJobTypes = preferences.getJobTypes();
+		    
+		    if (existingJobTypes == null) {
+		        existingJobTypes = new ArrayList<>();
+		    }
+
+		    for (String newType : preferencesDto.getJobTypes()) {
+		        if (newType != null && !existingJobTypes.contains(newType)) {
+		            existingJobTypes.add(newType); // ✅ add only if not already present
+		        }
+		    }
+
+		    preferences.setJobTypes(existingJobTypes);
+			}
+			
+			
 			if (preferencesDto.getExpectedSalary() != 0 )
 				preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
 			if (preferencesDto.getPreferredLocation() != null && !preferencesDto.getPreferredLocation().isEmpty())
@@ -608,7 +625,7 @@ public class JobSeekerService {
 	            JobSeekerJonPreferencesDto prefDto = new JobSeekerJonPreferencesDto();
 	            prefDto.setDesiredJobTitle(prefs.getDesiredJobTitle());
 	            prefDto.setExpectedSalary(prefs.getExpectedSalary());
-	            prefDto.setJobType(prefs.getJobType());
+	            prefDto.setJobTypes(prefs.getJobTypes());
 	            prefDto.setPreferredLocation(prefs.getPreferredLocation());
 	            dto.setJobPreferences(prefDto);
 	        }

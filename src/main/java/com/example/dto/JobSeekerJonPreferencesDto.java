@@ -1,20 +1,22 @@
 package com.example.dto;
 
+import java.util.List;
+
 public class JobSeekerJonPreferencesDto {
 
 	private String desiredJobTitle;
-	private String jobType;
+	private List<String> jobTypes; 
 	private Double expectedSalary;
 	private String preferredLocation;
 	public JobSeekerJonPreferencesDto() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public JobSeekerJonPreferencesDto(String desiredJobTitle, String jobType, Double expectedSalary,
+	public JobSeekerJonPreferencesDto(String desiredJobTitle, List<String> jobTypes, Double expectedSalary,
 			String preferredLocation) {
 		super();
 		this.desiredJobTitle = desiredJobTitle;
-		this.jobType = jobType;
+		this.jobTypes = jobTypes;
 		this.expectedSalary = expectedSalary;
 		this.preferredLocation = preferredLocation;
 	}
@@ -24,11 +26,13 @@ public class JobSeekerJonPreferencesDto {
 	public void setDesiredJobTitle(String desiredJobTitle) {
 		this.desiredJobTitle = desiredJobTitle;
 	}
-	public String getJobType() {
-		return jobType;
+	
+	
+	public List<String> getJobTypes() {
+		return jobTypes;
 	}
-	public void setJobType(String jobType) {
-		this.jobType = jobType;
+	public void setJobTypes(List<String> jobTypes) {
+		this.jobTypes = jobTypes;
 	}
 	public Double getExpectedSalary() {
 		return expectedSalary;

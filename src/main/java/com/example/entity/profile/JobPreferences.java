@@ -2,9 +2,14 @@ package com.example.entity.profile;
 
 
 
+import java.util.List;
+
 import com.example.entity.JobSeeker;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -19,7 +24,13 @@ public class JobPreferences {
 	private long id;
 	
 	private String desiredJobTitle;
-	private String jobType;
+	
+	
+	@ElementCollection
+	@CollectionTable(name = "job_preference_job_types", joinColumns = @JoinColumn(name = "job_preference_id"))
+	@Column(name = "job_type")
+	private List<String> jobTypes;
+
 	private Double expectedSalary;
 	private String preferredLocation;
 	
@@ -36,12 +47,12 @@ public class JobPreferences {
 	}
 
 
-	public JobPreferences(long id, String desiredJobTitle, String jobType, Double expectedSalary,
+	public JobPreferences(long id, String desiredJobTitle, List<String> jobType, Double expectedSalary,
 			String preferredLocation, JobSeeker jobSeeker) {
 		super();
 		this.id = id;
 		this.desiredJobTitle = desiredJobTitle;
-		this.jobType = jobType;
+		this.jobTypes = jobType;
 		this.expectedSalary = expectedSalary;
 		this.preferredLocation = preferredLocation;
 		this.jobSeeker = jobSeeker;
@@ -68,13 +79,13 @@ public class JobPreferences {
 	}
 
 
-	public String getJobType() {
-		return jobType;
+	public List<String> getJobTypes() {
+		return jobTypes;
 	}
 
 
-	public void setJobType(String jobType) {
-		this.jobType = jobType;
+	public void setJobTypes(List<String> jobTypes) {
+		this.jobTypes = jobTypes;
 	}
 
 
