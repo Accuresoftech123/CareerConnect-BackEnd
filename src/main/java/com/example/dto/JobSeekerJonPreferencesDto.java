@@ -4,7 +4,7 @@ import java.util.List;
 
 public class JobSeekerJonPreferencesDto {
 
-	private String desiredJobTitle;
+	private List<String> desiredJobTitle;
 	private List<String> jobTypes; 
 	private Double expectedSalary;
 	private String preferredLocation;
@@ -12,7 +12,7 @@ public class JobSeekerJonPreferencesDto {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	public JobSeekerJonPreferencesDto(String desiredJobTitle, List<String> jobTypes, Double expectedSalary,
+	public JobSeekerJonPreferencesDto(List<String> desiredJobTitle, List<String> jobTypes, Double expectedSalary,
 			String preferredLocation) {
 		super();
 		this.desiredJobTitle = desiredJobTitle;
@@ -20,13 +20,15 @@ public class JobSeekerJonPreferencesDto {
 		this.expectedSalary = expectedSalary;
 		this.preferredLocation = preferredLocation;
 	}
-	public String getDesiredJobTitle() {
+	
+	
+	
+	public List<String> getDesiredJobTitle() {
 		return desiredJobTitle;
 	}
-	public void setDesiredJobTitle(String desiredJobTitle) {
+	public void setDesiredJobTitle(List<String> desiredJobTitle) {
 		this.desiredJobTitle = desiredJobTitle;
 	}
-	
 	
 	public List<String> getJobTypes() {
 		return jobTypes;
