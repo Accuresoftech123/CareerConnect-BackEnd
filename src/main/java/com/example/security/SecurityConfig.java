@@ -119,6 +119,8 @@ public class SecurityConfig {
                      "/api/applications/*/shortlist" ,              // recruiter: shortlist applicant
                      "/api/jobposts/applicants/*/shortlist"
             		 ).hasRole("RECRUITER")
+          // ✅ === ADMIN-ONLY PROTECTED ENDPOINTS ===
+             .requestMatchers("/api/admin/**").hasRole("ADMIN")
              .anyRequest().authenticated()
          )
          .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // ✅ Disable session for JWT

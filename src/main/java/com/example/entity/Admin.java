@@ -1,6 +1,10 @@
 package com.example.entity;
 
+import com.example.enums.Role;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -16,15 +20,21 @@ public class Admin {
 
 	    private String email;
 	    private String password;
+	    
+	    // role of user
+		@Enumerated(EnumType.STRING)
+		private Role role;
+	    
 		public Admin() {
 			super();
 			// TODO Auto-generated constructor stub
 		}
-		public Admin(int id, String email, String password) {
+		public Admin(int id, String email, String password ,Role role) {
 			super();
 			this.id = id;
 			this.email = email;
 			this.password = password;
+			this.role = role;
 		}
 		
 		 public Admin(String email, String password) {
@@ -49,6 +59,14 @@ public class Admin {
 		public void setPassword(String password) {
 			this.password = password;
 		}
+		public Role getRole() {
+			return role;
+		}
+		public void setRole(Role role) {
+			this.role = role;
+		}
+		
+		
 	    
 	    
 }

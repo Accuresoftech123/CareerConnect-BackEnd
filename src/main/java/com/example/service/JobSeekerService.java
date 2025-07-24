@@ -43,6 +43,7 @@ import com.example.repository.JobSeekerRepository;
 import com.itextpdf.io.exceptions.IOException;
 import com.example.security.CustomUserDetails;
 import com.example.security.CustomUserDetailsService;
+import com.example.security.JobSeekerUserDetailsService;
 import com.example.security.JwtUtil;
 
 /**
@@ -55,7 +56,7 @@ public class JobSeekerService {
 	private JwtUtil jwtUtil;
 
 	    @Autowired
-	    private CustomUserDetailsService userDetailsService;
+	    private JobSeekerUserDetailsService jobSeekerUserDetailsService;
 	    
 	    @Autowired
 	    private PasswordEncoder passwordEncoder;
@@ -166,7 +167,7 @@ public class JobSeekerService {
 
 		// ✅ Load user details for JWT
 
-		UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+		UserDetails userDetails = jobSeekerUserDetailsService.loadUserByUsername(email);
 		CustomUserDetails customUser = (CustomUserDetails) userDetails;
 
 		// Generate JWT token with role

@@ -23,7 +23,9 @@ import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
 import com.example.security.CustomUserDetails;
 import com.example.security.CustomUserDetailsService;
+import com.example.security.JobSeekerUserDetailsService;
 import com.example.security.JwtUtil;
+import com.example.security.RecruiterUserDetailsService;
 
 @Service
 public class EmailService {
@@ -36,6 +38,13 @@ public class EmailService {
 	
 	    @Autowired
 	    private JwtUtil jwtUtil;
+
+	    @Autowired
+	    private JobSeekerUserDetailsService jobSeekerUserDetailsService;
+	    
+	    @Autowired
+	    private RecruiterUserDetailsService recruiterUserDetailsService;
+	    
 
 	    @Autowired
 	    private CustomUserDetailsService userDetailsService;
@@ -112,7 +121,13 @@ public class EmailService {
             repo.save(jobSeeker);
             
             //call the generate token function 
-            String token = generateToken(email);
+         // ✅ Load user details for JWT
+
+    		UserDetails userDetails = jobSeekerUserDetailsService.loadUserByUsername(email);
+    		CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+    		// Generate JWT token with role
+    		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
             
             return Map.of(
                     "success", true,
@@ -186,7 +201,15 @@ public class EmailService {
             recruiterRepository.save(recruiter);
             
             //call the generate token function 
-            String token = generateToken(email);
+            //String token = generateToken(email);
+            
+         // ✅ Load user details for JWT
+
+    		UserDetails userDetails = recruiterUserDetailsService.loadUserByUsername(email);
+    		CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+    		// Generate JWT token with role
+    		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
             
             return Map.of(
                     "success", true,

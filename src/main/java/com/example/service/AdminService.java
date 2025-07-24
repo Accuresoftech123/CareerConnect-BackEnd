@@ -7,6 +7,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,10 +33,14 @@ import com.example.entity.profile.Education;
 import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
+import com.example.enums.Role;
 import com.example.enums.Status;
 import com.example.repository.AdminRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
+import com.example.security.AdminUserDetailsService;
+import com.example.security.CustomUserDetails;
+import com.example.security.JwtUtil;
 
 /**
  * Service class to handle admin-level operations such as retrieving counts and
@@ -49,26 +58,80 @@ public class AdminService {
 	
 	 @Autowired
 	 private AdminRepository adminRepository;
+	 
+	 @Autowired
+	    private PasswordEncoder passwordEncoder;
+	 @Autowired
+	 private AdminUserDetailsService adminUserDetailsService;
 
 	 
 	 
 
-	    // Register admin
-	    public String register(AdminRegisterDto request) {
-	        if (adminRepository.findByEmail(request.getEmail()).isPresent()) {
-	            return "Email already registered";
-	        }
-	        Admin admin = new Admin(request.getEmail(), request.getPassword());
-	        adminRepository.save(admin);
-	        return "Admin registered successfully";
-	    }
+	// Service method to register admin
+	 public String register(AdminRegisterDto request) {
+	     // Check if email already exists
+	     if (adminRepository.findByEmail(request.getEmail()).isPresent()) {
+	         return "Email already registered";
+	     }
 
-	    // Login admin
-	    public boolean login(AdminLogin request) {
-	        return adminRepository.findByEmail(request.getEmail())
-	                .map(admin -> admin.getPassword().equals(request.getPassword()))
-	                .orElse(false);
-	    }
+	     // Encode password before saving
+	     String encodedPassword = passwordEncoder.encode(request.getPassword());
+
+	     // Create Admin entity (make sure constructor exists or use setters)
+	     Admin admin = new Admin();
+	     admin.setEmail(request.getEmail());
+	     admin.setPassword(encodedPassword);
+	     admin.setRole(Role.ROLE_ADMIN);
+
+	     // Save to repository
+	     adminRepository.save(admin);
+
+	     return "Admin registered successfully";
+	 }
+
+	 
+
+	
+
+	 @Autowired
+	 private JwtUtil jwtUtil;
+
+	 public ResponseEntity<?> login(AdminLogin request) {
+	     // 1. Validate input
+	     if (request.getEmail() == null || request.getPassword() == null ||
+	         request.getEmail().isBlank() || request.getPassword().isBlank()) {
+	         return ResponseEntity.badRequest().body("Email and password must be provided");
+	     }
+
+	     // 2. Find Admin by email
+	     Admin admin = adminRepository.findByEmail(request.getEmail())
+	             .orElseThrow(() -> new UsernameNotFoundException("Admin not found with email"));
+
+	     // 3. Verify password using encoded hash
+	     if (!passwordEncoder.matches(request.getPassword(), admin.getPassword())) {
+	         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+	     }
+
+	     
+	     // token generate
+	        // ✅ Load user details for JWT
+
+			UserDetails userDetails = adminUserDetailsService.loadUserByUsername(request.getEmail());
+			CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+			// Generate JWT token with role
+			String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+	     
+
+	     // 5. Build response
+	     Map<String, Object> response = new HashMap<>();
+	     response.put("token", token);
+	     response.put("role", admin.getRole().name());
+	     response.put("id", admin.getId());
+
+	     return ResponseEntity.ok(response);
+	 }
+
 	/**
 	 * Returns the total number of job seekers.
 	 *

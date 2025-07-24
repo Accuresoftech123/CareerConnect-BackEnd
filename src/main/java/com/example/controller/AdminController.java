@@ -44,13 +44,11 @@ public class AdminController {
 	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
 	    }
 
+	// ✅ Admin Login Endpoint
 	    @PostMapping("/login")
-	    public ResponseEntity<String> login(@RequestBody AdminLogin request) {
-	        boolean isValid = adminService.login(request);
-	        if (isValid) {
-	            return ResponseEntity.ok("Login successful");
-	        }
-	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
+	    public ResponseEntity<?> login(@RequestBody AdminLogin request) {
+	        // Delegate to service method that returns ResponseEntity
+	        return adminService.login(request);
 	    }
 	/**
 	 * Returns the total number of job seekers.

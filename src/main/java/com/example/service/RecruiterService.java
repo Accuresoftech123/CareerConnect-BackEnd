@@ -36,6 +36,7 @@ import com.example.repository.RecruiterRepository;
 import com.example.security.CustomUserDetails;
 import com.example.security.CustomUserDetailsService;
 import com.example.security.JwtUtil;
+import com.example.security.RecruiterUserDetailsService;
 
 import jakarta.transaction.Transactional;
 
@@ -56,6 +57,9 @@ public class RecruiterService {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private RecruiterUserDetailsService recruiterUserDetailsService;
 
     
     
@@ -146,12 +150,12 @@ public class RecruiterService {
         }
            
         // ✅ Load user details for JWT
-		
-		 UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-		 CustomUserDetails customUser = (CustomUserDetails) userDetails;
-		 
-		  // Generate JWT token with role
-	      String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+
+		UserDetails userDetails = recruiterUserDetailsService.loadUserByUsername(email);
+		CustomUserDetails customUser = (CustomUserDetails) userDetails;
+
+		// Generate JWT token with role
+		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
 
 
 	      // Prepare response
