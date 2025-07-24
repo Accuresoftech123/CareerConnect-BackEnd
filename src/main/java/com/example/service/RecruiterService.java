@@ -31,6 +31,7 @@ import com.example.enums.ApplicationStatus;
 import com.example.enums.Role;
 import com.example.enums.Status;
 import com.example.exception.RecruiterNotFoundException;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.ApplicantRepository;
 import com.example.repository.RecruiterRepository;
 import com.example.security.CustomUserDetails;
@@ -81,7 +82,7 @@ public class RecruiterService {
             
             if (!existingRecruiter.isVerified()) {
                 // Re-send OTP to the unverified recruiter
-                emailService.generateAndSendOtp(existingRecruiter);
+                emailService.generateAndSendOtpToRecruiter(existingRecruiter);
 
                 return ResponseEntity.status(HttpStatus.OK).body(Map.of(
                     "success", true,
@@ -113,7 +114,7 @@ public class RecruiterService {
 	//	recruiterRepository.save(recruiter);
 
         Recruiter savedRecruiter = recruiterRepository.save(recruiter);
-        emailService.generateAndSendOtp(savedRecruiter);
+        emailService.generateAndSendOtpToRecruiter(savedRecruiter);
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "OTP sent. Please verify your account.");
@@ -253,7 +254,17 @@ public class RecruiterService {
         return dto;
     }
 
+//Set Password
+    public void SetPassword(String email, String newPassword) {
+    	Recruiter recruiter =recruiterRepository.findByEmail(email)
+    			.orElseThrow(()-> new UserNotFoundException("Recruiter not found. Please Resister with email!.."));
+    	  recruiter.setPassword(passwordEncoder.encode(newPassword));
+    	    recruiter.setOtp(null); // Invalidate OTP
+    	    recruiter.setOtpGeneratedTime(null);
+    	    recruiterRepository.save(recruiter);
 
-   
+    }
+    
+
 
 }

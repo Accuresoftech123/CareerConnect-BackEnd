@@ -1,14 +1,18 @@
 package com.example.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.dto.AdminLogin;
 import com.example.dto.AdminRegisterDto;
@@ -29,6 +33,7 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Status;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.AdminRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
@@ -51,24 +56,32 @@ public class AdminService {
 	 private AdminRepository adminRepository;
 
 	 
-	 
+	 @Autowired
+	 private EmailService emailService;
+	  @Autowired
+	    private PasswordEncoder passwordEncoder;
+	  
+	  
 
-	    // Register admin
-	    public String register(AdminRegisterDto request) {
-	        if (adminRepository.findByEmail(request.getEmail()).isPresent()) {
-	            return "Email already registered";
-	        }
-	        Admin admin = new Admin(request.getEmail(), request.getPassword());
-	        adminRepository.save(admin);
-	        return "Admin registered successfully";
-	    }
+	public String register(AdminRegisterDto request) {
+		    if (adminRepository.findByEmail(request.getEmail()).isPresent()) {
+		        return "Email already registered";
+		    }
+
+		    String encodedPassword = passwordEncoder.encode(request.getPassword());
+		    Admin admin = new Admin(request.getEmail(), encodedPassword);
+		    adminRepository.save(admin);
+
+		    return "Admin registered successfully";
+		}
+
 
 	    // Login admin
 	    public boolean login(AdminLogin request) {
-	        return adminRepository.findByEmail(request.getEmail())
-	                .map(admin -> admin.getPassword().equals(request.getPassword()))
-	                .orElse(false);
-	    }
+	    	 return adminRepository.findByEmail(request.getEmail())
+	    		        .map(admin -> passwordEncoder.matches(request.getPassword(), admin.getPassword()))
+	    		        .orElse(false);
+	    		}
 	/**
 	 * Returns the total number of job seekers.
 	 *
@@ -255,5 +268,16 @@ public class AdminService {
 
 	public void deleteRecruiterById(int id) {
 		recruiterRepository.deleteById(id);
+	}
+	//Forget password
+	
+	public void resetAdminPassword( String email, String newPassword) {
+	    Admin admin = adminRepository.findByEmail(email)
+	        .orElseThrow(() -> new UserNotFoundException("Admin not registered. Please register first."));
+
+	    admin.setPassword(passwordEncoder.encode(newPassword));
+	    admin.setOtp(null); // Invalidate OTP
+	    admin.setOtpGeneratedTime(null);
+	    adminRepository.save(admin);
 	}
 }

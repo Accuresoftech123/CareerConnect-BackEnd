@@ -99,16 +99,16 @@ public interface JobPostRepository extends JpaRepository<JobPost, Integer> {
     	    @Param("experience") Integer experience);
 
     @Query("SELECT COUNT(j) FROM JobPost j " +
-    	       "WHERE j.postedDate = :today " +
-    	       "AND ( j.location = :location " +
-    	       "OR :experience BETWEEN j.minExperience AND j.maxExperience ) " +
-    	       "OR EXISTS (SELECT s FROM j.skills s WHERE s IN :skills)")
+    	       "WHERE j.postedDate = :today AND " +
+    	       "(j.location = :location OR " +
+    	       ":experience BETWEEN j.minExperience AND j.maxExperience OR " +
+    	       "EXISTS (SELECT s FROM j.skills s WHERE s IN :skills))")
     	Long countTodayMatches(
     	    @Param("today") LocalDate today,
     	    @Param("location") String location,
     	    @Param("skills") List<String> skills,
     	    @Param("experience") Integer experience);
-    
+
     //For Fetch Job Post by posted date
     List<JobPost> findAllByOrderByPostedDateDesc();
     
