@@ -8,6 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -21,6 +22,15 @@ import jakarta.servlet.http.HttpServletResponse;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	  @Autowired
 	    private CustomUserDetailsService customUserDetailsService;
+	  
+	  @Autowired
+	 private RecruiterUserDetailsService recruiterUserDetailsService;
+	  
+	  @Autowired
+	  private JobSeekerUserDetailsService jobSeekerUserDetailsService;
+	  
+	  @Autowired
+	 private AdminUserDetailsService adminUserDetailsService;
 
 	    @Autowired
 	    private JwtUtil jwtUtil;
@@ -57,12 +67,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	        }
 
 	        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-	            UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+	         //   UserDetails userDetails = customUserDetailsService.loadUserByUsername(username);
+	        	
+	        	UserDetails userDetails;
+	        	
+	        	 String rawRole = jwtUtil.extractRole(token);
+	        	 
+	        	 switch (rawRole) {
+	             case "ADMIN":
+	                 userDetails = adminUserDetailsService.loadUserByUsername(username);
+	                 break;
+	             case "RECRUITER":
+	                 userDetails = recruiterUserDetailsService.loadUserByUsername(username);
+	                 break;
+	             case "JOBSEEKER":
+	                 userDetails = jobSeekerUserDetailsService.loadUserByUsername(username);
+	                 break;
+	             default:
+	                 throw new UsernameNotFoundException("Invalid role in token: " + rawRole);
+	         }
 
 	            if (jwtUtil.validateToken(token, userDetails)) {
 	            	
 	            	// ✅ Extract role from token and format correctly
-	                String rawRole = jwtUtil.extractRole(token); // e.g., "RECRUITER"
+	               // String rawRole = jwtUtil.extractRole(token); // e.g., "RECRUITER"
 	                String authority = "ROLE_" + rawRole;        // Spring expects ROLE_RECRUITER
 
 	                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(authority));

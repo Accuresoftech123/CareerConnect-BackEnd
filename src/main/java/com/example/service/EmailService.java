@@ -28,7 +28,9 @@ import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
 import com.example.security.CustomUserDetails;
 import com.example.security.CustomUserDetailsService;
+import com.example.security.JobSeekerUserDetailsService;
 import com.example.security.JwtUtil;
+import com.example.security.RecruiterUserDetailsService;
 
 @Service
 public class EmailService {
@@ -38,9 +40,16 @@ public class EmailService {
 	private JobSeekerRepository repo;
 	@Autowired
 	private RecruiterRepository recruiterRepository;
+	
+	    @Autowired
+	    private JwtUtil jwtUtil;
 
-	@Autowired
-	private JwtUtil jwtUtil;
+	    @Autowired
+	    private JobSeekerUserDetailsService jobSeekerUserDetailsService;
+	    
+	    @Autowired
+	    private RecruiterUserDetailsService recruiterUserDetailsService;
+	    
 
 	@Autowired
 	private CustomUserDetailsService userDetailsService;
@@ -110,21 +119,33 @@ public class EmailService {
 			return Map.of("success", false, "message", "OTP expired");
 		}
 
-		if (otp.equals(jobSeeker.getOtp())) {
-			jobSeeker.setVerified(true);
-			jobSeeker.setOtp(null);
-			jobSeeker.setOtpGeneratedTime(null);
-			repo.save(jobSeeker);
+        if (otp.equals(jobSeeker.getOtp())) {
+            jobSeeker.setVerified(true);
+            jobSeeker.setOtp(null);
+            jobSeeker.setOtpGeneratedTime(null);
+            repo.save(jobSeeker);
+            
+            //call the generate token function 
+         // ✅ Load user details for JWT
 
-			// call the generate token function
-			String token = generateToken(email);
+    		UserDetails userDetails = jobSeekerUserDetailsService.loadUserByUsername(email);
+    		CustomUserDetails customUser = (CustomUserDetails) userDetails;
 
-			return Map.of("success", true, "message", "OTP verified successfully", "token", token, "role",
-					jobSeeker.getRole().name(), "id", jobSeeker.getId());
-
-		} else {
-			return Map.of("success", false, "message", "Invalid OTP");
-		}
+    		// Generate JWT token with role
+    		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+            
+            return Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully",
+                    "token", token,
+                    "role", jobSeeker.getRole().name(),
+                    "id", jobSeeker.getId()
+                );
+            
+            
+        } else {
+        	return Map.of("success", false, "message", "Invalid OTP");
+        }
 	}
 
 	// Resend Otp
@@ -175,22 +196,37 @@ public class EmailService {
 			return Map.of("success", false, "message", "OTP expired");
 		}
 
-		if (otp.equals(recruiter.getOtp())) {
-			recruiter.setVerified(true);
-			recruiter.setOtp(null);
-			recruiter.setOtpGeneratedTime(null);
-			recruiterRepository.save(recruiter);
+        if (otp.equals(recruiter.getOtp())) {
+            recruiter.setVerified(true);
+            recruiter.setOtp(null);
+            recruiter.setOtpGeneratedTime(null);
+            recruiterRepository.save(recruiter);
+            
+            //call the generate token function 
+            //String token = generateToken(email);
+            
+         // ✅ Load user details for JWT
 
-			// call the generate token function
-			String token = generateToken(email);
+    		UserDetails userDetails = recruiterUserDetailsService.loadUserByUsername(email);
+    		CustomUserDetails customUser = (CustomUserDetails) userDetails;
 
-			return Map.of("success", true, "message", "OTP verified successfully", "token", token, "role",
-					recruiter.getRole().name(), "id", recruiter.getId());
+    		// Generate JWT token with role
+    		String token = jwtUtil.generateToken(customUser.getUsername(), customUser.getRole().name());
+            
+            return Map.of(
+                    "success", true,
+                    "message", "OTP verified successfully",
+                    "token", token,
+                    "role", recruiter.getRole().name(),
+                    "id", recruiter.getId()
+                );
+            
+            
+        } else {
+        	return Map.of("success", false, "message", "Invalid OTP");
+        }
+    }
 
-		} else {
-			return Map.of("success", false, "message", "Invalid OTP");
-		}
-	}
 
 	public String resendRecruiterOtp(String email) {
 		Optional<Recruiter> recruiterOpt = recruiterRepository.findByEmail(email);

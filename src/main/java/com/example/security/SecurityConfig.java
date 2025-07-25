@@ -54,8 +54,8 @@ public class SecurityConfig {
         	              
         	                "/api/jobseekers/Set-password/**",
         	                "/api/jobseekers/send-mobile-otp",
-        	                "api/jobseekers/recent",
-        	                "api/jobseekers/recent/count",
+        	                //"api/jobseekers/recent",
+        	                //"api/jobseekers/recent/count",
         	                
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
@@ -65,13 +65,18 @@ public class SecurityConfig {
         	                
         	                "/api/admin/register",
         	                "/api/admin/login",
-        	                "api/recruiters/recent/count",
-        	                "/api/jobposts/jobposts/recent/count",
-        	                "/api/admin/send-otp/{email}",
+        	                "/api/admin/jobseekers/count",
+        	                "/api/admin/recruiters/count",
+        	                "/api/admin/jobseekers/report",
+        	                //"/api/admin/jobposts/recent/count",
+        	                //"/api/admin/jobseeker/recent",
+        	                //"/api/admin/jobseeker/recent/count",
+        	                //"/api/admin/recruiter/recent",
+        	                //"api/admin/recruiter/recent/count",
+        	                  "/api/admin/send-otp/{email}",
         	                "/api/admin/verify-otp/{email}/{otp}",
         	                "/api/admin/Set-password/{adminId}/{newPassword}",
-        	                
-        	                
+
         	                "/api/auth/google-login",
         	                 "api/payments/total-amount",
         	                "/api/jobposts/search",
@@ -88,8 +93,8 @@ public class SecurityConfig {
         	                
         	                "/api/jobseekers/{id}/upload-resume",//for testing 
         	                "/api/jobseekers/getprofile/{id}",//for testing 
-        	                "/api/jobseekers/recent", //testing 
-        	                "/api/recruiters/recent",  //for testing 
+        	                //"/api/jobseekers/recent", //testing 
+        	                //"/api/recruiters/recent",  //for testing 
         	               "/api/recruiters/profile-image/{id}"
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
@@ -125,6 +130,8 @@ public class SecurityConfig {
                      "/api/applications/*/shortlist" ,              // recruiter: shortlist applicant
                      "/api/jobposts/applicants/*/shortlist"
             		 ).hasRole("RECRUITER")
+          // ✅ === ADMIN-ONLY PROTECTED ENDPOINTS ===
+             .requestMatchers("/api/admin/**").hasRole("ADMIN")
              .anyRequest().authenticated()
          )
          .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // ✅ Disable session for JWT
