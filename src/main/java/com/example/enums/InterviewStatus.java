@@ -5,5 +5,6 @@ public enum InterviewStatus {
  SCHEDULED,
  COMPLETED,
  CANCELLED,
- RESCHEDULED
+ RESCHEDULED,
+ PENDING
 }
