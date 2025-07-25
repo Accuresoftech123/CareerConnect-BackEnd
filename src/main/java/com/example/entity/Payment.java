@@ -4,7 +4,12 @@ import java.time.LocalDateTime;
 
 import org.hibernate.annotations.CreationTimestamp;
 
+import com.example.enums.PaymentStatus;
+import com.example.enums.SubscriptionPlan;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -23,7 +28,8 @@ public class Payment {
 	private double amount;
 	private String currency;
 	private String receipt;
-	private String status;
+	@Enumerated(EnumType.STRING)
+	private PaymentStatus status;
 	  @ManyToOne
 	    @JoinColumn(name = "job_seeker_id")
 	    private JobSeeker jobSeeker;
@@ -35,10 +41,13 @@ public class Payment {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+	
+	@Enumerated(EnumType.STRING)
+	private SubscriptionPlan plan;
 
 
 
-	public Payment(Long id, String paymentId, double amount, String currency, String receipt, String status,
+	public Payment(Long id, String paymentId, double amount, String currency, String receipt, PaymentStatus status,
 			JobSeeker jobSeeker, LocalDateTime createdAt) {
 		super();
 		this.id = id;
@@ -83,12 +92,7 @@ public class Payment {
 	public void setReceipt(String receipt) {
 		this.receipt = receipt;
 	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
-	}
+	
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
 	}
@@ -107,6 +111,32 @@ public class Payment {
 	public void setJobSeeker(JobSeeker jobSeeker) {
 		this.jobSeeker = jobSeeker;
 	}
+
+
+
+	public SubscriptionPlan getPlan() {
+		return plan;
+	}
+
+
+
+	public void setPlan(SubscriptionPlan plan) {
+		this.plan = plan;
+	}
+
+
+
+	public PaymentStatus getStatus() {
+		return status;
+	}
+
+
+
+	public void setStatus(PaymentStatus status) {
+		this.status = status;
+	}
+	
+	
 
 
 	
