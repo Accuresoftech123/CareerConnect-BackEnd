@@ -2,8 +2,13 @@ package com.example.controller;
 
 import com.example.dto.AdminLogin;
 import com.example.dto.AdminRegisterDto;
+import com.example.dto.JobSeekerProfileDto;
+import com.example.dto.RecruiterDTO;
 import com.example.enums.Status;
 import com.example.service.AdminService;
+import com.example.service.JobPostService;
+import com.example.service.JobSeekerService;
+import com.example.service.RecruiterService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -33,6 +39,15 @@ public class AdminController {
 
 	@Autowired
 	private AdminService adminService;
+	
+	@Autowired
+	private JobSeekerService jobSeekerService;
+	
+	@Autowired
+	private RecruiterService recruiterService;
+	
+	@Autowired
+    private JobPostService jobPostService;
 
 	
 	 @PostMapping("/register")
@@ -114,5 +129,38 @@ public class AdminController {
 		}
 
 	}
+	
+	
+	 //  GET list of job seekers registered in the last 30 days
+    @GetMapping("/jobseeker/recent")
+    public ResponseEntity<List<JobSeekerProfileDto>> getRecentJobSeekerSummaries() {
+        List<JobSeekerProfileDto> recentJobSeekers = jobSeekerService.getRecentJobSeekerSummaries();
+        return new ResponseEntity<>(recentJobSeekers, HttpStatus.OK);
+    }
+
+    // GET count of job seekers registered in the last 30 days
+    @GetMapping("/jobseeker/recent/count")
+    public ResponseEntity<Long> getRecentJobSeekerCount() {
+        return ResponseEntity.ok(jobSeekerService.countJobSeekersFromLast30Days());
+    }
+    
+ // GET count of recruiter registered in the last 30 days
+    @GetMapping("/recruiter/recent/count")
+    public ResponseEntity<Long> countRecentRecruiters() {
+        return ResponseEntity.ok(recruiterService.countRecruitersFromLast30Days());
+    }
+ 
+    //  GET list of recruiter registered in the last 30 days
+    @GetMapping("/recruiter/recent")
+    public ResponseEntity<List<RecruiterDTO>> getRecentRecruiterSummaries() {
+        List<RecruiterDTO> recentRecruiters = recruiterService.getRecentRecruiterSummaries();
+        return new ResponseEntity<>(recentRecruiters, HttpStatus.OK);
+    }
+    
+    // get latest count of job post by recruiter
+    @GetMapping("/jobposts/recent/count")
+    public ResponseEntity<Long> countRecentJobPosts() {
+        return ResponseEntity.ok(jobPostService.countRecentJobPosts());
+    }
 
 }

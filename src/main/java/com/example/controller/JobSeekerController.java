@@ -227,18 +227,7 @@ public class JobSeekerController {
 	    }
 
 		    
-//	 //  GET list of job seekers registered in the last 30 days
-	    @GetMapping("/recent")
-	    public ResponseEntity<List<JobSeekerProfileDto>> getRecentJobSeekerSummaries() {
-	        List<JobSeekerProfileDto> recentJobSeekers = jobSeekerService.getRecentJobSeekerSummaries();
-	        return new ResponseEntity<>(recentJobSeekers, HttpStatus.OK);
-	    }
-
-	    // GET count of job seekers registered in the last 30 days
-	    @GetMapping("/recent/count")
-	    public ResponseEntity<Long> getRecentJobSeekerCount() {
-	        return ResponseEntity.ok(jobSeekerService.countJobSeekersFromLast30Days());
-	    }
+//	
 
 
 

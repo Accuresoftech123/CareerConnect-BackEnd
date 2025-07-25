@@ -219,10 +219,7 @@ public class JobPostController {
         return ResponseEntity.ok(count);
     }
     
-    @GetMapping("/jobposts/recent/count")
-    public ResponseEntity<Long> countRecentJobPosts() {
-        return ResponseEntity.ok(jobPostService.countRecentJobPosts());
-    }
+    
 
 
     

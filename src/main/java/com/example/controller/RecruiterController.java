@@ -96,16 +96,7 @@ private EmailService emailService;
 	    }
 	} 
 
-	 @GetMapping("/recent/count")
-	    public ResponseEntity<Long> countRecentRecruiters() {
-	        return ResponseEntity.ok(recruiterService.countRecruitersFromLast30Days());
-	    }
-	 
-	 @GetMapping("/recent")
-	    public ResponseEntity<List<RecruiterDTO>> getRecentRecruiterSummaries() {
-	        List<RecruiterDTO> recentRecruiters = recruiterService.getRecentRecruiterSummaries();
-	        return new ResponseEntity<>(recentRecruiters, HttpStatus.OK);
-	    }
+	
 	 
 	 //get image and company name
 	 @GetMapping("/profile-image/{id}")

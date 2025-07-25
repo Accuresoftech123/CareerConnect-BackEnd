@@ -53,8 +53,8 @@ public class SecurityConfig {
         	                "/api/jobseekers/forgot-password",
         	                "/api/jobseekers/reset-password",
         	                "/api/jobseekers/send-mobile-otp",
-        	                "api/jobseekers/recent",
-        	                "api/jobseekers/recent/count",
+        	                //"api/jobseekers/recent",
+        	                //"api/jobseekers/recent/count",
         	                
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
@@ -63,8 +63,14 @@ public class SecurityConfig {
         	                
         	                "/api/admin/register",
         	                "/api/admin/login",
-        	                "api/recruiters/recent/count",
-        	                "/api/jobposts/jobposts/recent/count",
+        	                "/api/admin/jobseekers/count",
+        	                "/api/admin/recruiters/count",
+        	                "/api/admin/jobseekers/report",
+        	                //"/api/admin/jobposts/recent/count",
+        	                //"/api/admin/jobseeker/recent",
+        	                //"/api/admin/jobseeker/recent/count",
+        	                //"/api/admin/recruiter/recent",
+        	                //"api/admin/recruiter/recent/count",
         	                
         	                "/api/auth/google-login",
         	                 "api/payments/total-amount",
@@ -82,8 +88,8 @@ public class SecurityConfig {
         	                
         	                "/api/jobseekers/{id}/upload-resume",//for testing 
         	                "/api/jobseekers/getprofile/{id}",//for testing 
-        	                "/api/jobseekers/recent", //testing 
-        	                "/api/recruiters/recent",  //for testing 
+        	                //"/api/jobseekers/recent", //testing 
+        	                //"/api/recruiters/recent",  //for testing 
         	               "/api/recruiters/profile-image/{id}"
         	                ).permitAll()
              // ✅ ✅ ✅ allow preflight OPTIONS requests globally
