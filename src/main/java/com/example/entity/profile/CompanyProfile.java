@@ -26,6 +26,7 @@ public class CompanyProfile {
     private String industryType;
     private String hrContactEmail;
     private String hrContactMobileNumber;
+    private String companyLinkdln;
 
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -157,6 +158,15 @@ public class CompanyProfile {
 			this.hrContactMobileNumber = hrContactMobileNumber;
 		}
 
+		public String getCompanyLinkdln() {
+			return companyLinkdln;
+		}
+
+		public void setCompanyLinkdln(String companyLinkdln) {
+			this.companyLinkdln = companyLinkdln;
+		}
+
+		
 	
     
     

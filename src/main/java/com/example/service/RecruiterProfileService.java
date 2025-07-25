@@ -81,6 +81,7 @@ public class RecruiterProfileService {
         if (companyProfileDto.getFoundingYear() != null && companyProfileDto.getFoundingYear() != 0) companyProfile.setFoundingYear(companyProfileDto.getFoundingYear());
         if (companyProfileDto.getHrContactEmail() != null && !companyProfileDto.getHrContactEmail().isEmpty()) companyProfile.setHrContactEmail(companyProfileDto.getHrContactEmail());
         if (companyProfileDto.getHrContactMobileNumber() != null && !companyProfileDto.getHrContactMobileNumber().isEmpty()) companyProfile.setHrContactMobileNumber(companyProfileDto.getHrContactMobileNumber());
+        if(companyProfileDto.getCompanyLinkdln()!=null && !companyProfileDto.getCompanyLinkdln().isEmpty()) companyProfile.setCompanyLinkdln(companyProfileDto.getCompanyLinkdln()); 
 
         
         

@@ -114,6 +114,7 @@ public class JobPostService {
 
 		return dto;
 	}
+	
 	public List<JobPostDto> getAllJobPostsWithBookmarks(int jobSeekerId) {
 	    List<JobPost> jobPosts = jobPostRepository.findAllByOrderByPostedDateDesc();
 
@@ -543,10 +544,7 @@ public class JobPostService {
 	    }
 
 
-	    
-	    
-	    
-	    
+
 	    
 	    //job post by recruiter
 	    public long getTotalJobPostsByRecruiter(int recruiterId) {

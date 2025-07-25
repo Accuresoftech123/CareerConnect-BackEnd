@@ -63,7 +63,7 @@ public class ResumeParserUtil {
     public static String extractLinkedin(String content) {
         Pattern pattern = Pattern.compile("https?://(www\\.)?linkedin\\.com/in/[a-zA-Z0-9\\-_%]+", Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(content);
-        return matcher.find() ? matcher.group() : "Not found";
+        return matcher.find() ? matcher.group() : "";
     }
 
     public static List<Education> extractEducations(String content) {
