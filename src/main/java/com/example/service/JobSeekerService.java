@@ -9,12 +9,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,8 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
+import com.example.repository.JobSeekerEducationRepository;
+import com.example.repository.JobSeekerExperienceRepository;
 import com.example.exception.UserNotFoundException;
 import com.example.repository.JobSeekerPersonalInfoRepository;
 import com.example.repository.JobSeekerRepository;
@@ -59,6 +63,12 @@ public class JobSeekerService {
 	    
 	    @Autowired
 	    private JobSeekerPersonalInfoRepository personalInfoRepo;
+	    
+	    @Autowired
+	    private JobSeekerEducationRepository educationRepository;
+	    
+	    @Autowired
+	    private JobSeekerExperienceRepository experienceRepository;
 	
 	
 
@@ -173,7 +183,6 @@ public class JobSeekerService {
 	}
 
 	// update jobseeker profile
-
 	public ResponseEntity<?> updateJobSeekerProfile(int id, JobSeekerProfileDto dto, MultipartFile resumeFile,
 			MultipartFile videoFile, MultipartFile imageFile) throws java.io.IOException {
 
@@ -187,17 +196,39 @@ public class JobSeekerService {
 
 		// update registration data
 
-		if (dto.getFullName() != null) {
+		if (dto.getFullName() != null && !dto.getFullName().isEmpty()) {
 			jobSeeker.setFullName(dto.getFullName());
 		}
 
-		if (dto.getMobileNumber() != null) {
+		if (dto.getMobileNumber() != null && !dto.getMobileNumber().isEmpty()) {
 			jobSeeker.setMobileNumber(dto.getMobileNumber());
 		}
 
 		// update personal info
 		JobSeekerPersonalInfoDto personalInfoDto = dto.getPersonalInfo();
+		
+		CompletableFuture<String> resumeFuture = null;
+	    CompletableFuture<String> videoFuture = null;
+	    CompletableFuture<String> imageFuture = null;
+	    
+	    if (resumeFile != null && !resumeFile.isEmpty()) {
+	        resumeFuture = cloudinaryService.uploadFileAsync(resumeFile, "jobseeker/resumes");
+	    }
 
+	    if (videoFile != null && !videoFile.isEmpty()) {
+	        videoFuture = cloudinaryService.uploadFileAsync(videoFile, "jobseeker/videos");
+	    }
+
+	    if (imageFile != null && !imageFile.isEmpty()) {
+	        imageFuture = cloudinaryService.uploadFileAsync(imageFile, "jobseeker/images");
+	    }
+
+	    CompletableFuture.allOf(
+	            resumeFuture != null ? resumeFuture : CompletableFuture.completedFuture(""),
+	            videoFuture != null ? videoFuture : CompletableFuture.completedFuture(""),
+	            imageFuture != null ? imageFuture : CompletableFuture.completedFuture("")
+	    ).join(); 
+	    
 		if (personalInfoDto != null) {
 
 			JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
@@ -223,20 +254,39 @@ public class JobSeekerService {
 			if (personalInfoDto.getCountry() != null && !personalInfoDto.getCountry().isEmpty())
 				personalInfo.setCountry(personalInfoDto.getCountry());
 			try {
-				if (resumeFile != null && !resumeFile.isEmpty()) {
-					String resumeUrl = cloudinaryService.uploadFile(resumeFile, "jobseeker/resumes");
-					personalInfo.setResumeUrl(resumeUrl);
-				}
-
-				if (videoFile != null && !videoFile.isEmpty()) {
-					String videoUrl = cloudinaryService.uploadFile(videoFile, "jobseeker/videos");
-					personalInfo.setIntroVideoUrl(videoUrl);
-				}
-
-				if (imageFile != null && !imageFile.isEmpty()) {
-					String imageUrl = cloudinaryService.uploadFile(imageFile, "jobseeker/images");
-					personalInfo.setProfileImageUrl(imageUrl);
-				}
+				if (resumeFuture != null) {
+		            try {
+						personalInfo.setResumeUrl(resumeFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		        if (videoFuture != null) {
+		            try {
+						personalInfo.setIntroVideoUrl(videoFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
+		        if (imageFuture != null) {
+		            try {
+						personalInfo.setProfileImageUrl(imageFuture.get());
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ExecutionException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+		        }
 			} catch (IOException e) {
 				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
 						.body("File upload failed: " + e.getMessage());
@@ -259,16 +309,31 @@ public class JobSeekerService {
 
 			for (JobSeekerEducationDto num : dto.getEducationList()) {
 
-				Education education = new Education();
+				Education education;
+				
+				 if (num.getId() != 0) {
+			            // Try to fetch existing education record
+			            Optional<Education> existingEdu = educationRepository.findById(num.getId());
+
+			            if (existingEdu.isPresent()) {
+			                education = existingEdu.get();
+			            } else {
+			                // If not found, create new (optional fallback)
+			                education = new Education();
+			            }
+			        } else {
+			            // If no ID is passed, create new
+			            education = new Education();
+			        }
 
 				// create object or save each object of education
-				if (num.getDegree() != null)
+				if (num.getDegree() != null && !num.getDegree().isEmpty())
 					education.setDegree(num.getDegree());
-				if (num.getFieldOfStudy() != null)
+				if (num.getFieldOfStudy() != null && !num.getFieldOfStudy().isEmpty())
 					education.setFieldOfStudy(num.getFieldOfStudy());
-				if (num.getInstitution() != null)
+				if (num.getInstitution() != null && !num.getInstitution().isEmpty())
 					education.setInstitution(num.getInstitution());
-				if (num.getPassingYear() != null && num.getPassingYear() >= 1950) {
+				if (num.getPassingYear() != null && num.getPassingYear() >= 1950 && num.getPassingYear() != 0) {
 					education.setPassingYear(num.getPassingYear());
 				}
 				education.setJobSeeker(jobSeeker);
@@ -294,20 +359,35 @@ public class JobSeekerService {
 			for (JobSeekerExperienceDto num : dto.getExperienceList()) {
 
 				// create object of experience to access the data
-				Experience experience = new Experience();
+				 Experience experience;
 
-				if (num.getJobTitle() != null)
+			        if (num.getId() != 0) {
+			            // Try to fetch existing experience record
+			            Optional<Experience> existingExp = experienceRepository.findById(num.getId());
+
+			            if (existingExp.isPresent()) {
+			                experience = existingExp.get();
+			            } else {
+			                // If not found, create new (optional fallback)
+			                experience = new Experience();
+			            }
+			        } else {
+			            // If no ID is passed, create new
+			            experience = new Experience();
+			        }
+
+				if (num.getJobTitle() != null && !num.getJobTitle().isEmpty())
 					experience.setJobTitle(num.getJobTitle());
-				if (num.getCompanyName() != null)
+				if (num.getCompanyName() != null && !num.getCompanyName().isEmpty())
 					experience.setCompanyName(num.getCompanyName());
-				if (num.getStartDate() != null)
+				if (num.getStartDate() != null )
 					experience.setStartDate(num.getStartDate());
 				if (num.getEndDate() != null) {
 					experience.setEndDate(num.getEndDate());
 				} else {
 					experience.setEndDate(LocalDate.now());
 				}
-				if (num.getKeyResponsibilities() != null)
+				if (num.getKeyResponsibilities() != null && !num.getKeyResponsibilities().isEmpty())
 					experience.setKeyResponsibilities(num.getKeyResponsibilities());
 				experience.setJobSeeker(jobSeeker);
 
@@ -354,11 +434,11 @@ public class JobSeekerService {
 				socialProfile = new SocialProfile();
 			}
 
-			if (socialProfileDto.getLinkedinUrl() != null)
+			if (socialProfileDto.getLinkedinUrl() != null && !socialProfileDto.getLinkedinUrl().isEmpty() )
 				socialProfile.setLinkedinUrl(socialProfileDto.getLinkedinUrl());
-			if (socialProfileDto.getGithubUrl() != null)
+			if (socialProfileDto.getGithubUrl() != null && !socialProfileDto.getGithubUrl().isEmpty())
 				socialProfile.setGithubUrl(socialProfileDto.getGithubUrl());
-			if (socialProfileDto.getPortfolioWebsite() != null)
+			if (socialProfileDto.getPortfolioWebsite() != null && !socialProfileDto.getPortfolioWebsite().isEmpty())
 				socialProfile.setPortfolioWebsite(socialProfileDto.getPortfolioWebsite());
 			socialProfile.setJobSeeker(jobSeeker);
 
@@ -377,13 +457,44 @@ public class JobSeekerService {
 				preferences = new JobPreferences();
 			}
 
-			if (preferencesDto.getDesiredJobTitle() != null)
-				preferences.setDesiredJobTitle(preferencesDto.getDesiredJobTitle());
-			if (preferencesDto.getJobType() != null)
-				preferences.setJobType(preferencesDto.getJobType());
-			if (preferencesDto.getExpectedSalary() != 0)
+			if (preferencesDto.getDesiredJobTitle() != null && !preferencesDto.getDesiredJobTitle().isEmpty()) {
+				
+				List<String> existingDesiredJobTitle = preferences.getDesiredJobTitle();
+				
+				if(existingDesiredJobTitle == null) {
+					existingDesiredJobTitle = new ArrayList<>();
+				}
+				
+				for (String newType : preferencesDto.getDesiredJobTitle()) {
+			        if (newType != null && !existingDesiredJobTitle.contains(newType)) {
+			        	existingDesiredJobTitle.add(newType); // ✅ add only if not already present
+			        }
+			    }
+				preferences.setDesiredJobTitle(existingDesiredJobTitle);
+			}
+				
+			
+			
+			if (preferencesDto.getJobTypes() != null && !preferencesDto.getJobTypes().isEmpty()) {
+				 List<String> existingJobTypes = preferences.getJobTypes();
+		    
+		    if (existingJobTypes == null) {
+		        existingJobTypes = new ArrayList<>();
+		    }
+
+		    for (String newType : preferencesDto.getJobTypes()) {
+		        if (newType != null && !existingJobTypes.contains(newType)) {
+		            existingJobTypes.add(newType); // ✅ add only if not already present
+		        }
+		    }
+
+		    preferences.setJobTypes(existingJobTypes);
+			}
+			
+			
+			if (preferencesDto.getExpectedSalary() != 0 )
 				preferences.setExpectedSalary(preferencesDto.getExpectedSalary());
-			if (preferencesDto.getPreferredLocation() != null)
+			if (preferencesDto.getPreferredLocation() != null && !preferencesDto.getPreferredLocation().isEmpty())
 				preferences.setPreferredLocation(preferencesDto.getPreferredLocation());
 			preferences.setJobSeeker(jobSeeker);
 
@@ -439,7 +550,7 @@ public class JobSeekerService {
 			emptyFields.add("Social Profile");
 
 		if (jobSeeker.getJobPrefeences() != null && jobSeeker.getJobPrefeences().getDesiredJobTitle() != null
-				&& !jobSeeker.getJobPrefeences().getDesiredJobTitle().isBlank())
+				&& !jobSeeker.getJobPrefeences().getDesiredJobTitle().isEmpty())
 			filledFields++;
 		else
 			emptyFields.add("Job Preferences");
@@ -487,6 +598,7 @@ public class JobSeekerService {
 	            .orElseThrow(() -> new RuntimeException("JobSeeker not found with id: " + id));
 
 	        JobSeekerProfileDto dto = new JobSeekerProfileDto();
+	        dto.setId(jobSeeker.getId());
 	        dto.setFullName(jobSeeker.getFullName());
 	        dto.setMobileNumber(jobSeeker.getMobileNumber());
 	        dto.setSkills(jobSeeker.getSkills());
@@ -495,6 +607,7 @@ public class JobSeekerService {
 	        JobSeekerPersonalInfo personalInfo = jobSeeker.getPersonalInfo();
 	        if (personalInfo != null) {
 	            JobSeekerPersonalInfoDto personalInfoDto = new JobSeekerPersonalInfoDto();
+	            personalInfoDto.setFullName(jobSeeker.getFullName());
 	            personalInfoDto.setCity(personalInfo.getCity());
 	            personalInfoDto.setState(personalInfo.getState());
 	            personalInfoDto.setCountry(personalInfo.getCountry());
@@ -509,6 +622,7 @@ public class JobSeekerService {
 	            List<JobSeekerEducationDto> educationDtos = jobSeeker.getEducationList().stream()
 	                .map(edu -> {
 	                    JobSeekerEducationDto edto = new JobSeekerEducationDto();
+	                    edto.setId(edu.getId());
 	                    edto.setDegree(edu.getDegree());
 	                    edto.setFieldOfStudy(edu.getFieldOfStudy());
 	                    edto.setInstitution(edu.getInstitution());
@@ -523,6 +637,7 @@ public class JobSeekerService {
 	            List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
 	                .map(exp -> {
 	                    JobSeekerExperienceDto exdto = new JobSeekerExperienceDto();
+	                    exdto.setId(exp.getId());
 	                    exdto.setJobTitle(exp.getJobTitle());
 	                    exdto.setCompanyName(exp.getCompanyName());
 	                    exdto.setStartDate(exp.getStartDate());
@@ -549,7 +664,7 @@ public class JobSeekerService {
 	            JobSeekerJonPreferencesDto prefDto = new JobSeekerJonPreferencesDto();
 	            prefDto.setDesiredJobTitle(prefs.getDesiredJobTitle());
 	            prefDto.setExpectedSalary(prefs.getExpectedSalary());
-	            prefDto.setJobType(prefs.getJobType());
+	            prefDto.setJobTypes(prefs.getJobTypes());
 	            prefDto.setPreferredLocation(prefs.getPreferredLocation());
 	            dto.setJobPreferences(prefDto);
 	        }

@@ -131,7 +131,7 @@ public class AdminService {
 			if (jobSeeker.getEducationList() != null) {
 				List<JobSeekerEducationDto> educationDtos = jobSeeker
 						.getEducationList().stream().map(edu -> new JobSeekerEducationDto(edu.getDegree(),
-								edu.getFieldOfStudy(), edu.getInstitution(), edu.getPassingYear()))
+								edu.getFieldOfStudy(), edu.getInstitution(), edu.getPassingYear(),edu.getId()))
 						.collect(Collectors.toList());
 				dto.setEducationList(educationDtos);
 			}
@@ -140,7 +140,7 @@ public class AdminService {
 			if (jobSeeker.getExperienceList() != null) {
 				List<JobSeekerExperienceDto> experienceDtos = jobSeeker.getExperienceList().stream()
 						.map(exp -> new JobSeekerExperienceDto(exp.getJobTitle(), exp.getCompanyName(),
-								exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities()))
+								exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities(),exp.getId()))
 						.collect(Collectors.toList());
 				dto.setExperienceList(experienceDtos);
 			}
@@ -158,7 +158,7 @@ public class AdminService {
 			// Job Preferences
 			if (jobSeeker.getJobPrefeences() != null) {
 				JobPreferences pref = jobSeeker.getJobPrefeences();
-				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobType(),
+				dto.setJobPreferences(new JobSeekerJonPreferencesDto(pref.getDesiredJobTitle(), pref.getJobTypes(),
 						pref.getExpectedSalary(), pref.getPreferredLocation()));
 			}
 

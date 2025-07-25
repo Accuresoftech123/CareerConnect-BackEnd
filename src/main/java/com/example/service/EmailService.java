@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -57,6 +58,7 @@ public class EmailService {
 	public static final String EMAIL_NOT_FOUND = "Email not found";
 	public static final String EMAIL_ALREADY_REGISTERED = "Email already registered";
 
+    @Async
 	public void sendOtpMail(String toEmail, String otp) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(toEmail);
@@ -67,6 +69,7 @@ public class EmailService {
 	}
 
 	// OTP Generation function
+	@Async
 	public void generateAndSendOtp(JobSeeker jobSeeker) {
 		// Generate 6-digit OTP
 		String otp = String.valueOf(new Random().nextInt(900000) + 100000);
@@ -139,7 +142,7 @@ public class EmailService {
 	}
 
 	// ====================== Recruiter Email OTP Methods =====================
-
+	@Async
 	public void sendRecruiterOtpMail(String toEmail, String otp) {
 		SimpleMailMessage message = new SimpleMailMessage();
 		message.setTo(toEmail);
@@ -147,7 +150,7 @@ public class EmailService {
 		message.setText("Your OTP is: " + otp + "\nIt will expire in 5 minutes. Please do not share it.");
 		mailSender.send(message);
 	}
-
+@Async
 	public void generateAndSendOtpToRecruiter(Recruiter recruiter) {
 		String otp = String.valueOf(100000 + new Random().nextInt(900000));
 		recruiter.setOtp(otp);

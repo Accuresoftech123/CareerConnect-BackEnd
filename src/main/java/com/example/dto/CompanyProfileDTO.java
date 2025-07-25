@@ -15,6 +15,7 @@ public class CompanyProfileDTO {
 	private String industryType;
 	private String hrContactEmail;
 	private String hrContactMobileNumber;
+	private String companyLinkdln;
 
 	public CompanyProfileDTO() {
 		super();
@@ -142,5 +143,14 @@ public class CompanyProfileDTO {
 		this.hrContactMobileNumber = hrContactMobileNumber;
 	}
 
+	public String getCompanyLinkdln() {
+		return companyLinkdln;
+	}
+
+	public void setCompanyLinkdln(String companyLinkdln) {
+		this.companyLinkdln = companyLinkdln;
+	}
+
+	
 
 }

@@ -60,22 +60,30 @@ public class RecruiterProfileService {
 
         // 2. Proceed with profile creation since email is registered
         Recruiter recruiter = existingRecruiter.get();
-     // Update recruiter details
-      //  recruiter.setCompanyName(dto.getCompanyName());
-        // Handle company profile
-        CompanyProfile companyProfile = recruiter.getCompanyProfile() != null ? 
-            recruiter.getCompanyProfile() : new CompanyProfile();
         
-        companyProfile.setHrName(dto.getCompanyProfile().getHrName());
-        companyProfile.setWebsite(dto.getCompanyProfile().getWebsite());
-        companyProfile.setIndustryType(dto.getCompanyProfile().getIndustryType());
-        companyProfile.setAbout(dto.getCompanyProfile().getAbout());
-        companyProfile.setImg(dto.getCompanyProfile().getImg());
-        companyProfile.setCompanyEmail(dto.getCompanyProfile().getCompanyEmail());
-        companyProfile.setCompanySize(dto.getCompanyProfile().getCompanySize());
-        companyProfile.setFoundingYear(dto.getCompanyProfile().getFoundingYear());
-        companyProfile.setHrContactEmail(dto.getCompanyProfile().getHrContactEmail());
-        companyProfile.setHrContactMobileNumber(dto.getCompanyProfile().getHrContactMobileNumber());
+        // Handle company profile  
+     // Get or create company profile
+        CompanyProfile companyProfile = recruiter.getCompanyProfile();
+        if (companyProfile == null) {
+            companyProfile = new CompanyProfile();
+            companyProfile.setRecruiter(recruiter); // set recruiter only once for new profile
+        }
+
+        // Safely update only non-null fields from DTO
+        CompanyProfileDTO companyProfileDto = dto.getCompanyProfile();
+
+        if (companyProfileDto.getHrName() != null && !companyProfileDto.getHrContactEmail().isEmpty()) companyProfile.setHrName(companyProfileDto.getHrName());
+        if (companyProfileDto.getWebsite() != null && !companyProfileDto.getWebsite().isEmpty()) companyProfile.setWebsite(companyProfileDto.getWebsite());
+        if (companyProfileDto.getIndustryType() != null && !companyProfileDto.getIndustryType().isEmpty()) companyProfile.setIndustryType(companyProfileDto.getIndustryType());
+        if (companyProfileDto.getAbout() != null && !companyProfileDto.getAbout().isEmpty()) companyProfile.setAbout(companyProfileDto.getAbout());
+        if (companyProfileDto.getCompanyEmail() != null && !companyProfileDto.getCompanyEmail().isEmpty()) companyProfile.setCompanyEmail(companyProfileDto.getCompanyEmail());
+        if (companyProfileDto.getCompanySize() != null && !companyProfileDto.getCompanySize().isEmpty()) companyProfile.setCompanySize(companyProfileDto.getCompanySize());
+        if (companyProfileDto.getFoundingYear() != null && companyProfileDto.getFoundingYear() != 0) companyProfile.setFoundingYear(companyProfileDto.getFoundingYear());
+        if (companyProfileDto.getHrContactEmail() != null && !companyProfileDto.getHrContactEmail().isEmpty()) companyProfile.setHrContactEmail(companyProfileDto.getHrContactEmail());
+        if (companyProfileDto.getHrContactMobileNumber() != null && !companyProfileDto.getHrContactMobileNumber().isEmpty()) companyProfile.setHrContactMobileNumber(companyProfileDto.getHrContactMobileNumber());
+        if(companyProfileDto.getCompanyLinkdln()!=null && !companyProfileDto.getCompanyLinkdln().isEmpty()) companyProfile.setCompanyLinkdln(companyProfileDto.getCompanyLinkdln()); 
+
+        
         
      // Upload image to Cloudinary
         try {
@@ -89,17 +97,63 @@ public class RecruiterProfileService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
         companyProfile.setRecruiter(recruiter);
-        recruiter.setCompanyProfile(companyProfile);// Handle locations (clear existing and add new)
-        recruiter.getCompanyLocations().clear();
-        dto.getCompanyLocation().forEach(locationDto -> {
-            CompanyLocation location = new CompanyLocation();
-            location.setCity(locationDto.getCity());
-            location.setState(locationDto.getState());
-            location.setCountry(locationDto.getCountry());
-            location.setAddress(locationDto.getAddress());
-            location.setRecruiter(recruiter);
-            recruiter.getCompanyLocations().add(location);
-        });
+        recruiter.setCompanyProfile(companyProfile);
+        
+        
+//        update company location
+        
+        if(dto.getCompanyLocation() != null) {
+        	
+        	List<CompanyLocation> updatedLocations = recruiter.getCompanyLocations();
+        	//updatedLocations.clear();
+        	
+        	for(CompanyLocationDTO  locDto : dto.getCompanyLocation()) {
+        		
+        		CompanyLocation location;
+        		
+        		if(locDto.getId() != null && locDto.getId() != 0) {
+        			
+        			   // Try to fetch existing location
+                    Optional<CompanyLocation> existingLoc = companyLocationRepository.findById(locDto.getId());
+                    
+                    if (existingLoc.isPresent()) {
+                        location = existingLoc.get();
+                    } else {
+                        // Not found, create new
+                        location = new CompanyLocation();
+                    }
+                } else {
+                    // New location
+                    location = new CompanyLocation();
+                }
+        		
+        		 // Set fields if valid
+                if (locDto.getCity() != null && !locDto.getCity().isEmpty())
+                    location.setCity(locDto.getCity());
+
+                if (locDto.getState() != null && !locDto.getState().isEmpty())
+                    location.setState(locDto.getState());
+
+                if (locDto.getCountry() != null && !locDto.getCountry().isEmpty())
+                    location.setCountry(locDto.getCountry());
+
+                if (locDto.getAddress() != null && !locDto.getAddress().isEmpty())
+                    location.setAddress(locDto.getAddress());
+                
+                if(locDto.getPostalCode() != null && !locDto.getPostalCode().isEmpty()) {
+                	location.setPostalCode(locDto.getPostalCode());
+                }
+
+                location.setRecruiter(recruiter);
+
+                updatedLocations.add(location);
+        		
+        		}
+        	
+        //	recruiter.setCompanyLocations(updatedLocations);
+        	
+        
+        }
 
         recruiterRepository.save(recruiter);
 
@@ -109,11 +163,7 @@ public class RecruiterProfileService {
     }
 
     
-    
-    
-
-    
-    
+      
 
     public RecruiterDTO getRecruiterProfile(Integer recruiterId) {
         Recruiter recruiter = recruiterRepository.findById(recruiterId)

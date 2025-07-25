@@ -4,11 +4,13 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class CloudinaryService {
@@ -28,7 +30,20 @@ public class CloudinaryService {
         ));
     }
 	
+	@Async
+    public CompletableFuture<String> uploadFileAsync(MultipartFile file, String folder) {
+        try {
+            Map<String, Object> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(
+                    "resource_type", "auto",
+                    "folder", folder
+            ));
+            return CompletableFuture.completedFuture(result.get("secure_url").toString());
+        } catch (IOException e) {
+            return CompletableFuture.failedFuture(e);
+        }
+    }
 	
+
 	public String uploadFile(MultipartFile file, String folder) throws IOException
 {
         Map<String, Object> result = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.asMap(

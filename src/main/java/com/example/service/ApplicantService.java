@@ -182,13 +182,13 @@ public class ApplicantService {
         dto.setMobileNumber(jobSeeker.getMobileNumber());
 
         dto.setEducationList(jobSeeker.getEducationList().stream().map(edu -> new JobSeekerEducationDto(edu.getDegree(),edu.getFieldOfStudy(), 
-        		edu.getInstitution(), edu.getPassingYear())).collect(Collectors.toList())
+        		edu.getInstitution(), edu.getPassingYear(),edu.getId())).collect(Collectors.toList())
         );
 
         dto.setExperienceList(
             jobSeeker.getExperienceList().stream()
                 .map(exp -> new JobSeekerExperienceDto(
-                    exp.getJobTitle(), exp.getCompanyName(), exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities()))
+                    exp.getJobTitle(), exp.getCompanyName(), exp.getStartDate(), exp.getEndDate(), exp.getKeyResponsibilities(),exp.getId()))
                 .collect(Collectors.toList())
         );
 

@@ -18,12 +18,15 @@ public class CompanyProfile {
     
 	private String hrName;
     private String website;
+    
+    @Column(length = 5000)
     private String about;
     private int foundingYear;
     private String companySize;
     private String industryType;
     private String hrContactEmail;
     private String hrContactMobileNumber;
+    private String companyLinkdln;
 
 
 	@OneToOne(fetch = FetchType.LAZY)
@@ -155,6 +158,15 @@ public class CompanyProfile {
 			this.hrContactMobileNumber = hrContactMobileNumber;
 		}
 
+		public String getCompanyLinkdln() {
+			return companyLinkdln;
+		}
+
+		public void setCompanyLinkdln(String companyLinkdln) {
+			this.companyLinkdln = companyLinkdln;
+		}
+
+		
 	
     
     

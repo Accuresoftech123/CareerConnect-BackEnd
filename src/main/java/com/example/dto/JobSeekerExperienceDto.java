@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public class JobSeekerExperienceDto {
 
+	private long id;
 	private String jobTitle;
 	private String companyName;
 	private LocalDate startDate;
@@ -14,13 +15,23 @@ public class JobSeekerExperienceDto {
 		// TODO Auto-generated constructor stub
 	}
 	public JobSeekerExperienceDto(String jobTitle, String companyName, LocalDate startDate, LocalDate endDate,
-			String keyResponsibilities) {
+			String keyResponsibilities,long id) {
 		super();
 		this.jobTitle = jobTitle;
 		this.companyName = companyName;
 		this.startDate = startDate;
 		this.endDate = endDate;
 		this.keyResponsibilities = keyResponsibilities;
+		this.id=id;
+	}
+	
+	
+	
+	public long getId() {
+		return id;
+	}
+	public void setId(long id) {
+		this.id = id;
 	}
 	public String getJobTitle() {
 		return jobTitle;

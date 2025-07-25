@@ -8,4 +8,5 @@ import com.example.entity.profile.Education;
 @Repository
 public interface JobSeekerEducationRepository extends JpaRepository<Education, Long>{
 
+	
 }

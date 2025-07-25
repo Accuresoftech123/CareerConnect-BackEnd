@@ -114,6 +114,7 @@ public class JobPostService {
 
 		return dto;
 	}
+	
 	public List<JobPostDto> getAllJobPostsWithBookmarks(int jobSeekerId) {
 	    List<JobPost> jobPosts = jobPostRepository.findAllByOrderByPostedDateDesc();
 
@@ -477,19 +478,21 @@ public class JobPostService {
 	}
 
 //To get count of Todays match Jobpost
-	 public double calculateTotalExperience(int jobSeekerId) {
-	        List<Experience> experiences = experienceRepository.findByJobSeekerId(jobSeekerId);
+	public double calculateTotalExperience(int jobSeekerId) {
+	    List<Experience> experiences = experienceRepository.findByJobSeekerId(jobSeekerId);
 
-	        long totalMonths = experiences.stream()
-	            .mapToLong(exp -> {
-	                LocalDate start = exp.getStartDate();
-	                LocalDate end = exp.getEndDate() != null ? exp.getEndDate() : LocalDate.now();
-	                return Period.between(start, end).toTotalMonths();
-	            })
-	            .sum();
+	    long totalMonths = experiences.stream()
+	        .filter(exp -> exp.getStartDate() != null) // Skip entries with null start date
+	        .mapToLong(exp -> {
+	            LocalDate start = exp.getStartDate();
+	            LocalDate end = exp.getEndDate() != null ? exp.getEndDate() : LocalDate.now();
+	            return Period.between(start, end).toTotalMonths();
+	        })
+	        .sum();
 
-	        return totalMonths / 12.0;
-	    }
+	    return totalMonths / 12.0;
+	}
+
 
 	    public List<JobPost> getTodayJobMatchesListForSeeker(int jobSeekerId) {
 	        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
@@ -544,10 +547,7 @@ public class JobPostService {
 	    }
 
 
-	    
-	    
-	    
-	    
+
 	    
 	    //job post by recruiter
 	    public long getTotalJobPostsByRecruiter(int recruiterId) {
