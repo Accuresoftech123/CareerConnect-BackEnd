@@ -50,9 +50,9 @@ public class SecurityConfig {
         	                "/api/jobseekers/login",
         	                "/api/jobseekers/verify-otp",
         	                "/api/jobseekers/resend-otp",
-        	                "/api/jobseekers/forget-password/{email}",
+        	                "/api/jobseekers/Send-Otp/**",
         	              
-        	                "/api/jobseekers/Set-password/{email}/{newPassword}",
+        	                "/api/jobseekers/Set-password/**",
         	                "/api/jobseekers/send-mobile-otp",
         	                "api/jobseekers/recent",
         	                "api/jobseekers/recent/count",
@@ -60,8 +60,8 @@ public class SecurityConfig {
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
         	                "/api/recruiters/verify-otp",
-        	                "/api/recruiters/send-otp/{email}",
-        	                "/api/recruiters/Set-password/{email}/{newpassword}",
+        	                "/api/recruiters/send-otp/**",
+        	                "/api/recruiters/Set-password/**",
         	                
         	                "/api/admin/register",
         	                "/api/admin/login",

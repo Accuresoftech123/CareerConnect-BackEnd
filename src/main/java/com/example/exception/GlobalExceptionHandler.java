@@ -50,4 +50,10 @@ public class GlobalExceptionHandler {
 	                .status(HttpStatus.INTERNAL_SERVER_ERROR)
 	                .body(Map.of("error", "Something went wrong", "details", ex.getMessage()));
 	    }
+	    //Recruiter Not Found Exception..
+	    @ExceptionHandler(RecruiterNotFoundException.class)
+	    public ResponseEntity<?> handleRecruiterNotFound(RecruiterNotFoundException ex) {
+	        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+	                .body(Map.of("message", ex.getMessage())); // 👈 send JSON response
+	    }
 }

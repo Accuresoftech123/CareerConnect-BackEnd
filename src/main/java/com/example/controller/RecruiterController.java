@@ -118,11 +118,11 @@ public class RecruiterController {
 	public ResponseEntity<?> SendOtp(@PathVariable String email) {
 		Optional<Recruiter> Optionalrecruiter = recruiterRepo.findByEmail(email);
 		if (Optionalrecruiter.isEmpty()) {
-			throw new UserNotFoundException("Admin not registered. Please register first.");
+			throw new UserNotFoundException("Email not registered. Please register first.");
 		}
 		Recruiter recruiter = Optionalrecruiter.get();
 		emailService.generateAndSendOtpToRecruiter(recruiter);
-		return ResponseEntity.ok(Map.of("Massage", "OTP sent successfully!..."));
+		return ResponseEntity.ok(Map.of("message", "OTP sent successfully!..."));
 	}
 
 	// Then Call Verify method
@@ -130,7 +130,7 @@ public class RecruiterController {
 	@PutMapping("/Set-password/{email}/{newpassword}")
 	public ResponseEntity<?> Setpassword(@PathVariable String email, @PathVariable String newpassword) {
 		recruiterService.SetPassword(email, newpassword);
-		return ResponseEntity.ok(Map.of("massage", "Password Reset Sucessfully!.."));
+		return ResponseEntity.ok(Map.of("message", "Password Reset Sucessfully!.."));
 
 	}
 

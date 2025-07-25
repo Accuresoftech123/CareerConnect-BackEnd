@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import com.example.dto.JobSeekerProfileDto;
 import com.example.dto.JobSeekerRegistrationDto;
 import com.example.entity.JobSeeker;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.JobSeekerRepository;
 import com.example.service.EmailService;
 import com.example.service.JobSeekerService;
@@ -33,7 +34,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 
 @RequestMapping("/api/jobseekers")  // Use plural naming for RESTful endpoints
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class JobSeekerController {
 
 	@Autowired
@@ -161,14 +162,15 @@ public class JobSeekerController {
 	    
 
 	    // Forgot Password — Send OTP
-	    @PostMapping("/forget-password/{email}")
+	    @PostMapping("/Send-Otp/{email}")
 	    public ResponseEntity<?> SendOtpToJobSeeker(@PathVariable String email) {
 	    	JobSeeker jobSeeker = repo.findByEmail(email)
-	    		    .orElseThrow(() -> new UsernameNotFoundException("Job seeker not found with email: " + email));
+	    		    .orElseThrow(() -> new UserNotFoundException("Job seeker not found with email: " + email));
 
 	        emailService.generateAndSendOtp(jobSeeker);
 
-	        return ResponseEntity.ok("OTP sent to your registered email!.");
+	        return ResponseEntity.ok(Map.of( "success", true,
+	        	    "message", "OTP sent to your registered email!"));
 	    }
 	    
 
@@ -178,7 +180,7 @@ public class JobSeekerController {
 	    @PutMapping("/Set-password/{email}/{newPassword}")
 	    public ResponseEntity<?> setpassword(@PathVariable String email,@PathVariable String newPassword){
 	    	jobSeekerService.setPassword(email, newPassword);
-	    	return ResponseEntity.ok(Map.of("massage", "Password reset successfully!."));
+	    	return ResponseEntity.ok(Map.of("message", "Password reset successfully!."));
 	    }
 	    //get jobseeker image and name of jobseeker for dashboard
 	    

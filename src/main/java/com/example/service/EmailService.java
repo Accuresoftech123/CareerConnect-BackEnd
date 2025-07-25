@@ -218,16 +218,22 @@ public class EmailService {
 	}
 
 	public void verifyAdminOtp(String email, String enteredOtp) {
-		Admin user = adminRepository.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException("User not registered. Please register first."));
+	    Admin user = adminRepository.findByEmail(email)
+	            .orElseThrow(() -> new UserNotFoundException("User not registered. Please register first."));
 
-		if (!enteredOtp.equals(user.getOtp())) {
-			throw new InvalidOtpException("Incorrect OTP");
-		}
+	    if (!enteredOtp.equals(user.getOtp())) {
+	        throw new InvalidOtpException("Incorrect OTP");
+	    }
 
-		if (user.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
-			throw new OtpExpiredException("OTP has expired. Please request a new one.");
-		}
+	    if (user.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
+	        throw new OtpExpiredException("OTP has expired. Please request a new one.");
+	    }
+
+	    // ✅ Clear OTP and OTP time after successful verification
+	    user.setOtp(null);
+	    user.setOtpGeneratedTime(null);
+	    adminRepository.save(user); // persist the changes
 	}
+
 
 }
