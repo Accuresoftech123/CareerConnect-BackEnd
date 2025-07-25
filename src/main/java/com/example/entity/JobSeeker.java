@@ -10,6 +10,7 @@ import com.example.entity.profile.JobPreferences;
 import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
+import com.example.enums.SubscriptionPlan;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
@@ -22,6 +23,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
@@ -124,6 +126,15 @@ public class JobSeeker {
 	// role of user
 	@Enumerated(EnumType.STRING)
 	private Role role;
+	
+	//subscription plan
+	 @Enumerated(EnumType.STRING)
+	    private SubscriptionPlan subscriptionPlan;
+	 
+	 @OneToOne
+	 @JoinColumn(name = "payment_id") // This will create a foreign key column in JobSeeker table
+	 private Payment payment;
+	 
 
 	public JobSeeker() {
 		super();
@@ -340,6 +351,25 @@ public class JobSeeker {
 	public void setCreatedAt(LocalDateTime createdAt) {
 		this.createdAt = createdAt;
 	}
+
+	public SubscriptionPlan getSubscriptionPlan() {
+		return subscriptionPlan;
+	}
+
+	public void setSubscriptionPlan(SubscriptionPlan subscriptionPlan) {
+		this.subscriptionPlan = subscriptionPlan;
+	}
+
+	public Payment getPayment() {
+		return payment;
+	}
+
+	public void setPayment(Payment payment) {
+		this.payment = payment;
+	}
+	
+	
+	
 	
 	
 	

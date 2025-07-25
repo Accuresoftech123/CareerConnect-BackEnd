@@ -23,10 +23,10 @@ public class Interview {
     @JoinColumn(name = "job_post_id", nullable = false)
     private JobPost jobPost;
     
-    @Column(nullable = false)
+  
     private LocalDateTime interviewDateTime;
     
-    @Column(nullable = false)
+    
     private String round; // Technical round 1, Technical round 2, HR Introduction
     
     private String interviewer;

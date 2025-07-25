@@ -27,6 +27,8 @@ public class Receipt {
     @JoinColumn(name = "job_seeker_id")
     private JobSeeker jobSeeker;
     
+    
+    
    
 	public Receipt() {
 		super();

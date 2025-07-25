@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.dto.PaymentConformDto;
 import com.example.entity.Receipt;
+import com.example.enums.SubscriptionPlan;
 import com.example.repository.PaymentRepository;
 import com.example.service.PaymentService;
 import com.example.service.ReceiptService;
@@ -38,19 +39,25 @@ public class PaymentController {
 	PaymentRepository paymentRepository;
 
     // ✅ 1️⃣ API to Create Razorpay Order (and create Payment record with status CREATED)
-    @PostMapping("/create-order")
-    public ResponseEntity<Map<String, Object>> createOrder(
-            @RequestParam int userId,
-            @RequestParam double amount) {
-        try {
-            Map<String, Object> response = paymentService.createOrder(userId, amount);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Collections.singletonMap("error", "Failed to create order"));
-        }
-    }
+	@PostMapping("/create-order")
+	public ResponseEntity<Map<String, Object>> createOrder(
+	        @RequestParam int userId,
+	        @RequestParam double amount,
+	        @RequestParam String plan) {
+	    try {
+	        SubscriptionPlan subscriptionPlan = SubscriptionPlan.valueOf(plan.toUpperCase());
+
+	        Map<String, Object> response = paymentService.createOrder(userId, amount, subscriptionPlan);
+	        return ResponseEntity.ok(response);
+	    } catch (IllegalArgumentException e) {
+	        return ResponseEntity.badRequest().body(Collections.singletonMap("error", "Invalid plan type"));
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	                .body(Collections.singletonMap("error", "Failed to create order"));
+	    }
+	}
+
 
 
 	 // 📌 Simple Webhook endpoint for Razorpay
