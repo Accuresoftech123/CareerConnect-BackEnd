@@ -5,6 +5,7 @@ import org.springframework.http.MediaType;
 import com.example.dto.JobSeekerProfileDto;
 import com.example.dto.JobSeekerRegistrationDto;
 import com.example.entity.JobSeeker;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.JobSeekerRepository;
 import com.example.service.EmailService;
 import com.example.service.JobSeekerService;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -34,7 +36,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 
 @RequestMapping("/api/jobseekers")  // Use plural naming for RESTful endpoints
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 public class JobSeekerController {
 
 	@Autowired
@@ -163,30 +165,26 @@ public class JobSeekerController {
 	    
 
 	    // Forgot Password — Send OTP
-	    @PostMapping("/forgot-password")
-	    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-	        JobSeeker seeker = repo.findByEmail(email)
-	                .orElseThrow(() -> new RuntimeException("JobSeeker not found"));
+	    @PostMapping("/Send-Otp/{email}")
+	    public ResponseEntity<?> SendOtpToJobSeeker(@PathVariable String email) {
+	    	JobSeeker jobSeeker = repo.findByEmail(email)
+	    		    .orElseThrow(() -> new UserNotFoundException("Job seeker not found with email: " + email));
 
-	        emailService.generateAndSendOtp(seeker);
+	        emailService.generateAndSendOtp(jobSeeker);
 
-	        return ResponseEntity.ok("OTP sent to your registered email.");
+	        return ResponseEntity.ok(Map.of( "success", true,
+	        	    "message", "OTP sent to your registered email!"));
 	    }
 	    
 
-	    @PostMapping("/reset-password")
-	    public ResponseEntity<String> resetPassword(
-	        @RequestParam String email,
-	        @RequestParam String otp,
-	        @RequestParam String newPassword) {
-
-	        boolean isValid = jobSeekerService.validateOtpAndResetPassword(email, otp, newPassword);
-	        if (!isValid) {
-	            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired OTP.");
-	        }
-	        return ResponseEntity.ok("Password reset successfully.");
-	    }
+	  //Then Call Verify otp method
+	    //after Verification Set Password
 	    
+	    @PutMapping("/Set-password/{email}/{newPassword}")
+	    public ResponseEntity<?> setpassword(@PathVariable String email,@PathVariable String newPassword){
+	    	jobSeekerService.setPassword(email, newPassword);
+	    	return ResponseEntity.ok(Map.of("message", "Password reset successfully!."));
+	    }
 	    //get jobseeker image and name of jobseeker for dashboard
 	    
 	    @GetMapping("/get-image-name/{id}")

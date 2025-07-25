@@ -2,8 +2,12 @@ package com.example.controller;
 
 import com.example.dto.AdminLogin;
 import com.example.dto.AdminRegisterDto;
+import com.example.entity.Admin;
 import com.example.enums.Status;
+import com.example.exception.UserNotFoundException;
+import com.example.repository.AdminRepository;
 import com.example.service.AdminService;
+import com.example.service.EmailService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * REST Controller for admin operations such as user and recruiter reporting and
@@ -33,7 +38,12 @@ public class AdminController {
 
 	@Autowired
 	private AdminService adminService;
-
+	
+	@Autowired
+	private EmailService emailService;
+	
+	@Autowired
+	private AdminRepository adminRepository;
 	
 	 @PostMapping("/register")
 	    public ResponseEntity<String> register(@RequestBody AdminRegisterDto request) {
@@ -116,5 +126,30 @@ public class AdminController {
 		}
 
 	}
+	
+	  // 1. Send OTP to email
+	 @PostMapping("/send-otp/{email}")
+	    public ResponseEntity<?> sendOtpToAdmin(@PathVariable String email) {
+	        Optional<Admin> optionalAdmin = adminRepository.findByEmail(email);
+	        if (optionalAdmin.isEmpty()) {
+	            throw new UserNotFoundException("Admin not registered. Please register first.");
+	        }
+
+	        emailService.generateAndSendOtpToAdmin(optionalAdmin.get());
+	        return ResponseEntity.ok(Map.of("message", "OTP has been sent to your email."));
+	    }
+    // 2. Verify OTP
+    @PostMapping("/verify-otp/{email}/{otp}")
+    public ResponseEntity<?> verifyAdminOtp(@PathVariable String email, @PathVariable String otp) {
+    	emailService.verifyAdminOtp(email, otp);
+        return ResponseEntity.ok(Map.of("message", "OTP verified successfully."));
+    }
+
+    // 3. Set Password
+    @PutMapping("/Set-password/{email}/{newPassword}")
+    public ResponseEntity<?> SetAdminPassword(@PathVariable String email, @PathVariable String newPassword) {
+        adminService.resetAdminPassword(email, newPassword);
+        return ResponseEntity.ok(Map.of("message", "Password reset successfully."));
+    }
 
 }

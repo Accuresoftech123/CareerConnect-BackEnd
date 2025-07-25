@@ -517,6 +517,7 @@ public class JobPostService {
 	        );
 	    }
         
+	    @Transactional
 	    public Long getTodayJobMatchesCountForSeeker(int jobSeekerId) {
 	        JobSeeker jobSeeker = jobSeekerRepository.findById(jobSeekerId)
 	            .orElseThrow(() -> new ResourceNotFoundException("Job seeker not found"));
@@ -527,17 +528,19 @@ public class JobPostService {
 	        double totalYears = calculateTotalExperience(jobSeekerId);
 	        int roundedYears = (int) Math.floor(totalYears);
 
-	        LocalDate today = LocalDate.now();
-	        
-	     
-	      
+	        List<String> skills = jobSeeker.getSkills();
+	        if (skills == null || skills.isEmpty()) {
+	            skills = List.of(""); // prevent null list
+	        }
+
 	        return jobPostRepository.countTodayMatches(
-	                today,
-	                personalInfo.getCity().trim(),
-	                jobSeeker.getSkills(),
-	                roundedYears
+	            LocalDate.now(),
+	            personalInfo.getCity().trim(),
+	            skills,
+	            roundedYears
 	        );
 	    }
+
 	    public long countRecentJobPosts() {
 	        LocalDate startDate = LocalDate.now().minusDays(30);
 	        return jobPostRepository.countJobPostsFromLast30Days(startDate);
