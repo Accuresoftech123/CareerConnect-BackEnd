@@ -1,9 +1,11 @@
 package com.example.service;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import com.example.dto.AdminLogin;
 import com.example.dto.AdminRegisterDto;
@@ -35,6 +38,7 @@ import com.example.entity.profile.JobSeekerPersonalInfo;
 import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
 import com.example.enums.Status;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.AdminRepository;
 import com.example.repository.JobSeekerRepository;
 import com.example.repository.RecruiterRepository;
@@ -318,5 +322,16 @@ public class AdminService {
 
 	public void deleteRecruiterById(int id) {
 		recruiterRepository.deleteById(id);
+	}
+	//Forget password
+	
+	public void resetAdminPassword( String email, String newPassword) {
+	    Admin admin = adminRepository.findByEmail(email)
+	        .orElseThrow(() -> new UserNotFoundException("Admin not registered. Please register first."));
+
+	    admin.setPassword(passwordEncoder.encode(newPassword));
+	    admin.setOtp(null); // Invalidate OTP
+	    admin.setOtpGeneratedTime(null);
+	    adminRepository.save(admin);
 	}
 }

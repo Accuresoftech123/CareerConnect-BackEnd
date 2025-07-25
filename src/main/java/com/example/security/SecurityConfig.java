@@ -50,8 +50,9 @@ public class SecurityConfig {
         	                "/api/jobseekers/login",
         	                "/api/jobseekers/verify-otp",
         	                "/api/jobseekers/resend-otp",
-        	                "/api/jobseekers/forgot-password",
-        	                "/api/jobseekers/reset-password",
+        	                "/api/jobseekers/Send-Otp/**",
+        	              
+        	                "/api/jobseekers/Set-password/**",
         	                "/api/jobseekers/send-mobile-otp",
         	                //"api/jobseekers/recent",
         	                //"api/jobseekers/recent/count",
@@ -59,7 +60,8 @@ public class SecurityConfig {
         	                "/api/recruiters/register",
         	                "/api/recruiters/login",
         	                "/api/recruiters/verify-otp",
-        	                
+        	                "/api/recruiters/send-otp/**",
+        	                "/api/recruiters/Set-password/**",
         	                
         	                "/api/admin/register",
         	                "/api/admin/login",
@@ -71,7 +73,10 @@ public class SecurityConfig {
         	                //"/api/admin/jobseeker/recent/count",
         	                //"/api/admin/recruiter/recent",
         	                //"api/admin/recruiter/recent/count",
-        	                
+        	                  "/api/admin/send-otp/{email}",
+        	                "/api/admin/verify-otp/{email}/{otp}",
+        	                "/api/admin/Set-password/{adminId}/{newPassword}",
+
         	                "/api/auth/google-login",
         	                 "api/payments/total-amount",
         	                "/api/jobposts/search",

@@ -38,6 +38,7 @@ import com.example.entity.profile.SocialProfile;
 import com.example.enums.Role;
 import com.example.repository.JobSeekerEducationRepository;
 import com.example.repository.JobSeekerExperienceRepository;
+import com.example.exception.UserNotFoundException;
 import com.example.repository.JobSeekerPersonalInfoRepository;
 import com.example.repository.JobSeekerRepository;
 import com.itextpdf.io.exceptions.IOException;
@@ -568,25 +569,7 @@ public class JobSeekerService {
 
 		return response;
 	}
-	// Forgate password
-	// Validate Otp and reset password
-
-	public boolean validateOtpAndResetPassword(String email, String inputOtp, String newPassword) {
-		JobSeeker seeker = repo.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
-		if (seeker.getOtpGeneratedTime().plusMinutes(5).isBefore(LocalDateTime.now())) {
-			return false;
-		}
-		if (seeker.getOtp().equals(inputOtp)) {
-			seeker.setPassword(passwordEncoder.encode(newPassword));
-			seeker.setOtp(null);
-			seeker.setOtpGeneratedTime(null);
-			repo.save(seeker);
-			return true;
-		}
-		return false;
-
-	}
-
+	
 	// jobseeker get by id personal info
 	public ResponseEntity<?> getJobSeekerImageAndName(int id) {
 		Optional<JobSeeker> optionalJobSeeker = repo.findById(id);
@@ -716,6 +699,15 @@ public class JobSeekerService {
 	public long countJobSeekersFromLast30Days() {
 		LocalDateTime startDate = LocalDateTime.now().minusDays(30);
 		return repo.countJobSeekersRegisteredInLast30Days(startDate);
+	}
+	//Forget Password
+	public void setPassword(String email, String newpassword) {
+		JobSeeker jobseeker=repo.findByEmail(email).orElseThrow(()-> new UserNotFoundException("User Not registerd. Please register first!."));
+		
+		jobseeker.setPassword(passwordEncoder.encode(newpassword));
+	    jobseeker.setOtp(null);
+	    jobseeker.setOtpGeneratedTime(null);
+	    repo.save(jobseeker);
 	}
 
 }
