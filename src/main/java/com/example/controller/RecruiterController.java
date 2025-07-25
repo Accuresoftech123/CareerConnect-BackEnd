@@ -95,23 +95,14 @@ public class RecruiterController {
 		}
 	}
 
-	@GetMapping("/recent/count")
-	public ResponseEntity<Long> countRecentRecruiters() {
-		return ResponseEntity.ok(recruiterService.countRecruitersFromLast30Days());
-	}
-
-	@GetMapping("/recent")
-	public ResponseEntity<List<RecruiterDTO>> getRecentRecruiterSummaries() {
-		List<RecruiterDTO> recentRecruiters = recruiterService.getRecentRecruiterSummaries();
-		return new ResponseEntity<>(recentRecruiters, HttpStatus.OK);
-	}
-
-	// get image and company name
-	@GetMapping("/profile-image/{id}")
-	public ResponseEntity<recruiterProfileImgDto> getRecruiterProfileImage(@PathVariable int id) {
-		recruiterProfileImgDto dto = recruiterService.getRecruiterProfileImage(id);
-		return new ResponseEntity<>(dto, HttpStatus.OK);
-	}
+	
+	 
+	 //get image and company name
+	 @GetMapping("/profile-image/{id}")
+	 public ResponseEntity<recruiterProfileImgDto> getRecruiterProfileImage(@PathVariable int id) {
+	     recruiterProfileImgDto dto = recruiterService.getRecruiterProfileImage(id);
+	     return new ResponseEntity<>(dto, HttpStatus.OK);
+	 }
 
 	// Forget Password
 	@PostMapping("/send-otp/{email}")
